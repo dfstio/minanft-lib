@@ -35,7 +35,7 @@ and verifying data off-chain and on-chain within one hour with easy and intiutiv
 	
 ## Usage:
 ```	
-	import { MinaNFT } from "minanft"; // "minanftjs" for JavaScript
+	import { MinaNFT } from "minanft"; // const { MinaNFT } = require("minanft") for JavaScript
 	import fs from "fs/promises";
 	
 	await MinaNFT.minaInit(); // init Mina network connection
@@ -85,6 +85,9 @@ and verifying data off-chain and on-chain within one hour with easy and intiutiv
 
 ## Website
 https://minanft.io
+
+## Example
+https://github.com/dfstio/minanft-lib-example
 
 ## Faucet 
 https://faucet.minaprotocol.com
