@@ -1,0 +1,29 @@
+{
+  "name": "minanft",
+  "version": "1.0.0",
+  "description": "MinaNFT Typescript/JavaScript integration library",
+  "main": "lib/js/index.js",
+  "module": "lib/ts/index.js",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfstio/minanft-lib.git"
+  },
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
+  "keywords": [
+    "javascript",
+    "typescript",
+    "mina-protocol",
+    "minanft"
+  ],
+  "author": "MinaNFT",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dfstio/minanft-lib/issues"
+  },
+  "homepage": "https://github.com/dfstio/minanft-lib#readme"
+}

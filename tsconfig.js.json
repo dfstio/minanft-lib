@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "declaration": true,
+    "outDir": "./dist/lib/js",
+    "moduleResolution": "node",
+    "lib": ["ES2021", "DOM"]
+  },
+  "include": ["src/**/*"]
+}

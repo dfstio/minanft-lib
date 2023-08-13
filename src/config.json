@@ -1,0 +1,7 @@
+{
+    "MINAURL": "https://proxy.berkeley.minaexplorer.com/graphql",
+    "MINAFEE": "0.1",
+    "MINAEXPLORER": "https://berkeley.minaexplorer.com/wallet/",
+    "MINNFTAPIAUTH": "***********************************************",
+    "MINNFTAPI": "https://************.execute-api.eu-west-1.amazonaws.com/dev/api"
+}
