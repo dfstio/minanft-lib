@@ -6,11 +6,7 @@ and verifying data off-chain and on-chain within one hour with easy and intiutiv
 
 ## Installation
 
-	TypeScript:
-	yarn add minanft
-	
-	JavaScript:
-	yarn add minanftjs
+	yarn add minanft	
 	
 ## Example:
 	yarn test
