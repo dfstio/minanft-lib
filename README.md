@@ -86,6 +86,9 @@ and verifying data off-chain and on-chain within one hour with easy and intiutiv
 ## Website
 https://minanft.io
 
+## Library on NPM
+https://www.npmjs.com/package/minanft
+
 ## Example
 https://github.com/dfstio/minanft-lib-example
 
