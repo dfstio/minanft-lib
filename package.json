@@ -1,6 +1,19 @@
 {
   "name": "minanft",
-  "version": "1.0.4",
+  "description": "MinaNFT TypeScript/JavaScript integration library",
+  "keywords": [
+    "minanft",
+    "NFT",
+    "library",
+    "TypeScript",
+    "mina",
+    "zkapp",
+    "zk",
+    "blockchain",
+    "web3",
+    "zero knowledge"
+  ],
+  "version": "1.0.5",
   "repository": "git@dfstio.github.com:dfstio/minanft-lib.git",
   "main": "src/minanft.ts",
   "author": "dfst.io",
