@@ -1,33 +1,32 @@
 import {
-    Mina,
-    PrivateKey,
-    PublicKey,
-    isReady,
-    Field,
-    fetchAccount,
-    fetchTransactionStatus,
-    TransactionStatus,
-    shutdown,
-    AccountUpdate,
-    SmartContract,
-    state,
-    State,
-    method,
-    Signature,
-    UInt64,
-    DeployArgs,
-    Permissions,
-    Poseidon,
-    Proof,
-    MerkleTree,
-    MerkleMapWitness,
-    Encoding,
-    MerkleWitness,
-    SelfProof,
-    Experimental,
-    verify,
-    MerkleMap,
-} from "snarkyjs"; //TODO: remove unused
+  Mina,
+  PrivateKey,
+  PublicKey,
+  Field,
+  fetchAccount,
+  fetchTransactionStatus,
+  TransactionStatus,
+  shutdown,
+  AccountUpdate,
+  SmartContract,
+  state,
+  State,
+  method,
+  Signature,
+  UInt64,
+  DeployArgs,
+  Permissions,
+  Poseidon,
+  Proof,
+  MerkleTree,
+  MerkleMapWitness,
+  Encoding,
+  MerkleWitness,
+  SelfProof,
+  Experimental,
+  verify,
+  MerkleMap,
+} from "o1js"; //TODO: remove unused
 import { MINAURL } from "./config";
 
 /*
@@ -43,124 +42,123 @@ export class AvatarNFT extends SmartContract {
 */
 
 class MinaNFTfile {
-    metadata: Map<string, string>; // metadata of file
-    root?: Field; // root of Merkle tree with file data
+  metadata: Map<string, string>; // metadata of file
+  root?: Field; // root of Merkle tree with file data
 
-    constructor() {
-        this.metadata = new Map<string, string>();
-    }
+  constructor() {
+    this.metadata = new Map<string, string>();
+  }
 }
 
 class MinaNFTpost {
-    publicData: Map<string, string>;
-    publicFiles?: Map<string, MinaNFTfile>;
-    privateData: Map<string, string>;
-    privateFiles?: Map<string, MinaNFTfile>;
+  publicData: Map<string, string>;
+  publicFiles?: Map<string, MinaNFTfile>;
+  privateData: Map<string, string>;
+  privateFiles?: Map<string, MinaNFTfile>;
 
-    constructor() {
-        this.publicData = new Map<string, string>();
-        this.privateData = new Map<string, string>();
-    }
+  constructor() {
+    this.publicData = new Map<string, string>();
+    this.privateData = new Map<string, string>();
+  }
 }
 
 class MinaNFT {
-    publicData: Map<string, string>; // public data like name, image, description
-    privateData: Map<string, string>;
-    salt?: Field;
-    secret?: Field;
-    publicFiles?: Map<string, MinaNFTfile>; // public files and long text fields like description
-    privateFiles?: Map<string, MinaNFTfile>;
-    posts?: Map<string, MinaNFTpost>;
+  publicData: Map<string, string>; // public data like name, image, description
+  privateData: Map<string, string>;
+  salt?: Field;
+  secret?: Field;
+  publicFiles?: Map<string, MinaNFTfile>; // public files and long text fields like description
+  privateFiles?: Map<string, MinaNFTfile>;
+  posts?: Map<string, MinaNFTpost>;
 
-    constructor() {
-        this.publicData = new Map<string, string>();
-        this.privateData = new Map<string, string>();
-        this.secret = Field.random();
-        this.salt = Field.random();
-    }
+  constructor() {
+    this.publicData = new Map<string, string>();
+    this.privateData = new Map<string, string>();
+    this.secret = Field.random();
+    this.salt = Field.random();
+  }
 
-    public static async minaInit(network: string = MINAURL): Promise<void> {
-        await isReady;
-        const Network = Mina.Network(network);
-        await Mina.setActiveInstance(Network);
-    }
+  public static async minaInit(network: string = MINAURL): Promise<void> {
+    const Network = Mina.Network(network);
+    Mina.setActiveInstance(Network);
+  }
 
-    public async getPublicJson(): Promise<Object | undefined> {
-        if (!this.publicData.get("name") || !this.publicData.get("image"))
-            return undefined;
-        const publicData: MerkleMap = new MerkleMap();
-        Object.keys(this.publicData).map((key) => {
-            const value = this.publicData.get(key);
-            if (value)
-                publicData.set(
-                    MinaNFT.stringToField(key),
-                    MinaNFT.stringToField(value)
-                );
-            else {
-                console.error("Map error");
-                return undefined;
-            }
-        });
-        const publicMapRoot: string = publicData.getRoot().toJSON();
-        return { publicMapRoot, publicData: MinaNFT.mapToJSON(this.publicData) };
-    }
+  public async getPublicJson(): Promise<Object | undefined> {
+    if (!this.publicData.get("name") || !this.publicData.get("image"))
+      return undefined;
+    const publicData: MerkleMap = new MerkleMap();
+    Object.keys(this.publicData).map((key) => {
+      const value = this.publicData.get(key);
+      if (value)
+        publicData.set(
+          MinaNFT.stringToField(key),
+          MinaNFT.stringToField(value)
+        );
+      else {
+        console.error("Map error");
+        return undefined;
+      }
+    });
+    const publicMapRoot: string = publicData.getRoot().toJSON();
+    return { publicMapRoot, publicData: MinaNFT.mapToJSON(this.publicData) };
+  }
 
-    public async getPrivateJson(): Promise<Object | undefined> {
-        if (!this.publicData.get("name") || !this.publicData.get("image"))
-            return undefined;
-        const publicData: MerkleMap = new MerkleMap();
-        Object.keys(this.publicData).map((key) => {
-            const value = this.publicData.get(key);
-            if (value)
-                publicData.set(
-                    MinaNFT.stringToField(key),
-                    MinaNFT.stringToField(value)
-                );
-            else {
-                console.error("Map error");
-                return undefined;
-            }
-        });
-        const publicMapRoot: string = publicData.getRoot().toJSON();
+  public async getPrivateJson(): Promise<Object | undefined> {
+    if (!this.publicData.get("name") || !this.publicData.get("image"))
+      return undefined;
+    const publicData: MerkleMap = new MerkleMap();
+    Object.keys(this.publicData).map((key) => {
+      const value = this.publicData.get(key);
+      if (value)
+        publicData.set(
+          MinaNFT.stringToField(key),
+          MinaNFT.stringToField(value)
+        );
+      else {
+        console.error("Map error");
+        return undefined;
+      }
+    });
+    const publicMapRoot: string = publicData.getRoot().toJSON();
 
-        const privateData: MerkleMap = new MerkleMap();
-        Object.keys(this.privateData).map((key) => {
-            const value = this.publicData.get(key);
-            if (value)
-                privateData.set(
-                    MinaNFT.stringToField(key),
-                    MinaNFT.stringToField(value)
-                );
-            else {
-                console.error("Map error");
-                return undefined;
-            }
-        });
-        const privateMapRoot: string = privateData.getRoot().toJSON();
+    const privateData: MerkleMap = new MerkleMap();
+    Object.keys(this.privateData).map((key) => {
+      const value = this.publicData.get(key);
+      if (value)
+        privateData.set(
+          MinaNFT.stringToField(key),
+          MinaNFT.stringToField(value)
+        );
+      else {
+        console.error("Map error");
+        return undefined;
+      }
+    });
+    const privateMapRoot: string = privateData.getRoot().toJSON();
 
-        return {
-            publicMapRoot,
-            privateMapRoot,
-            secret: this.secret ? this.secret.toJSON() : "",
-            salt: this.salt ? this.salt.toJSON() : "",
-            publicData: MinaNFT.mapToJSON(this.publicData),
-            privateData: MinaNFT.mapToJSON(this.privateData),
-        };
-    }
+    return {
+      publicMapRoot,
+      privateMapRoot,
+      secret: this.secret ? this.secret.toJSON() : "",
+      salt: this.salt ? this.salt.toJSON() : "",
+      publicData: MinaNFT.mapToJSON(this.publicData),
+      privateData: MinaNFT.mapToJSON(this.privateData),
+    };
+  }
 
-    public static stringToField(item: string): Field {
-        return Encoding.stringToFields(item)[0];
-    }
+  public static stringToField(item: string): Field {
+    return Encoding.stringToFields(item)[0];
+  }
 
-    public static mapToJSON(map: Map<string, string>): Object {
-        return Object.fromEntries(map);
-    }
+  public static mapToJSON(map: Map<string, string>): Object {
+    return Object.fromEntries(map);
+  }
 
-    public static mapFromJSON(json: Object): Map<string, string> {
-        const map: Map<string, string> = new Map<string, string>();
-        Object.entries(json).forEach(([key, value]) => map.set(key, value));
-        return map;
-    }
+  public static mapFromJSON(json: Object): Map<string, string> {
+    const map: Map<string, string> = new Map<string, string>();
+    Object.entries(json).forEach(([key, value]) => map.set(key, value));
+    return map;
+  }
 }
 
 export { MinaNFT, MinaNFTfile, MinaNFTpost };
