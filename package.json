@@ -1,10 +1,10 @@
 {
-  "name": "minanft-lib",
-  "version": "1.0.3",
+  "name": "minanft",
+  "version": "1.0.4",
   "repository": "git@dfstio.github.com:dfstio/minanft-lib.git",
   "main": "src/minanft.ts",
-  "author": "Mina NFT",
-  "license": "MIT",
+  "author": "dfst.io",
+  "license": "Apache-2.0",
   "scripts": {
     "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.js.json",
     "archive": "git archive -o lib.zip HEAD",
@@ -17,7 +17,9 @@
     "githubcleartoken": "git config --global --unset credential.helper",
     "checkout": "git checkout -b lib",
     "upgradeinteractive": "yarn upgrade-interactive",
-    "commit": "git commit -a -S -m"
+    "commit": "git commit -a -S -m",
+    "login": "yarn npm login",
+    "publish": "yarn npm publish --access public"
   },
   "dependencies": {
     "axios": "^1.5.1",
