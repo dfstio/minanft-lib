@@ -27,7 +27,9 @@ import {
   verify,
   MerkleMap,
 } from "o1js"; //TODO: remove unused
-import { MinaNFTContract } from "./contract"
+import { MinaNFTContract } from "./contract/minanft"
+import { MinaNFTMap } from "./contract/map"
+import { MinaNFTTree } from "./contract/tree"
 import { MINAURL } from "./config";
 const transactionFee = 100_000_000; // TODO: use current market fees
 
@@ -189,7 +191,11 @@ class MinaNFT {
     if (this.verificationKey !== undefined) {
       return this.verificationKey;
     }
-    console.log("compiling zkapp...");
+    console.log("compiling MinaNFTTree...");
+    await MinaNFTTree.compile();
+    console.log("compiling MinaNFTMap...");
+    await MinaNFTMap.compile();
+    console.log("compiling MinaNFTContract...");
     const { verificationKey } = await MinaNFTContract.compile()
     this.verificationKey = verificationKey as VeificationKey;
     return this.verificationKey

@@ -10,7 +10,7 @@ import {
 
 import { BaseMinaNFTContract } from './base';
 
-export class AvatarNFT extends BaseMinaNFTContract {
+export class MinaNFTContract extends BaseMinaNFTContract {
   @state(Field) name = State<Field>();
   @state(Field) publicMapRoot = State<Field>(); // Merkle root of public key-values Map
   @state(Field) publicFilesRoot = State<Field>(); // Merkle root of public Files Map
