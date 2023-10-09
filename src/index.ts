@@ -1,1 +1,1 @@
-export { MinaNFT, MinaNFTfile, MinaNFTpost } from "./minanft"
+export { MinaNFT } from "./minanft"
