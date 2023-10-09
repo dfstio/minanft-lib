@@ -1,0 +1,60 @@
+{
+  "title": "Asset Metadata",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Identifies the asset to which this NFT represents"
+    },
+    "description": {
+      "type": "string",
+      "description": "Describes the asset to which this NFT represents"
+    },
+    "image": {
+      "type": "string",
+      "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+    },
+    "address": {
+      "type": "string",
+      "description": "The address of the NFT contract"
+    },
+    "public": {
+      "type": "object",
+      "description": "publicly visible data",
+      "properties": {
+        "metadata": [
+          {
+            "key": {
+              "type": "string",
+              "description": "key"
+            },
+            "value": {
+              "type": "string",
+              "description": "value"
+            }
+          }
+        ],
+        "files": [
+          {
+            "name": {
+              "type": "string",
+              "description": "name"
+            },
+            "type": {
+              "type": "string",
+              "description": "type"
+            },
+            "uri": {
+              "type": "string",
+              "description": "uri"
+            }
+          }
+        ]
+      }
+    },
+  },
+  "required": [
+    "name",
+    "image"
+  ]
+}

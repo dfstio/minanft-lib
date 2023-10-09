@@ -5,7 +5,12 @@
     "declaration": true,
     "outDir": "./dist/lib/js",
     "moduleResolution": "node",
-    "lib": ["ES2021", "DOM"]
+    "lib": [
+      "ES2021",
+      "DOM"
+    ]
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ]
 }
