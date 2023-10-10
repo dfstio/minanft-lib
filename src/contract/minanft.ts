@@ -45,7 +45,7 @@ export class MinaNFTContract extends BaseMinaNFTContract {
 
   // Create NFT on the MINA blockchain
 
-  @method createNFT(
+  @method mint(
     name: Field,
     publicMapRoot: Field,
     publicFilesRoot: Field,
@@ -58,8 +58,8 @@ export class MinaNFTContract extends BaseMinaNFTContract {
     this.account.provedState.assertEquals(this.account.provedState.get());
     this.account.provedState.get().assertTrue();
 
-    const usernameOld = this.username.get();
-    this.name.assertEquals(usernameOld);
+    const nameOld = this.name.get();
+    this.name.assertEquals(nameOld);
     this.name.assertEquals(Field(0));
 
     const pwdHashOld = this.pwdHash.get();

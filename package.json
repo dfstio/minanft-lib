@@ -22,7 +22,8 @@
     "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.js.json",
     "archive": "git archive -o lib.zip HEAD",
     "lint": "eslint src/*.ts",
-    "test": "ts-node tests/test.ts",
+    "testold": "ts-node tests/test.ts",
+    "test": "jest",
     "addtest": "ts-node tests/add.ts",
     "rollup": "ts-node tests/rollup.ts",
     "coverage": "jest --coverage",
@@ -41,9 +42,14 @@
     "o1js": "^0.13.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.22.20",
+    "@babel/preset-typescript": "^7.23.0",
+    "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.5",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
+    "babel-jest": "^29.7.0",
     "eslint": "^8.50.0",
     "jest": "^29.7.0",
     "prettier": "3.0.3",
@@ -72,7 +78,10 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "slowTestThreshold": 40,
-    "verbose": true
+    "slowTestThreshold": 1500,
+    "verbose": true,
+    "roots": [
+      "test"
+    ]
   }
 }
