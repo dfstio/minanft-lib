@@ -256,7 +256,6 @@ class MinaNFT {
     const res = await transaction.send()
     const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
     if (Number(blockchainLength) > 100) {
-      console.log("Mina state", blockchainLength);
       //console.log("Transaction sent", res)
       const hash = res.hash();
       if (hash === undefined) {
@@ -331,6 +330,7 @@ class MinaNFT {
     tx.sign([deployer]);
     const sentTx = await tx.send();
     const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
+    console.log("Mina blockchain length:", blockchainLength);
     if (Number(blockchainLength) > 100) {
 
       if (sentTx.hash() !== undefined) {
