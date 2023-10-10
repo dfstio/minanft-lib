@@ -254,17 +254,21 @@ class MinaNFT {
 
     console.log("Sending the deploy transaction...");
     const res = await transaction.send()
-    console.log("Transaction sent", res)
-    const hash = res.hash();
-    if (hash === undefined) {
-      console.log("error sending transaction (see above)");
-    } else {
-      console.log(
-        "See deploy transaction at",
-        "https://berkeley.minaexplorer.com/transaction/" + hash,
-      );
-      console.log("waiting for zkApp account to be deployed...");
-      await res.wait();
+    const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
+    if (Number(blockchainLength) > 100) {
+      console.log("Mina state", blockchainLength);
+      //console.log("Transaction sent", res)
+      const hash = res.hash();
+      if (hash === undefined) {
+        console.log("error sending transaction (see above)");
+      } else {
+        console.log(
+          "See deploy transaction at",
+          "https://berkeley.minaexplorer.com/transaction/" + hash,
+        );
+        console.log("waiting for zkApp account to be deployed...");
+        await res.wait();
+      }
     }
   }
 
@@ -326,17 +330,20 @@ class MinaNFT {
     await tx.prove();
     tx.sign([deployer]);
     const sentTx = await tx.send();
+    const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
+    if (Number(blockchainLength) > 100) {
 
-    if (sentTx.hash() !== undefined) {
-      console.log(`
+      if (sentTx.hash() !== undefined) {
+        console.log(`
     Success! Mint NFT transaction sent.
   
     Your smart contract state will be updated
     as soon as the transaction is included in a block:
     https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
     `);
-      await sentTx.wait();
-    } else console.error("Send fail", sentTx);
+        await sentTx.wait();
+      } else console.error("Send fail", sentTx);
+    }
   }
 
   /*

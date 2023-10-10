@@ -77,15 +77,15 @@ const MinaNFTMap = Experimental.ZkProgram({
 
       method(
         newState: MinaNFTMapState,
-        rollup1proof: SelfProof<MinaNFTMapState, void>,
-        rollup2proof: SelfProof<MinaNFTMapState, void>,
+        proof1: SelfProof<MinaNFTMapState, void>,
+        proof2: SelfProof<MinaNFTMapState, void>,
       ) {
-        rollup1proof.verify();
-        rollup2proof.verify();
+        proof1.verify();
+        proof2.verify();
 
-        rollup2proof.publicInput.initialRoot.assertEquals(rollup1proof.publicInput.latestRoot);
-        rollup1proof.publicInput.initialRoot.assertEquals(newState.initialRoot);
-        rollup2proof.publicInput.latestRoot.assertEquals(newState.latestRoot);
+        proof2.publicInput.initialRoot.assertEquals(proof1.publicInput.latestRoot);
+        proof1.publicInput.initialRoot.assertEquals(newState.initialRoot);
+        proof2.publicInput.latestRoot.assertEquals(newState.latestRoot);
       }
     }
   },

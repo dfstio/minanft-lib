@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { MinaNFT } from "../src/minanft"
+import { Mina } from 'o1js';
 
 beforeAll(() => {
   MinaNFT.minaInit();

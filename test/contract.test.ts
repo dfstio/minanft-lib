@@ -1,16 +1,15 @@
 import { describe, expect, it } from '@jest/globals';
 import { Mina, Field, Poseidon, PrivateKey } from 'o1js';
 import { MinaNFT } from "../src/minanft"
-import { DEPLOYER } from "../env.json"
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined
 
 beforeAll(async () => {
-  const Local = Mina.LocalBlockchain({ proofsEnabled: true });
-  Mina.setActiveInstance(Local);
-  const { privateKey } = Local.testAccounts[0];
+  const Local = Mina.LocalBlockchain({ proofsEnabled: true })
+  Mina.setActiveInstance(Local)
+  const { privateKey } = Local.testAccounts[0]
   deployer = privateKey
   await MinaNFT.compile()
 });
