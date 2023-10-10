@@ -3,34 +3,14 @@ import {
   PrivateKey,
   PublicKey,
   Field,
-  fetchAccount,
-  fetchTransactionStatus,
-  TransactionStatus,
-  shutdown,
   AccountUpdate,
-  SmartContract,
-  state,
-  State,
-  method,
-  Signature,
-  UInt64,
-  DeployArgs,
-  Permissions,
-  Poseidon,
-  Proof,
-  MerkleTree,
-  MerkleMapWitness,
   Encoding,
-  MerkleWitness,
-  SelfProof,
-  Experimental,
-  verify,
-  MerkleMap,
-} from "o1js"; //TODO: remove unused
+  MerkleMap
+} from "o1js";
 import { MinaNFTContract } from "./contract/minanft"
 import { MinaNFTMap } from "./contract/map"
 import { MinaNFTTree } from "./contract/tree"
-import { MINAURL } from "./config";
+
 const transactionFee = 100_000_000; // TODO: use current market fees
 
 interface VeificationKey {
@@ -38,7 +18,7 @@ interface VeificationKey {
   hash: string | Field;
 }
 
-/*
+
 class MinaNFTfile {
   metadata: Map<string, string>; // metadata of file
   root?: Field; // root of Merkle tree with file data
@@ -48,6 +28,7 @@ class MinaNFTfile {
   }
 }
 
+/*
 class MinaNFTpost {
   publicData: Map<string, string>;
   publicFiles?: Map<string, MinaNFTfile>;
@@ -63,52 +44,72 @@ class MinaNFTpost {
 
 class MinaNFT {
   name: string;
-  spaces: Map<string, Field>
-  static verificationKey: VeificationKey | undefined;
-  zkAppPublicKey: PublicKey | undefined;
-  /*
-  publicData: Map<string, string>; // public data like name, image, description
-  privateData: Map<string, string>;
-  salt?: Field;
-  secret?: Field;
-  publicFiles?: Map<string, MinaNFTfile>; // public files and long text fields like description
-  privateFiles?: Map<string, MinaNFTfile>;
-  posts?: Map<string, MinaNFTpost>;
-  */
+  publicData: Map<string, Field> // public data like name, image, description
+  privateData: Map<string, Field> // private data
+  publicFiles?: Map<string, MinaNFTfile> // public files and long text fields like description
+  privateFiles?: Map<string, MinaNFTfile> // private files and long text fields
+  static verificationKey: VeificationKey | undefined
+  zkAppPublicKey: PublicKey | undefined
 
+  /**
+   * Create MinaNFT object
+   * @param name Name of NFT
+   * @param zkAppPublicKey Public key of the deployed NFT zkApp
+   */
   constructor(name: string, zkAppPublicKey: PublicKey | undefined = undefined) {
     this.name = name;
-    this.spaces = new Map<string, Field>();
-    this.zkAppPublicKey = zkAppPublicKey;
-    /*
-    this.publicData = new Map<string, string>();
-    this.privateData = new Map<string, string>();
-    this.secret = Field.random();
-    this.salt = Field.random();
-    */
+    this.zkAppPublicKey = zkAppPublicKey
+    this.publicData = new Map<string, Field>()
+    this.privateData = new Map<string, Field>()
+    // TODO: load the NFT metadata using zkAppPublicKey
   }
 
-  public static async minaInit(network: string = MINAURL): Promise<void> {
-    const Network = Mina.Network(network);
-    Mina.setActiveInstance(Network);
+  /**
+   * Initialize Mina o1js library
+   * @param network Mina network to use. Default is local network
+   */
+  public static minaInit(network: string | undefined = undefined): void {
+    const Network = (network === undefined) ? Mina.LocalBlockchain({ proofsEnabled: true }) : Mina.Network(network)
+    Mina.setActiveInstance(Network)
+    //console.log('o1js is ready')
   }
 
-  public async getSpacesRootAndMap(): Promise<{ root: Field, map: MerkleMap } | undefined> {
-    // check if spaces are empty - there should be at least description and image
-    if (!this.spaces.get("description") || !this.spaces.get("image"))
-      return undefined;
-    const spaces: MerkleMap = new MerkleMap();
-    //console.log("this.spaces", this.spaces)
-    this.spaces.forEach((value: Field, key: string) => {
-      console.log(key, value.toJSON());
-      spaces.set(
+  /**
+   * Calculates a root and MerkleMap of the publicData
+   * @returns Root and MerkleMap of the publicData
+   */
+  public async getPublicMapRootAndMap(): Promise<{ root: Field, map: MerkleMap } | undefined> {
+    // check if publicData is empty - there should be at least image
+    if (!this.publicData.get("image")) return undefined;
+    else return this.getMapRootAndMap(this.publicData)
+  }
+
+  /**
+   * Calculates a root and MerkleMap of the privateData
+   * @returns Root and MerkleMap of the privateData
+   */
+  public async getPrivateMapRootAndMap(): Promise<{ root: Field, map: MerkleMap } | undefined> {
+    return this.getMapRootAndMap(this.privateData)
+  }
+
+  /**
+   * Calculates a root and MerkleMap of the Map
+   * @param data Map to calculate root and MerkleMap
+   * @returns Root and MerkleMap of the Map
+   */
+  private async getMapRootAndMap(data: Map<string, Field>): Promise<{ root: Field, map: MerkleMap } | undefined> {
+    const map: MerkleMap = new MerkleMap();
+    data.forEach((value: Field, key: string) => {
+      //console.log(key, value.toJSON());
+      map.set(
         MinaNFT.stringToField(key),
         value
       );
     });
-    console.log("spaces root", spaces.getRoot())
-    return { root: spaces.getRoot(), map: spaces };
+    //console.log("root", map.getRoot())
+    return { root: map.getRoot(), map };
   }
+
   /*
   public async getPublicJson(): Promise<Object | undefined> {
     if (!this.publicData.get("name") || !this.publicData.get("image"))
@@ -173,20 +174,43 @@ class MinaNFT {
     };
   }
   */
+
+  //TODO: write tests for string convertions and check errors for long strings that do not fit into a Field
+  /**
+   * Converts a string to a Field
+   * @param item string to convert
+   * @returns string as a Field
+   */
   public static stringToField(item: string): Field {
     return Encoding.stringToFields(item)[0]
   }
 
+
+  // TODO: change string to Field in maps
+  /**
+   * Converts a Map to JSON
+   * @param map map to convert
+   * @returns map as JSON object
+   */
   public static mapToJSON(map: Map<string, string>): Object {
     return Object.fromEntries(map)
   }
 
+  /**
+   * Creates a Map from JSON
+   * @param map map to convert
+   * @returns map as JSON object
+   */
   public static mapFromJSON(json: Object): Map<string, string> {
     const map: Map<string, string> = new Map<string, string>()
     Object.entries(json).forEach(([key, value]) => map.set(key, value))
     return map
   }
 
+  /**
+   * Compiles MinaNFT contract (takes a long time)
+   * @returns verification key
+   */
   public static async compile(): Promise<VeificationKey> {
     if (this.verificationKey !== undefined) {
       return this.verificationKey;
@@ -201,6 +225,10 @@ class MinaNFT {
     return this.verificationKey
   }
 
+  /**
+   * Deploys the MinaNFT contract (takes a long time, and compiles the contract if needed)
+   * @param deployer Private key of the account that will deploy the contract
+   */
   public async deploy(deployer: PrivateKey): Promise<void> {
     if (this.zkAppPublicKey !== undefined) {
       console.error("already deployed")
@@ -210,7 +238,7 @@ class MinaNFT {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = PrivateKey.random();
     this.zkAppPublicKey = zkAppPrivateKey.toPublicKey();
-    console.log("using deployer private key with public key", sender.toBase58())
+    console.log("using deployer with public key", sender.toBase58())
     console.log("Deploying zkapp to address", this.zkAppPublicKey.toBase58());
 
     const zkApp = new MinaNFTContract(this.zkAppPublicKey);
@@ -218,7 +246,6 @@ class MinaNFT {
       { sender, fee: transactionFee },
       () => {
         AccountUpdate.fundNewAccount(sender);
-        // NOTE: this calls `init()` if this is the first deploy
         zkApp.deploy({ verificationKey: MinaNFT.verificationKey });
       },
     );
@@ -226,7 +253,8 @@ class MinaNFT {
     transaction.sign([deployer, zkAppPrivateKey]);
 
     console.log("Sending the deploy transaction...");
-    const res = await transaction.send();
+    const res = await transaction.send()
+    console.log("Transaction sent", res)
     const hash = res.hash();
     if (hash === undefined) {
       console.log("error sending transaction (see above)");
@@ -240,7 +268,12 @@ class MinaNFT {
     }
   }
 
-  public async create(deployer: PrivateKey): Promise<void> {
+  /**
+   * Mints an NFT. Deploys and compiles the MinaNFT contract if needed. Takes a long time.
+   * @param deployer Private key of the account that will mint and deploy if necessary the contract
+   * @param pwdHash Hash of the password used to prove transactions
+   */
+  public async mint(deployer: PrivateKey, pwdHash: Field): Promise<void> {
     if (this.zkAppPublicKey === undefined) {
       console.log("deploying NFT contract...")
       await this.deploy(deployer);
@@ -250,19 +283,43 @@ class MinaNFT {
       return
     }
     const zkApp = new MinaNFTContract(this.zkAppPublicKey);
-    console.log("Creating NFT...");
+    console.log("Minting NFT...");
     const sender = deployer.toPublicKey();
-    const spacesRoot = await this.getSpacesRootAndMap();
-    if (spacesRoot === undefined) {
-      console.error("spaces are empty")
+    const publicMapData = await this.getPublicMapRootAndMap();
+    const privateMapData = await this.getPrivateMapRootAndMap();
+    const emptyMap = new MerkleMap(); // TODO: generate map for files
+    const emptyRoot = emptyMap.getRoot();
+    if (publicMapData === undefined || privateMapData === undefined) {
+      console.error("wrong NFT maps data")
       return
     }
-    const { root } = spacesRoot;
-    await MinaNFT.compile();
+    const { root: publicMapRoot } = publicMapData;
+    const { root: privateMapRoot } = privateMapData;
+    await MinaNFT.compile(); // TODO: remove this line
+    /*
+        @method mint(
+          name: Field,
+          publicMapRoot: Field,
+          publicFilesRoot: Field,
+          privateMapRoot: Field,
+          privateFilesRoot: Field,
+          uri1: Field,
+          uri2: Field,
+          pwdHash: Field,
+    */
     const tx = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
-        zkApp.createNFT(MinaNFT.stringToField(this.name), root);
+        zkApp.mint(
+          MinaNFT.stringToField(this.name),
+          publicMapRoot,
+          privateMapRoot,
+          emptyRoot,
+          emptyRoot,
+          MinaNFT.stringToField("ipfs:"),
+          MinaNFT.stringToField("none"),
+          pwdHash
+        );
       },
     );
 
@@ -272,17 +329,18 @@ class MinaNFT {
 
     if (sentTx.hash() !== undefined) {
       console.log(`
-  Success! Create NFT transaction sent.
-
-  Your smart contract state will be updated
-  as soon as the transaction is included in a block:
-  https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
-  `);
+    Success! Mint NFT transaction sent.
+  
+    Your smart contract state will be updated
+    as soon as the transaction is included in a block:
+    https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
+    `);
       await sentTx.wait();
     } else console.error("Send fail", sentTx);
   }
 
-  public async updateSpaces(deployer: PrivateKey): Promise<void> {
+  /*
+  public async updatePublicMap(deployer: PrivateKey): Promise<void> {
     if (this.zkAppPublicKey === undefined) {
       console.error("NFT is not deployed")
       return
@@ -310,16 +368,16 @@ class MinaNFT {
 
     if (sentTx.hash() !== undefined) {
       console.log(`
-  Success! Update NFT Spaces transaction sent.
-
-  Your smart contract state will be updated
-  as soon as the transaction is included in a block:
-  https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
-  `);
+    Success! Update NFT transaction sent.
+  
+    Your smart contract state will be updated
+    as soon as the transaction is included in a block:
+    https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
+    `);
       await sentTx.wait();
     } else console.error("Send fail", sentTx);
   }
-
+  */
 }
 
-export { MinaNFT }
+export { MinaNFT, MinaNFTfile, VeificationKey }
