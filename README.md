@@ -14,7 +14,7 @@ https://lib.minanft.io
 
 ## Example:
 ```
-	 const nft = new MinaNFT('@test')
+    const nft = new MinaNFT('@test')
     nft.publicData.set("description", MinaNFT.stringToField("my nft @test"))
     nft.publicData.set("image", MinaNFT.stringToField("ipfs:Qm..."))
     const secret: Field = Field.random()
