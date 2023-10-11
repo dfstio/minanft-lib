@@ -16,6 +16,16 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
   },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/index.ts"
+    ],
+    "out": "docs",
+    "plugin": [
+      "@mxssfd/typedoc-theme"
+    ],
+    "theme": "my-theme"
+  },
   "include": [
     "src/**/*"
   ],
