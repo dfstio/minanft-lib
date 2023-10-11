@@ -7,32 +7,22 @@ and verifying data off-chain and on-chain within one hour with easy and intiutiv
 ## Installation
 
 	yarn add minanft	
-	
+
+## Documentation
+https://lib.minanft.io
+
+
 ## Example:
-	yarn test
-	/**
-	publicJson {
-		publicMapRoot: '22731122946631793544306773678309960639073656601863129978322145324846701682624',
-		publicData: {
-			name: '@test',
-			description: 'my nft @test',
-			image: 'https/ipfs.io/ipfs/Qm...'
-		}
-	}
-	privateJson {
-		publicMapRoot: '22731122946631793544306773678309960639073656601863129978322145324846701682624',
-		privateMapRoot: '22731122946631793544306773678309960639073656601863129978322145324846701682624',
-		secret: '27316507744649576315264793589997090976505003005329138038060744248453624828573',
-		salt: '28415388566484028622541902066833196068283745836710945290933054341632001313105',
-		publicData: {
-			name: '@test',
-			description: 'my nft @test',
-			image: 'https/ipfs.io/ipfs/Qm...'
-		},
-		privateData: { name: 'cohort2' }
-	}
-	**/
-	
+```
+	 const nft = new MinaNFT('@test')
+    nft.publicData.set("description", MinaNFT.stringToField("my nft @test"))
+    nft.publicData.set("image", MinaNFT.stringToField("ipfs:Qm..."))
+    const secret: Field = Field.random()
+    const pwdHash: Field = Poseidon.hash([secret])
+
+    await nft.mint(deployer, pwdHash)
+```
+
 ## Usage:
 ```	
 	import { MinaNFT } from "minanft"; // const { MinaNFT } = require("minanft") for JavaScript
