@@ -13,7 +13,7 @@ https://lib.minanft.io
 
 
 ## Example:
-```
+```typescript
     const nft = new MinaNFT('@test')
     nft.publicData.set("description", MinaNFT.stringToField("my nft @test"))
     nft.publicData.set("image", MinaNFT.stringToField("ipfs:Qm..."))
