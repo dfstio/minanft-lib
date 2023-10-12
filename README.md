@@ -24,7 +24,7 @@ https://lib.minanft.io
 ```
 
 ## Usage:
-```	
+```	typescript
 	import { MinaNFT } from "minanft"; // const { MinaNFT } = require("minanft") for JavaScript
 	import fs from "fs/promises";
 	
