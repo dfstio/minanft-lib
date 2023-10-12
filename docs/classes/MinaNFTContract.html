@@ -28,6 +28,12 @@
 <li><a href="../modules.html">minanft</a></li>
 <li><a href="MinaNFTContract.html">MinaNFTContract</a></li></ul>
 <h1>Class MinaNFTContract</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>class MinaNFTContract</p>
+<pre><code class="language-mermaid"><span class="hl-1"> </span><span class="hl-7">classDiagram</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">MinaNFT</span><span class="hl-7">{</span><br/><span class="hl-1">      </span><span class="hl-2">name</span><br/><span class="hl-1">      </span><span class="hl-2">publicMapRoot</span><br/><span class="hl-1">      </span><span class="hl-2">publicFilesRoot</span><br/><span class="hl-1">      </span><span class="hl-2">privateMapRoot</span><br/><span class="hl-1">      </span><span class="hl-2">privateFilesRoot</span><br/><span class="hl-1">      </span><span class="hl-2">uri1</span><br/><span class="hl-1">      </span><span class="hl-2">uri2</span><br/><span class="hl-1">      </span><span class="hl-2">pwdHash</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">uri</span><span class="hl-7">{</span><br/><span class="hl-1">      </span><span class="hl-2">storage</span><span class="hl-1"> </span><span class="hl-0">hash</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">PrivateMerkleMap</span><span class="hl-7">{</span><br/><span class="hl-1">      key : </span><span class="hl-2">value</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">PublicMerkleMap</span><span class="hl-7">{</span><br/><span class="hl-1">      key : </span><span class="hl-2">value</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">PublicFiles</span><span class="hl-7">{</span><br/><span class="hl-1">    </span><span class="hl-2">filename</span><br/><span class="hl-1">    </span><span class="hl-2">size</span><br/><span class="hl-1">    </span><span class="hl-2">mime-type</span><br/><span class="hl-1">    </span><span class="hl-2">sha2-256</span><br/><span class="hl-1">    </span><span class="hl-2">sha3-512</span><br/><span class="hl-1">    </span><span class="hl-2">MerkleTree</span><span class="hl-1"> </span><span class="hl-0">root</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">PrivateFiles</span><span class="hl-7">{</span><br/><span class="hl-1">    </span><span class="hl-2">filename</span><br/><span class="hl-1">    </span><span class="hl-2">size</span><br/><span class="hl-1">    </span><span class="hl-2">mime-type</span><br/><span class="hl-1">    </span><span class="hl-2">sha2-256</span><br/><span class="hl-1">    </span><span class="hl-2">sha3-512</span><br/><span class="hl-1">    </span><span class="hl-2">powerToAddPublicData</span><br/><span class="hl-1">    </span><span class="hl-2">powerToAddPublicFiles</span><br/><span class="hl-1">    </span><span class="hl-2">powerToAddPrivateData</span><br/><span class="hl-1">    </span><span class="hl-2">powerToAddPrivateFiles</span><br/><span class="hl-1">    </span><span class="hl-2">powerToChangePassword</span><br/><span class="hl-1">    </span><span class="hl-2">powerToVerify</span><br/><span class="hl-1">    </span><span class="hl-2">MerkleTree</span><span class="hl-1"> </span><span class="hl-0">root</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">PublicFileMerkleTree</span><span class="hl-7">{</span><br/><span class="hl-1">    [file data]</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  </span><span class="hl-7">class</span><span class="hl-1"> </span><span class="hl-6">PrivateFileMerkleTree</span><span class="hl-7">{</span><br/><span class="hl-1">    [file data]</span><br/><span class="hl-1">  </span><span class="hl-7">}</span><br/><span class="hl-1">  MinaNFT &quot;uri1&quot; --&gt; </span><span class="hl-6">uri</span><span class="hl-1"> </span><span class="hl-7">:</span><span class="hl-1"> </span><span class="hl-2">uri1</span><br/><span class="hl-1">  MinaNFT &quot;uri2&quot; --&gt; </span><span class="hl-6">uri</span><span class="hl-1"> </span><span class="hl-7">:</span><span class="hl-1"> </span><span class="hl-2">uri2</span><br/><span class="hl-1">  MinaNFT &quot;publicMapRoot&quot; --&gt; </span><span class="hl-6">PublicMerkleMap</span><span class="hl-1"> </span><span class="hl-7">:</span><span class="hl-1"> </span><span class="hl-2">publicMapRoot</span><br/><span class="hl-1">  MinaNFT &quot;privateMapRoot&quot; --&gt; </span><span class="hl-6">PrivateMerkleMap</span><span class="hl-1"> </span><span class="hl-7">:</span><span class="hl-1"> </span><span class="hl-2">privateMapRoot</span><br/><span class="hl-1">  </span><span class="hl-6">uri</span><span class="hl-1"> </span><span class="hl-7">--&gt;</span><span class="hl-1"> </span><span class="hl-6">IPFS</span><br/><span class="hl-1">  </span><span class="hl-6">uri</span><span class="hl-1"> </span><span class="hl-7">--&gt;</span><span class="hl-1"> </span><span class="hl-6">Arweave</span><br/><span class="hl-1">  PublicFiles &quot;MerkleTree root&quot; --&gt; </span><span class="hl-6">PublicFileMerkleTree</span><span class="hl-1"> </span><span class="hl-7">:</span><span class="hl-1"> </span><span class="hl-2">MerkleTree</span><span class="hl-1"> </span><span class="hl-0">root</span><br/><span class="hl-1">  MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles</span><br/><span class="hl-1">  PrivateFiles &quot;MerkleTree root&quot; --&gt; </span><span class="hl-6">PrivateFileMerkleTree</span><span class="hl-1"> </span><span class="hl-7">:</span><span class="hl-1"> </span><span class="hl-2">MerkleTree</span><span class="hl-1"> </span><span class="hl-0">root</span><br/><span class="hl-1">  MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles   </span>
+</code><button>Copy</button></pre>
+</div>
+<div class="tsd-comment tsd-typography"></div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -35,7 +41,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">MinaNFTContract</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L13">src/contract/minanft.ts:13</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L79">src/contract/minanft.ts:79</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -160,32 +166,32 @@
 <h3 class="tsd-anchor-link"><span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L14">src/contract/minanft.ts:14</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L80">src/contract/minanft.ts:80</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="privateFilesRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>private<wbr/>Files<wbr/>Root</span><a href="#privateFilesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Files<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L18">src/contract/minanft.ts:18</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L84">src/contract/minanft.ts:84</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="privateMapRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>private<wbr/>Map<wbr/>Root</span><a href="#privateMapRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Map<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L17">src/contract/minanft.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L83">src/contract/minanft.ts:83</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="publicFilesRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>public<wbr/>Files<wbr/>Root</span><a href="#publicFilesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Files<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L16">src/contract/minanft.ts:16</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L82">src/contract/minanft.ts:82</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="publicMapRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>public<wbr/>Map<wbr/>Root</span><a href="#publicMapRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Map<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L15">src/contract/minanft.ts:15</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L81">src/contract/minanft.ts:81</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="pwdHash" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>pwd<wbr/>Hash</span><a href="#pwdHash" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">pwd<wbr/>Hash</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L22">src/contract/minanft.ts:22</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L88">src/contract/minanft.ts:88</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="tokenId" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>token<wbr/>Id</span><a href="#tokenId" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">token<wbr/>Id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Field</span></div><aside class="tsd-sources">
@@ -196,12 +202,12 @@
 <h3 class="tsd-anchor-link"><span>uri1</span><a href="#uri1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">uri1</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L20">src/contract/minanft.ts:20</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L86">src/contract/minanft.ts:86</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="uri2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>uri2</span><a href="#uri2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">uri2</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L21">src/contract/minanft.ts:21</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L87">src/contract/minanft.ts:87</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_maxProofsVerified" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>_max<wbr/>Proofs<wbr/>Verified</span><a href="#_maxProofsVerified" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_max<wbr/>Proofs<wbr/>Verified</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">0</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">2</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">1</span></div><aside class="tsd-sources">
@@ -508,7 +514,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h5><span class="tsd-kind-parameter">newsecret</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L119">src/contract/minanft.ts:119</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L185">src/contract/minanft.ts:185</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPrivateFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Private<wbr/>File</span><a href="#checkPrivateFile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -516,7 +522,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L173">src/contract/minanft.ts:173</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L239">src/contract/minanft.ts:239</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPrivateKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Private<wbr/>Key<wbr/>Value</span><a href="#checkPrivateKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -524,7 +530,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L161">src/contract/minanft.ts:161</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L227">src/contract/minanft.ts:227</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPublicFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Public<wbr/>File</span><a href="#checkPublicFile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -532,7 +538,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L167">src/contract/minanft.ts:167</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L233">src/contract/minanft.ts:233</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPublicKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Public<wbr/>Key<wbr/>Value</span><a href="#checkPublicKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -540,7 +546,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L155">src/contract/minanft.ts:155</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L221">src/contract/minanft.ts:221</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="deploy" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>deploy</span><a href="#deploy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -554,7 +560,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Overrides BaseMinaNFTContract.deploy</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L24">src/contract/minanft.ts:24</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L90">src/contract/minanft.ts:90</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="emitEvent" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>emit<wbr/>Event</span><a href="#emitEvent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -619,7 +625,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Overrides BaseMinaNFTContract.init</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L39">src/contract/minanft.ts:39</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L105">src/contract/minanft.ts:105</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="mint-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>mint</span><a href="#mint-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -646,7 +652,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h5><span class="tsd-kind-parameter">pwdHash</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L48">src/contract/minanft.ts:48</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L114">src/contract/minanft.ts:114</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="newSelf" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>new<wbr/>Self</span><a href="#newSelf" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -720,7 +726,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L149">src/contract/minanft.ts:149</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L215">src/contract/minanft.ts:215</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPrivateKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Private<wbr/>Key<wbr/>Value</span><a href="#setPrivateKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -728,7 +734,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L143">src/contract/minanft.ts:143</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L209">src/contract/minanft.ts:209</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPublicFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Public<wbr/>File</span><a href="#setPublicFile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -736,7 +742,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L137">src/contract/minanft.ts:137</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L203">src/contract/minanft.ts:203</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPublicKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Public<wbr/>Key<wbr/>Value</span><a href="#setPublicKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -744,7 +750,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/minanft.ts#L131">src/contract/minanft.ts:131</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/minanft.ts#L197">src/contract/minanft.ts:197</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="setValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span class="deprecated">set<wbr/>Value</span><a href="#setValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -817,7 +823,7 @@ authorization flow.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Inherited from BaseMinaNFTContract.verifyMapProof</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/base.ts#L23">src/contract/base.ts:23</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/base.ts#L23">src/contract/base.ts:23</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyMapWitness" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Map<wbr/>Witness</span><a href="#verifyMapWitness" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -837,7 +843,7 @@ authorization flow.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Inherited from BaseMinaNFTContract.verifyMapWitness</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/base.ts#L17">src/contract/base.ts:17</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/base.ts#L17">src/contract/base.ts:17</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyTreeProof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Tree<wbr/>Proof</span><a href="#verifyTreeProof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -853,7 +859,7 @@ authorization flow.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Inherited from BaseMinaNFTContract.verifyTreeProof</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/base.ts#L35">src/contract/base.ts:35</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/base.ts#L35">src/contract/base.ts:35</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyTreeWitness" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Tree<wbr/>Witness</span><a href="#verifyTreeWitness" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -873,7 +879,7 @@ authorization flow.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Inherited from BaseMinaNFTContract.verifyTreeWitness</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/b1ba679/src/contract/base.ts#L28">src/contract/base.ts:28</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/a514fdb/src/contract/base.ts#L28">src/contract/base.ts:28</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="Proof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>Proof</span><a href="#Proof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -1130,7 +1136,8 @@ a cached verification key can be used.</p>
 <li><a href="MinaNFT.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>MinaNFT</div></a></li>
 <li><a href="MinaNFTContract.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
-<div>MinaNFTContract</div></a></li>
+<div>MinaNFTContract
+<div class="menu-item-desc">class MinaNFTContract ```mermaid</div></div></a></li>
 <li><a href="MinaNFTfile.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>MinaNFTfile</div></a></li>
 <li><a href="../interfaces/VeificationKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>
