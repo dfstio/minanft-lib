@@ -23,6 +23,69 @@ https://lib.minanft.io
     await nft.mint(deployer, pwdHash)
 ```
 
+## NFT on-chain and off-chain data
+```mermaid
+classDiagram
+    class MinaNFT{
+        name
+        publicMapRoot
+        publicFilesRoot
+        privateMapRoot
+        privateFilesRoot
+        uri1
+        uri2
+        pwdHash
+    }
+    class uri{
+        storage hash
+    }
+    class PrivateMerkleMap{
+        key : value
+    }
+    class PublicMerkleMap{
+        key : value
+    }
+    class PublicFiles{
+      filename
+      size
+      mime-type
+      sha2-256
+      sha3-512
+      MerkleTree root
+    }
+    class PrivateFiles{
+      filename
+      size
+      mime-type
+      sha2-256
+      sha3-512
+      powerToAddPublicData
+      powerToAddPublicFiles
+      powerToAddPrivateData
+      powerToAddPrivateFiles
+      powerToChangePassword
+      powerToVerify
+      MerkleTree root
+    }
+    class PublicFileMerkleTree{
+      [file data]
+    }
+    class PrivateFileMerkleTree{
+      [file data]
+    }
+    MinaNFT "uri1" --> uri : uri1
+    MinaNFT "uri2" --> uri : uri2
+    MinaNFT "publicMapRoot" --> PublicMerkleMap : publicMapRoot
+    MinaNFT "privateMapRoot" --> PrivateMerkleMap : privateMapRoot
+    uri --> IPFS
+    uri --> Arweave
+    PublicFiles "MerkleTree root" --> PublicFileMerkleTree : MerkleTree root
+    MinaNFT "publicFilesRoot" --> PublicFiles
+    PrivateFiles "MerkleTree root" --> PrivateFileMerkleTree : MerkleTree root
+    MinaNFT "privateFilesRoot" --> PrivateFiles
+
+```
+
 ## Usage:
 ```	typescript
 	import { MinaNFT } from "minanft"; // const { MinaNFT } = require("minanft") for JavaScript
