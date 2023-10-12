@@ -3429,6 +3429,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-escaper@npm:^3.0.0":
+  version: 3.0.3
+  resolution: "html-escaper@npm:3.0.3"
+  checksum: a2678be42c15d2ef6e629775dac0925a729f4615c6593db8358b9262c7565c4627134987c00f548eb4eb76cbc3b3392f78475cd02b022f8ae7aeb9a88280831b
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -4499,6 +4506,7 @@ __metadata:
     prettier: 3.0.3
     ts-jest: ^29.1.1
     typedoc: ^0.25.2
+    typedoc-plugin-mermaid: ^1.10.0
     typescript: ^5.2.2
   languageName: unknown
   linkType: soft
@@ -5599,6 +5607,17 @@ __metadata:
   version: 0.21.3
   resolution: "type-fest@npm:0.21.3"
   checksum: e6b32a3b3877f04339bae01c193b273c62ba7bfc9e325b8703c4ee1b32dc8fe4ef5dfa54bf78265e069f7667d058e360ae0f37be5af9f153b22382cd55a9afe0
+  languageName: node
+  linkType: hard
+
+"typedoc-plugin-mermaid@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "typedoc-plugin-mermaid@npm:1.10.0"
+  dependencies:
+    html-escaper: ^3.0.0
+  peerDependencies:
+    typedoc: ">=0.23.0"
+  checksum: d5d0e27bb2b94001dbce6439258d9728dc79db5e3b9b00b6f543f26ddda29be1555352bf495f5799c3c3577c28534bb7d5195e63d01c9e1e04fd40e692d52e90
   languageName: node
   linkType: hard
 
