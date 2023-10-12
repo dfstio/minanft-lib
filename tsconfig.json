@@ -22,6 +22,7 @@
     ],
     "out": "docs",
     "plugin": [
+      "typedoc-plugin-mermaid",
       "@mxssfd/typedoc-theme"
     ],
     "theme": "my-theme"

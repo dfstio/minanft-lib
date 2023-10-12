@@ -13,7 +13,7 @@ import { BaseMinaNFTContract } from './base';
 
 /**
  * class MinaNFTContract
- *
+ * 
  * ```mermaid
  *  classDiagram
  *   class MinaNFT{
