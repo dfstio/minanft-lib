@@ -23,7 +23,7 @@ https://lib.minanft.io
     await nft.mint(deployer, pwdHash)
 ```
 
-## NFT on-chain and off-chain data
+## MinaNFT on-chain and off-chain data diagram
 ```mermaid
 classDiagram
     class MinaNFT{
