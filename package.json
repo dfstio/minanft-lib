@@ -28,7 +28,7 @@
     "rollup": "ts-node tests/rollup.ts",
     "coverage": "jest --coverage",
     "style": "prettier --tab-width 4 --write {,!(node_modules)/**/}*.ts",
-    "push": "git status && git push -u originminanftlib master",
+    "push": "git status && git push -u originminanftlib recursive",
     "gitcreate": "git remote add originminanftlib https://github.com/dfstio/minanft-lib",
     "githubcleartoken": "git config --global --unset credential.helper",
     "checkout": "git checkout -b lib",
@@ -36,7 +36,8 @@
     "commit": "git commit -a -S -m",
     "login": "yarn npm login",
     "publish": "yarn npm publish --access public",
-    "docs": "yarn typedoc"
+    "docs": "yarn typedoc",
+    "vscode": "yarn dlx @yarnpkg/sdks vscode"
   },
   "dependencies": {
     "axios": "^1.5.1",

@@ -5,10 +5,12 @@ import {
   Field,
   AccountUpdate,
   Encoding,
-  MerkleMap
+  MerkleMap,
+  Proof,
+  verify
 } from "o1js";
 import { MinaNFTContract } from "./contract/minanft"
-import { MinaNFTMap } from "./contract/map"
+import { MinaNFTMap, MinaNFTMapState, MapUpdate } from "./contract/map"
 import { MinaNFTTree } from "./contract/tree"
 
 const transactionFee = 100_000_000; // TODO: use current market fees
@@ -17,7 +19,6 @@ interface VeificationKey {
   data: string;
   hash: string | Field;
 }
-
 
 class MinaNFTfile {
   metadata: Map<string, string>; // metadata of file
@@ -50,6 +51,10 @@ class MinaNFT {
   privateFiles?: Map<string, MinaNFTfile> // private files and long text fields
   static verificationKey: VeificationKey | undefined
   zkAppPublicKey: PublicKey | undefined
+  static mapVerificationKey?: string
+  static treeVerificationKey?: string
+  publicMapUpdates: MapUpdate[]
+  privateMapUpdates: MapUpdate[]
 
   /**
    * Create MinaNFT object
@@ -61,6 +66,8 @@ class MinaNFT {
     this.zkAppPublicKey = zkAppPublicKey
     this.publicData = new Map<string, Field>()
     this.privateData = new Map<string, Field>()
+    this.publicMapUpdates = []
+    this.privateMapUpdates = []
     // TODO: load the NFT metadata using zkAppPublicKey
   }
 
@@ -75,10 +82,94 @@ class MinaNFT {
   }
 
   /**
+   * updates public MerkleMap with key and value
+   * @param key key to update
+   * @param value value to update
+   */
+  public updatePublicData(key: string, value: Field): void {
+    this.publicMapUpdates.push(this.updateMap(this.publicData, key, value))
+  }
+
+   /**
+   * updates MerkleMap with key and value
+   * @param mapToUpdate map to update
+   * @param keyToUpdate key to update
+   * @param newValue new value
+   * @returns MapUpdate object
+   */
+  private updateMap(mapToUpdate: Map<string, Field>, keyToUpdate: string, newValue: Field): MapUpdate {
+    const { root, map } = this.getMapRootAndMap(mapToUpdate)
+    const key = MinaNFT.stringToField(keyToUpdate)
+    const witness = map.getWitness(key)
+    const currentValue = map.get(key)
+
+    mapToUpdate.set(keyToUpdate, newValue)
+    map.set(key, newValue)
+    const latestRoot = map.getRoot();
+
+    return { 
+      initialRoot: root, 
+      latestRoot, 
+      key, 
+      currentValue, 
+      newValue, 
+      witness } as MapUpdate
+  }
+
+  /**
+   * Commit updates of the MinaNFT to blockchain
+   * Generates recursive proofs for all updates, 
+   * than verify the proof locally and send the transaction to the blockchain
+   * 
+   * @param deployer Private key of the account that will commit the updates
+   */
+  public async commit(deployer: PrivateKey, secret: Field) {
+    if (this.zkAppPublicKey === undefined) {
+      console.error("NFT contract is not deployed")
+      return
+    }
+    await MinaNFT.compile()
+    if(MinaNFT.mapVerificationKey === undefined) { console.error("Compilation error"); return }
+    console.log("Creating proofs for updates...")
+    const proofs: Proof<MinaNFTMapState, void>[] = []
+    for (const update of this.publicMapUpdates) {
+      const state = MinaNFTMapState.create(update)
+      const proof = await MinaNFTMap.create(state, update)
+      proofs.push(proof)
+    }
+    console.log("Merging proofs...")
+    let proof: Proof<MinaNFTMapState, void> = proofs[0]
+    for (let i = 1; i < proofs.length; i++) {
+      const state = MinaNFTMapState.merge(proof.publicInput, proofs[i].publicInput)
+      const mergedProof = await MinaNFTMap.merge(state, proof, proofs[i])
+      proof = mergedProof
+    }
+    console.log('verifying proof:');
+    console.log(proof.publicInput.latestRoot.toString());
+    const verificationResult : boolean = await verify(proof.toJSON(), MinaNFT.mapVerificationKey);
+    console.log('verification result', verificationResult);
+    if( verificationResult === false) { console.error("Verification error"); return }
+
+    console.log("Comitting updates to blockchain...");
+    const sender = deployer.toPublicKey();
+    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    const tx = await Mina.transaction(
+      { sender, fee: transactionFee },
+      () => {
+        zkApp.update(secret, proof);
+      },
+    );
+    await tx.prove();
+    tx.sign([deployer]);
+    const res = await tx.send();
+    await MinaNFT.transactionInfo(res)
+  }
+
+  /**
    * Calculates a root and MerkleMap of the publicData
    * @returns Root and MerkleMap of the publicData
    */
-  public async getPublicMapRootAndMap(): Promise<{ root: Field, map: MerkleMap } | undefined> {
+  public getPublicMapRootAndMap(): { root: Field, map: MerkleMap } | undefined {
     // check if publicData is empty - there should be at least image
     if (!this.publicData.get("image")) return undefined;
     else return this.getMapRootAndMap(this.publicData)
@@ -88,7 +179,7 @@ class MinaNFT {
    * Calculates a root and MerkleMap of the privateData
    * @returns Root and MerkleMap of the privateData
    */
-  public async getPrivateMapRootAndMap(): Promise<{ root: Field, map: MerkleMap } | undefined> {
+  public getPrivateMapRootAndMap(): { root: Field, map: MerkleMap } {
     return this.getMapRootAndMap(this.privateData)
   }
 
@@ -97,7 +188,7 @@ class MinaNFT {
    * @param data Map to calculate root and MerkleMap
    * @returns Root and MerkleMap of the Map
    */
-  private async getMapRootAndMap(data: Map<string, Field>): Promise<{ root: Field, map: MerkleMap } | undefined> {
+  private getMapRootAndMap(data: Map<string, Field>): { root: Field, map: MerkleMap } {
     const map: MerkleMap = new MerkleMap();
     data.forEach((value: Field, key: string) => {
       //console.log(key, value.toJSON());
@@ -215,14 +306,34 @@ class MinaNFT {
     if (this.verificationKey !== undefined) {
       return this.verificationKey;
     }
-    console.log("compiling MinaNFTTree...");
-    await MinaNFTTree.compile();
-    console.log("compiling MinaNFTMap...");
-    await MinaNFTMap.compile();
-    console.log("compiling MinaNFTContract...");
+    console.log("compiling MinaNFTTree...")
+    const { verificationKey : treeKey } = await MinaNFTTree.compile()
+    MinaNFT.treeVerificationKey = treeKey
+    console.log("compiling MinaNFTMap...")
+    const { verificationKey : mapKey } = await MinaNFTMap.compile()
+    MinaNFT.mapVerificationKey = mapKey
+
+    console.log("compiling MinaNFTContract...")
     const { verificationKey } = await MinaNFTContract.compile()
-    this.verificationKey = verificationKey as VeificationKey;
+    this.verificationKey = verificationKey as VeificationKey
     return this.verificationKey
+  }
+
+  private static async transactionInfo(tx: Mina.TransactionId): Promise<void> {
+    const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
+    if (Number(blockchainLength) > 100) {
+
+      if (tx.hash() !== undefined) {
+        console.log(`
+    Success! MinaNFT transaction sent.
+  
+    Your smart contract state will be updated
+    as soon as the transaction is included in a block:
+    https://berkeley.minaexplorer.com/transaction/${tx.hash()}
+    `);
+        await tx.wait();
+      } else console.error("Send fail", tx);
+    }
   }
 
   /**
@@ -252,24 +363,9 @@ class MinaNFT {
     await transaction.prove();
     transaction.sign([deployer, zkAppPrivateKey]);
 
-    console.log("Sending the deploy transaction...");
+    console.log("Sending the deploy transaction...")
     const res = await transaction.send()
-    const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
-    if (Number(blockchainLength) > 100) {
-      console.log("Mina state", blockchainLength);
-      //console.log("Transaction sent", res)
-      const hash = res.hash();
-      if (hash === undefined) {
-        console.log("error sending transaction (see above)");
-      } else {
-        console.log(
-          "See deploy transaction at",
-          "https://berkeley.minaexplorer.com/transaction/" + hash,
-        );
-        console.log("waiting for zkApp account to be deployed...");
-        await res.wait();
-      }
-    }
+    await MinaNFT.transactionInfo(res)
   }
 
   /**
@@ -330,20 +426,7 @@ class MinaNFT {
     await tx.prove();
     tx.sign([deployer]);
     const sentTx = await tx.send();
-    const blockchainLength = Mina.getNetworkState().blockchainLength.toJSON()
-    if (Number(blockchainLength) > 100) {
-
-      if (sentTx.hash() !== undefined) {
-        console.log(`
-    Success! Mint NFT transaction sent.
-  
-    Your smart contract state will be updated
-    as soon as the transaction is included in a block:
-    https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
-    `);
-        await sentTx.wait();
-      } else console.error("Send fail", sentTx);
-    }
+    await MinaNFT.transactionInfo(sentTx)
   }
 
   /*
