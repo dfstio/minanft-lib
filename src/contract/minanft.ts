@@ -6,9 +6,12 @@ import {
   DeployArgs,
   Permissions,
   Poseidon,
+  SmartContract,
+  MerkleMapWitness
 } from "o1js";
 
-import { BaseMinaNFTContract } from './base';
+import { MinaNFTMapProof } from './map'
+import { MinaNFTTreeProof, MerkleWitness10 } from './tree'
 
 
 /**
@@ -76,7 +79,7 @@ import { BaseMinaNFTContract } from './base';
  * ```
  */
 
-export class MinaNFTContract extends BaseMinaNFTContract {
+export class MinaNFTContract extends SmartContract {
   @state(Field) name = State<Field>();
   @state(Field) publicMapRoot = State<Field>(); // Merkle root of public key-values Map
   @state(Field) publicFilesRoot = State<Field>(); // Merkle root of public Files Map
@@ -164,6 +167,43 @@ export class MinaNFTContract extends BaseMinaNFTContract {
     this.uri1.set(uri1);
     this.uri2.set(uri2);
     this.pwdHash.set(pwdHash);
+  }
+
+  @method update(secret: Field, proof: MinaNFTMapProof) {
+    this.account.provedState.assertEquals(this.account.provedState.get());
+    this.account.provedState.get().assertTrue();
+
+    const pwdHash = this.pwdHash.get();
+    this.pwdHash.assertEquals(pwdHash);
+    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+
+    const root = this.publicMapRoot.get()
+    this.verifyMapProof(root, proof)
+
+    this.publicMapRoot.set( proof.publicInput.latestRoot) 
+  }
+
+  @method verifyMapWitness(state: Field, key: Field, value: Field, merkleMapWitness: MerkleMapWitness) {
+    const [witnessRoot, witnessKey] = merkleMapWitness.computeRootAndKey(value)
+    witnessRoot.assertEquals(state)
+    witnessKey.assertEquals(key)
+  }
+
+  @method verifyMapProof(state: Field, minaNFTStateProof: MinaNFTMapProof) {
+    minaNFTStateProof.publicInput.initialRoot.assertEquals(state)
+    minaNFTStateProof.verify()
+  }
+
+  @method verifyTreeWitness(state: Field, index: Field, value: Field, merkleTreeWitness: MerkleWitness10) {
+    const witnessRoot = merkleTreeWitness.calculateRoot(value)
+    const calculatedIndex = merkleTreeWitness.calculateIndex()
+    witnessRoot.assertEquals(state)
+    calculatedIndex.assertEquals(index)
+  }
+
+  @method verifyTreeProof(state: Field, minaNFTTreeProof: MinaNFTTreeProof) {
+    minaNFTTreeProof.publicInput.root.assertEquals(state);
+    minaNFTTreeProof.verify();
   }
 
   // Make a post - TODO rewrite using new merkle roots structure

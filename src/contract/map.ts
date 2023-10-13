@@ -6,28 +6,30 @@ import {
   MerkleMapWitness,
 } from 'o1js';
 
+class MapUpdate extends Struct ({
+  initialRoot: Field,
+  latestRoot: Field,
+  key: Field,
+  currentValue: Field,
+  newValue: Field,
+  witness: MerkleMapWitness
+}) {}
+
 class MinaNFTMapState extends Struct({
   initialRoot: Field,
   latestRoot: Field,
 }) {
 
-  static create(
-    initialRoot: Field,
-    latestRoot: Field,
-    key: Field,
-    currentValue: Field,
-    newValue: Field,
-    merkleMapWitness: MerkleMapWitness,
-  ) {
-    const [witnessRootBefore, witnessKey] = merkleMapWitness.computeRootAndKey(currentValue);
-    initialRoot.assertEquals(witnessRootBefore);
-    witnessKey.assertEquals(key);
-    const [witnessRootAfter, _] = merkleMapWitness.computeRootAndKey(newValue);
-    latestRoot.assertEquals(witnessRootAfter);
+  static create( update: MapUpdate) {
+    const [witnessRootBefore, witnessKey] = update.witness.computeRootAndKey(update.currentValue);
+    update.initialRoot.assertEquals(witnessRootBefore);
+    witnessKey.assertEquals(update.key);
+    const [witnessRootAfter, _] = update.witness.computeRootAndKey(update.newValue);
+    update.latestRoot.assertEquals(witnessRootAfter);
 
     return new MinaNFTMapState({
-      initialRoot,
-      latestRoot
+      initialRoot: update.initialRoot,
+      latestRoot: update.latestRoot
     });
   }
 
@@ -49,25 +51,13 @@ const MinaNFTMap = Experimental.ZkProgram({
 
   methods: {
     create: {
-      privateInputs: [Field, Field, Field, Field, Field, MerkleMapWitness],
+      privateInputs: [MapUpdate],
 
       method(
         state: MinaNFTMapState,
-        initialRoot: Field,
-        latestRoot: Field,
-        key: Field,
-        currentValue: Field,
-        newValue: Field,
-        merkleMapWitness: MerkleMapWitness
+        update: MapUpdate
       ) {
-        const computedState = MinaNFTMapState.create(
-          initialRoot,
-          latestRoot,
-          key,
-          currentValue,
-          newValue,
-          merkleMapWitness
-        );
+        const computedState = MinaNFTMapState.create( update )
         MinaNFTMapState.assertEquals(computedState, state);
       }
     },
@@ -94,4 +84,4 @@ const MinaNFTMap = Experimental.ZkProgram({
 const MinaNFTMapProofClass = Experimental.ZkProgram.Proof(MinaNFTMap);
 class MinaNFTMapProof extends MinaNFTMapProofClass { }
 
-export { MinaNFTMap, MinaNFTMapProof, MinaNFTMapState }
+export { MinaNFTMap, MinaNFTMapProof, MinaNFTMapState, MapUpdate }

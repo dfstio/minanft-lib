@@ -1,3 +1,4 @@
+/*
 import {
   Field,
   MerkleMapWitness,
@@ -39,3 +40,4 @@ class BaseMinaNFTContract extends SmartContract {
 }
 
 export { BaseMinaNFTContract }
+*/
