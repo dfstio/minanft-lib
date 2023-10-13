@@ -198,32 +198,35 @@ export class MinaNFTContract extends SmartContract {
     this.privateMapRoot.set( proof.publicInput.latestRoot) 
   }
 
-
+/*
   @method verifyMapWitness(state: Field, key: Field, value: Field, merkleMapWitness: MerkleMapWitness) {
     const [witnessRoot, witnessKey] = merkleMapWitness.computeRootAndKey(value)
     witnessRoot.assertEquals(state)
     witnessKey.assertEquals(key)
   }
+*/
 
   @method verifyMapProof(state: Field, minaNFTStateProof: MinaNFTMapProof) {
     minaNFTStateProof.publicInput.initialRoot.assertEquals(state)
     minaNFTStateProof.verify()
   }
 
+  /*
   @method verifyTreeWitness(state: Field, index: Field, value: Field, merkleTreeWitness: MerkleWitness10) {
     const witnessRoot = merkleTreeWitness.calculateRoot(value)
     const calculatedIndex = merkleTreeWitness.calculateIndex()
     witnessRoot.assertEquals(state)
     calculatedIndex.assertEquals(index)
   }
+ */
 
   @method verifyTreeProof(state: Field, minaNFTTreeProof: MinaNFTTreeProof) {
     minaNFTTreeProof.publicInput.root.assertEquals(state);
     minaNFTTreeProof.verify();
   }
-
+/*
   // Make a post - TODO rewrite using new merkle roots structure
-  /*
+  
     @method post(salt: Field, secret: Field, postsRoot: Field) {
         this.account.provedState.assertEquals(this.account.provedState.get());
         this.account.provedState.get().assertTrue();
@@ -235,7 +238,7 @@ export class MinaNFTContract extends SmartContract {
         // TODO add checks and proofs
         this.postsRoot.set(postsRoot);
     }
-    */
+    
 
   // Change password
   @method changePassword(salt: Field, secret: Field, newsecret: Field) {
@@ -297,7 +300,7 @@ export class MinaNFTContract extends SmartContract {
     this.account.provedState.get().assertTrue();
   }
 
-  /*
+
     // put NFT to escrow before the transfer in case NFT is sold for fiat money
     // TODO - rewrite using privateMapRoot
     @method toEscrow(secret: Field, escrowhash: Field) {

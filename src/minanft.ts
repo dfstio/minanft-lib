@@ -334,8 +334,18 @@ class MinaNFT {
     if (this.verificationKey !== undefined) {
       return this.verificationKey;
     }
+
+    let methods =  MinaNFTTree.analyzeMethods()
+    for( const method of methods) { console.log("MinaNFTtree rows:", method.rows) }
+    methods =  MinaNFTMap.analyzeMethods()
+    for( const method of methods) { console.log("MinaNFTMap rows:", method.rows) }
+    const methods1 =  MinaNFTContract.analyzeMethods()
+    //console.log("MinaNFTContract rows:", methods)
+    console.log("MinaNFTContract rows:", methods1)
+
     console.log("compiling MinaNFTTree...")
     const { verificationKey : treeKey } = await MinaNFTTree.compile()
+    console.log("Tree", MinaNFTTree.analyzeMethods())
     MinaNFT.treeVerificationKey = treeKey
     console.log("compiling MinaNFTMap...")
     const { verificationKey : mapKey } = await MinaNFTMap.compile()
