@@ -130,6 +130,9 @@ class MinaNFT {
     }
     await MinaNFT.compile()
     if(MinaNFT.mapVerificationKey === undefined) { console.error("Compilation error"); return }
+    const proof: Proof<MinaNFTMapState, void> = await MinaNFT.generateProof(this.publicMapUpdates, MinaNFT.mapVerificationKey)  
+    
+    /*
     console.log("Creating proofs for updates...")
     const proofs: Proof<MinaNFTMapState, void>[] = []
     for (const update of this.publicMapUpdates) {
@@ -149,14 +152,14 @@ class MinaNFT {
     const verificationResult : boolean = await verify(proof.toJSON(), MinaNFT.mapVerificationKey);
     console.log('verification result', verificationResult);
     if( verificationResult === false) { console.error("Verification error"); return }
-
-    console.log("Comitting updates to blockchain...");
+    */
+    console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTContract(this.zkAppPublicKey);
     const tx = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
-        zkApp.update(secret, proof);
+        zkApp.updatePublicMap(secret, proof);
       },
     );
     await tx.prove();
@@ -164,6 +167,31 @@ class MinaNFT {
     const res = await tx.send();
     await MinaNFT.transactionInfo(res)
   }
+
+  private static async generateProof(updates: MapUpdate[], verificationKey: string): Promise<Proof<MinaNFTMapState, void>> {
+    console.log("Creating proofs for updates...")
+    const proofs: Proof<MinaNFTMapState, void>[] = []
+    for (const update of updates) {
+      const state = MinaNFTMapState.create(update)
+      const proof = await MinaNFTMap.create(state, update)
+      proofs.push(proof)
+    }
+    console.log("Merging proofs...")
+    let proof: Proof<MinaNFTMapState, void> = proofs[0]
+    for (let i = 1; i < proofs.length; i++) {
+      const state = MinaNFTMapState.merge(proof.publicInput, proofs[i].publicInput)
+      const mergedProof = await MinaNFTMap.merge(state, proof, proofs[i])
+      proof = mergedProof
+    }
+    console.log('verifying proof:');
+    console.log(proof.publicInput.latestRoot.toString());
+    const verificationResult : boolean = await verify(proof.toJSON(), verificationKey);
+    console.log('verification result', verificationResult);
+    if( verificationResult === false) { console.error("Verification error"); }
+
+    return proof
+  }
+
 
   /**
    * Calculates a root and MerkleMap of the publicData
@@ -306,8 +334,18 @@ class MinaNFT {
     if (this.verificationKey !== undefined) {
       return this.verificationKey;
     }
+
+    let methods =  MinaNFTTree.analyzeMethods()
+    for( const method of methods) { console.log("MinaNFTtree rows:", method.rows) }
+    methods =  MinaNFTMap.analyzeMethods()
+    for( const method of methods) { console.log("MinaNFTMap rows:", method.rows) }
+    const methods1 =  MinaNFTContract.analyzeMethods()
+    //console.log("MinaNFTContract rows:", methods)
+    console.log("MinaNFTContract rows:", methods1)
+
     console.log("compiling MinaNFTTree...")
     const { verificationKey : treeKey } = await MinaNFTTree.compile()
+    console.log("Tree", MinaNFTTree.analyzeMethods())
     MinaNFT.treeVerificationKey = treeKey
     console.log("compiling MinaNFTMap...")
     const { verificationKey : mapKey } = await MinaNFTMap.compile()
