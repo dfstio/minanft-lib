@@ -249,11 +249,11 @@ classDiagram
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
-<li><span class="tsd-signature-type ">BaseMinaNFTContract</span>
+<li><span class="tsd-signature-type ">SmartContract</span>
 <ul class="tsd-hierarchy">
 <li><span class="target">MinaNFTContract</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L79">src/contract/minanft.ts:79</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L82">src/contract/minanft.ts:82</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -318,10 +318,11 @@ classDiagram
 <a href="MinaNFTContract.html#setValue" class="tsd-index-link deprecated tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Value</span></a>
 <a href="MinaNFTContract.html#sign" class="tsd-index-link deprecated tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>sign</span></a>
 <a href="MinaNFTContract.html#skipAuthorization" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>skip<wbr/>Authorization</span></a>
-<a href="MinaNFTContract.html#verifyMapProof" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Proof</span></a>
-<a href="MinaNFTContract.html#verifyMapWitness" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Witness</span></a>
-<a href="MinaNFTContract.html#verifyTreeProof" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Proof</span></a>
-<a href="MinaNFTContract.html#verifyTreeWitness" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Witness</span></a>
+<a href="MinaNFTContract.html#update" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update</span></a>
+<a href="MinaNFTContract.html#verifyMapProof" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Proof</span></a>
+<a href="MinaNFTContract.html#verifyMapWitness" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Witness</span></a>
+<a href="MinaNFTContract.html#verifyTreeProof" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Proof</span></a>
+<a href="MinaNFTContract.html#verifyTreeWitness" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Witness</span></a>
 <a href="MinaNFTContract.html#Proof" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>Proof</span></a>
 <a href="MinaNFTContract.html#analyzeMethods" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>analyze<wbr/>Methods</span></a>
 <a href="MinaNFTContract.html#compile" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>compile</span></a>
@@ -343,7 +344,7 @@ classDiagram
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">tokenId</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="MinaNFTContract.html" class="tsd-signature-type tsd-kind-class">MinaNFTContract</a></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.constructor</p>
+<p>Inherited from SmartContract.constructor</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:121</li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -351,13 +352,13 @@ classDiagram
 <section class="tsd-panel tsd-member tsd-is-private tsd-is-inherited tsd-is-external"><a id="_private" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>#private</span><a href="#_private" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">#private</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.#private</p>
+<p>Inherited from SmartContract.#private</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:45</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="address" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>address</span><a href="#address" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">PublicKey</span></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.address</p>
+<p>Inherited from SmartContract.address</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:46</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="events" class="tsd-anchor"></a>
@@ -371,59 +372,59 @@ classDiagram
 <li class="tsd-parameter-index-signature">
 <h5><span class="tsd-signature-symbol">[</span><span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type ">FlexibleProvablePure</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.events</p>
+<p>Inherited from SmartContract.events</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:303</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="name" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L80">src/contract/minanft.ts:80</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L83">src/contract/minanft.ts:83</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="privateFilesRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>private<wbr/>Files<wbr/>Root</span><a href="#privateFilesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Files<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L84">src/contract/minanft.ts:84</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L87">src/contract/minanft.ts:87</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="privateMapRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>private<wbr/>Map<wbr/>Root</span><a href="#privateMapRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Map<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L83">src/contract/minanft.ts:83</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L86">src/contract/minanft.ts:86</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="publicFilesRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>public<wbr/>Files<wbr/>Root</span><a href="#publicFilesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Files<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L82">src/contract/minanft.ts:82</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L85">src/contract/minanft.ts:85</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="publicMapRoot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>public<wbr/>Map<wbr/>Root</span><a href="#publicMapRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Map<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L81">src/contract/minanft.ts:81</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L84">src/contract/minanft.ts:84</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="pwdHash" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>pwd<wbr/>Hash</span><a href="#pwdHash" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">pwd<wbr/>Hash</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L88">src/contract/minanft.ts:88</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L91">src/contract/minanft.ts:91</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="tokenId" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>token<wbr/>Id</span><a href="#tokenId" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">token<wbr/>Id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Field</span></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.tokenId</p>
+<p>Inherited from SmartContract.tokenId</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:47</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="uri1" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>uri1</span><a href="#uri1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">uri1</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L86">src/contract/minanft.ts:86</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L89">src/contract/minanft.ts:89</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="uri2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>uri2</span><a href="#uri2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">uri2</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L87">src/contract/minanft.ts:87</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L90">src/contract/minanft.ts:90</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_maxProofsVerified" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>_max<wbr/>Proofs<wbr/>Verified</span><a href="#_maxProofsVerified" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_max<wbr/>Proofs<wbr/>Verified</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">0</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">2</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">1</span></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract._maxProofsVerified</p>
+<p>Inherited from SmartContract._maxProofsVerified</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:57</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_methodMetadata" class="tsd-anchor"></a>
@@ -442,19 +443,19 @@ classDiagram
 <h5><span class="tsd-kind-property">has<wbr/>Return</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5></li>
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">rows</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li></ul></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract._methodMetadata</p>
+<p>Inherited from SmartContract._methodMetadata</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:49</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_methods" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>_methods</span><a href="#_methods" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_methods</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">MethodInterface</span><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract._methods</p>
+<p>Inherited from SmartContract._methods</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:48</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_provers" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>_provers</span><a href="#_provers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_provers</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">Prover</span><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract._provers</p>
+<p>Inherited from SmartContract._provers</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:56</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_verificationKey" class="tsd-anchor"></a>
@@ -467,7 +468,7 @@ classDiagram
 <h5><span class="tsd-kind-property">data</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5></li>
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">hash</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Field</span></h5></li></ul></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract._verificationKey</p>
+<p>Inherited from SmartContract._verificationKey</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:58</li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -481,7 +482,7 @@ classDiagram
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Account</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.account</p>
+<p>Inherited from SmartContract.account</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:228</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="balance" class="tsd-anchor"></a>
@@ -520,7 +521,7 @@ classDiagram
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:298</li></ul></aside></li></ul></li></ul>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.balance</p>
+<p>Inherited from SmartContract.balance</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:296</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="currentSlot" class="tsd-anchor"></a>
@@ -534,7 +535,7 @@ or <code>assertEquals()</code> (confusing, because the developer can&#39;t know 
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">CurrentSlot</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.currentSlot</p>
+<p>Inherited from SmartContract.currentSlot</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:238</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="network" class="tsd-anchor"></a>
@@ -546,7 +547,7 @@ or <code>assertEquals()</code> (confusing, because the developer can&#39;t know 
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Network</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.network</p>
+<p>Inherited from SmartContract.network</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:232</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="self" class="tsd-anchor"></a>
@@ -558,7 +559,7 @@ or <code>assertEquals()</code> (confusing, because the developer can&#39;t know 
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.self</p>
+<p>Inherited from SmartContract.self</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:211</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="sender" class="tsd-anchor"></a>
@@ -573,7 +574,7 @@ A malicious prover could use any other public key without affecting the validity
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">PublicKey</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.sender</p>
+<p>Inherited from SmartContract.sender</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:224</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="token" class="tsd-anchor"></a>
@@ -648,7 +649,7 @@ A malicious prover could use any other public key without affecting the validity
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:254</li></ul></aside></li></ul></li></ul>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.token</p>
+<p>Inherited from SmartContract.token</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:242</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="tokenSymbol" class="tsd-anchor"></a>
@@ -674,7 +675,7 @@ A malicious prover could use any other public key without affecting the validity
 <div class="tsd-comment tsd-typography">
 <h4>Deprecated</h4><p>use <code>this.account.tokenSymbol</code></p>
 </div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.tokenSymbol</p>
+<p>Inherited from SmartContract.tokenSymbol</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:290</li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -707,7 +708,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4><p>The account update that was approved (needed when passing in a Callback)</p>
 
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.approve</p>
+<p>Inherited from SmartContract.approve</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:282</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="changePassword" class="tsd-anchor"></a>
@@ -726,7 +727,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h5><span class="tsd-kind-parameter">newsecret</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L185">src/contract/minanft.ts:185</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L225">src/contract/minanft.ts:225</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPrivateFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Private<wbr/>File</span><a href="#checkPrivateFile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -734,7 +735,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L239">src/contract/minanft.ts:239</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L279">src/contract/minanft.ts:279</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPrivateKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Private<wbr/>Key<wbr/>Value</span><a href="#checkPrivateKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -742,7 +743,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L227">src/contract/minanft.ts:227</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L267">src/contract/minanft.ts:267</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPublicFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Public<wbr/>File</span><a href="#checkPublicFile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -750,7 +751,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L233">src/contract/minanft.ts:233</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L273">src/contract/minanft.ts:273</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="checkPublicKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>check<wbr/>Public<wbr/>Key<wbr/>Value</span><a href="#checkPublicKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -758,7 +759,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L221">src/contract/minanft.ts:221</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L261">src/contract/minanft.ts:261</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="deploy" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>deploy</span><a href="#deploy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -770,9 +771,9 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li>
 <h5><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-type ">DeployArgs</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Overrides BaseMinaNFTContract.deploy</p>
+<p>Overrides SmartContract.deploy</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L90">src/contract/minanft.ts:90</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L93">src/contract/minanft.ts:93</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="emitEvent" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>emit<wbr/>Event</span><a href="#emitEvent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -794,7 +795,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h5><span class="tsd-kind-parameter">event</span>: <span class="tsd-signature-type">any</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.emitEvent</p>
+<p>Inherited from SmartContract.emitEvent</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:309</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="fetchEvents" class="tsd-anchor"></a>
@@ -826,7 +827,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h4>Example</h4><pre><code class="language-ts"><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">startHeight</span><span class="hl-1"> = </span><span class="hl-0">UInt32</span><span class="hl-1">.</span><span class="hl-4">from</span><span class="hl-1">(</span><span class="hl-10">1000</span><span class="hl-1">);</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">endHeight</span><span class="hl-1"> = </span><span class="hl-0">UInt32</span><span class="hl-1">.</span><span class="hl-4">from</span><span class="hl-1">(</span><span class="hl-10">2000</span><span class="hl-1">);</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">events</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">myZkapp</span><span class="hl-1">.</span><span class="hl-4">fetchEvents</span><span class="hl-1">(</span><span class="hl-0">startHeight</span><span class="hl-1">, </span><span class="hl-0">endHeight</span><span class="hl-1">);</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-0">events</span><span class="hl-1">);</span>
 </code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.fetchEvents</p>
+<p>Inherited from SmartContract.fetchEvents</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:323</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="init" class="tsd-anchor"></a>
@@ -835,9 +836,9 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li class="tsd-signature tsd-anchor-link" id="init.init-1"><span class="tsd-kind-call-signature">init</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#init.init-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Overrides BaseMinaNFTContract.init</p>
+<p>Overrides SmartContract.init</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L105">src/contract/minanft.ts:105</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L108">src/contract/minanft.ts:108</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="mint-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>mint</span><a href="#mint-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -864,7 +865,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h5><span class="tsd-kind-parameter">pwdHash</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L114">src/contract/minanft.ts:114</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L117">src/contract/minanft.ts:117</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="newSelf" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>new<wbr/>Self</span><a href="#newSelf" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -874,7 +875,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.newSelf</p>
+<p>Inherited from SmartContract.newSelf</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:215</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="requireSignature" class="tsd-anchor"></a>
@@ -892,7 +893,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.requireSignature</p>
+<p>Inherited from SmartContract.requireSignature</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:194</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="send-2" class="tsd-anchor"></a>
@@ -911,7 +912,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.send</p>
+<p>Inherited from SmartContract.send</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:283</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="setPermissions" class="tsd-anchor"></a>
@@ -928,7 +929,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <div class="tsd-comment tsd-typography">
 <h4>Deprecated</h4><p>use <code>this.account.permissions.set()</code></p>
 </div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.setPermissions</p>
+<p>Inherited from SmartContract.setPermissions</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:374</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPrivateFile" class="tsd-anchor"></a>
@@ -938,7 +939,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L215">src/contract/minanft.ts:215</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L255">src/contract/minanft.ts:255</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPrivateKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Private<wbr/>Key<wbr/>Value</span><a href="#setPrivateKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -946,7 +947,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L209">src/contract/minanft.ts:209</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L249">src/contract/minanft.ts:249</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPublicFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Public<wbr/>File</span><a href="#setPublicFile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -954,7 +955,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L203">src/contract/minanft.ts:203</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L243">src/contract/minanft.ts:243</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPublicKeyValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Public<wbr/>Key<wbr/>Value</span><a href="#setPublicKeyValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -962,7 +963,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/minanft.ts#L197">src/contract/minanft.ts:197</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L237">src/contract/minanft.ts:237</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="setValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span class="deprecated">set<wbr/>Value</span><a href="#setValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -984,7 +985,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <div class="tsd-comment tsd-typography">
 <h4>Deprecated</h4><p>use <code>this.account.&lt;field&gt;.set()</code></p>
 </div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.setValue</p>
+<p>Inherited from SmartContract.setValue</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:370</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="sign" class="tsd-anchor"></a>
@@ -1001,7 +1002,7 @@ with the only difference being that quick mock proofs are filled in instead of r
 <div class="tsd-comment tsd-typography">
 <h4>Deprecated</h4><p><code>this.sign()</code> is deprecated in favor of <code>this.requireSignature()</code></p>
 </div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.sign</p>
+<p>Inherited from SmartContract.sign</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:198</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="skipAuthorization" class="tsd-anchor"></a>
@@ -1017,12 +1018,27 @@ authorization flow.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.skipAuthorization</p>
+<p>Inherited from SmartContract.skipAuthorization</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:207</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyMapProof" class="tsd-anchor"></a>
+<section class="tsd-panel tsd-member"><a id="update" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>update</span><a href="#update" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="update.update-1"><span class="tsd-kind-call-signature">update</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#update.update-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">secret</span>: <span class="tsd-signature-type ">Field</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">proof</span>: <span class="tsd-signature-type ">MinaNFTMapProof</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L172">src/contract/minanft.ts:172</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="verifyMapProof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Map<wbr/>Proof</span><a href="#verifyMapProof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-is-inherited">
+<ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="verifyMapProof.verifyMapProof-1"><span class="tsd-kind-call-signature">verify<wbr/>Map<wbr/>Proof</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">state</span>, <span class="tsd-kind-parameter">minaNFTStateProof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#verifyMapProof.verifyMapProof-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -1033,12 +1049,11 @@ authorization flow.</p>
 <li>
 <h5><span class="tsd-kind-parameter">minaNFTStateProof</span>: <span class="tsd-signature-type ">MinaNFTMapProof</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.verifyMapProof</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/base.ts#L23">src/contract/base.ts:23</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyMapWitness" class="tsd-anchor"></a>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L192">src/contract/minanft.ts:192</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="verifyMapWitness" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Map<wbr/>Witness</span><a href="#verifyMapWitness" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-is-inherited">
+<ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="verifyMapWitness.verifyMapWitness-1"><span class="tsd-kind-call-signature">verify<wbr/>Map<wbr/>Witness</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">state</span>, <span class="tsd-kind-parameter">key</span>, <span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">merkleMapWitness</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#verifyMapWitness.verifyMapWitness-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -1053,12 +1068,11 @@ authorization flow.</p>
 <li>
 <h5><span class="tsd-kind-parameter">merkleMapWitness</span>: <span class="tsd-signature-type ">MerkleMapWitness</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.verifyMapWitness</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/base.ts#L17">src/contract/base.ts:17</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyTreeProof" class="tsd-anchor"></a>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L186">src/contract/minanft.ts:186</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="verifyTreeProof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Tree<wbr/>Proof</span><a href="#verifyTreeProof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-is-inherited">
+<ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="verifyTreeProof.verifyTreeProof-1"><span class="tsd-kind-call-signature">verify<wbr/>Tree<wbr/>Proof</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">state</span>, <span class="tsd-kind-parameter">minaNFTTreeProof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#verifyTreeProof.verifyTreeProof-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -1069,12 +1083,11 @@ authorization flow.</p>
 <li>
 <h5><span class="tsd-kind-parameter">minaNFTTreeProof</span>: <span class="tsd-signature-type ">MinaNFTTreeProof</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.verifyTreeProof</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/base.ts#L35">src/contract/base.ts:35</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-is-inherited"><a id="verifyTreeWitness" class="tsd-anchor"></a>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L204">src/contract/minanft.ts:204</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="verifyTreeWitness" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>verify<wbr/>Tree<wbr/>Witness</span><a href="#verifyTreeWitness" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-is-inherited">
+<ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="verifyTreeWitness.verifyTreeWitness-1"><span class="tsd-kind-call-signature">verify<wbr/>Tree<wbr/>Witness</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">state</span>, <span class="tsd-kind-parameter">index</span>, <span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">merkleTreeWitness</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#verifyTreeWitness.verifyTreeWitness-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -1089,9 +1102,8 @@ authorization flow.</p>
 <li>
 <h5><span class="tsd-kind-parameter">merkleTreeWitness</span>: <span class="tsd-signature-type ">MerkleWitness10</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.verifyTreeWitness</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/5cc7966/src/contract/base.ts#L28">src/contract/base.ts:28</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/afc4f8e/src/contract/minanft.ts#L197">src/contract/minanft.ts:197</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="Proof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>Proof</span><a href="#Proof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -1193,7 +1205,7 @@ authorization flow.</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:109</li></ul></aside></li></ul></li></ul>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.Proof</p>
+<p>Inherited from SmartContract.Proof</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:65</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="analyzeMethods" class="tsd-anchor"></a>
@@ -1220,7 +1232,7 @@ To inspect the created circuit in detail, you can look at the returned <code>gat
 </ul>
 
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.analyzeMethods</p>
+<p>Inherited from SmartContract.analyzeMethods</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:360</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="compile" class="tsd-anchor"></a>
@@ -1240,7 +1252,7 @@ up to several minutes if your circuit is large or your hardware is not optimal f
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">provers</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Prover</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">verificationKey</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>        </span><span class="tsd-kind-property">data</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">hash</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">verify</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">statement</span>, <span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.compile</p>
+<p>Inherited from SmartContract.compile</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:136</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="digest" class="tsd-anchor"></a>
@@ -1255,7 +1267,7 @@ a cached verification key can be used.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><p>the digest, as a hex string</p>
 
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.digest</p>
+<p>Inherited from SmartContract.digest</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:150</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="runOutsideCircuit" class="tsd-anchor"></a>
@@ -1275,7 +1287,7 @@ a cached verification key can be used.</p>
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4></li></ul></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Inherited from BaseMinaNFTContract.runOutsideCircuit</p>
+<p>Inherited from SmartContract.runOutsideCircuit</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:339</li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
@@ -1332,10 +1344,11 @@ a cached verification key can be used.</p>
 <li><a href="#setValue" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Value</span></a></li>
 <li><a href="#sign" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>sign</span></a></li>
 <li><a href="#skipAuthorization" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>skip<wbr/>Authorization</span></a></li>
-<li><a href="#verifyMapProof" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Proof</span></a></li>
-<li><a href="#verifyMapWitness" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Witness</span></a></li>
-<li><a href="#verifyTreeProof" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Proof</span></a></li>
-<li><a href="#verifyTreeWitness" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Witness</span></a></li>
+<li><a href="#update" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update</span></a></li>
+<li><a href="#verifyMapProof" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Proof</span></a></li>
+<li><a href="#verifyMapWitness" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Witness</span></a></li>
+<li><a href="#verifyTreeProof" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Proof</span></a></li>
+<li><a href="#verifyTreeWitness" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Witness</span></a></li>
 <li><a href="#Proof" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>Proof</span></a></li>
 <li><a href="#analyzeMethods" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>analyze<wbr/>Methods</span></a></li>
 <li><a href="#compile" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>compile</span></a></li>
