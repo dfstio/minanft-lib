@@ -169,7 +169,7 @@ export class MinaNFTContract extends SmartContract {
     this.pwdHash.set(pwdHash);
   }
 
-  @method update(secret: Field, proof: MinaNFTMapProof) {
+  @method updatePublicMap(secret: Field, proof: MinaNFTMapProof) {
     this.account.provedState.assertEquals(this.account.provedState.get());
     this.account.provedState.get().assertTrue();
 
@@ -182,6 +182,22 @@ export class MinaNFTContract extends SmartContract {
 
     this.publicMapRoot.set( proof.publicInput.latestRoot) 
   }
+
+  
+  @method updatePrivateMap(secret: Field, proof: MinaNFTMapProof) {
+    this.account.provedState.assertEquals(this.account.provedState.get());
+    this.account.provedState.get().assertTrue();
+
+    const pwdHash = this.pwdHash.get();
+    this.pwdHash.assertEquals(pwdHash);
+    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+
+    const root = this.privateMapRoot.get()
+    this.verifyMapProof(root, proof)
+
+    this.privateMapRoot.set( proof.publicInput.latestRoot) 
+  }
+
 
   @method verifyMapWitness(state: Field, key: Field, value: Field, merkleMapWitness: MerkleMapWitness) {
     const [witnessRoot, witnessKey] = merkleMapWitness.computeRootAndKey(value)
