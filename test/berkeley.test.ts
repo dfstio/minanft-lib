@@ -7,7 +7,7 @@ import { DEPLOYER} from "../env.json"
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined
-const useFaucet : boolean = false
+const useFaucet : boolean = true
 
 beforeAll(async () => {
   MinaNFT.minaInit(MINAURL)
@@ -23,8 +23,8 @@ beforeAll(async () => {
       if( balance > 0 ) 
         waitForTopup = false
       else  {
-        if( count > 20) { console.error("Faucet failed to fund account"); waitForTopup = false; break; }
-        console.log("Waiting for topup...")
+        if( count > 30) { console.error("The Faucet has failed to fund an account"); waitForTopup = false; break; }
+        if( count === 0 ) console.log(`Waiting for the funding of the deployer ${deployer.toPublicKey().toBase58()}...`)
         count++
         await sleep(60 * 1000)
       }
