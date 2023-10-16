@@ -15,22 +15,27 @@ beforeAll(async () => {
 });
 
 describe('MinaNFT contract', () => {
-  it('should mint and update MinaNFT NFT', async () => {
+  it('should mint and update MinaNFT NFT on local blockchain', async () => {
     expect(deployer).not.toBeUndefined()
     if (deployer === undefined) return
 
     const nft = new MinaNFT('@test') //, PublicKey.fromBase58(NFT_ADDRESS))
-    nft.publicData.set("description", MinaNFT.stringToField("my nft @test"))
-    nft.publicData.set("image", MinaNFT.stringToField("ipfs:Qm..."))
+    nft.updatePublicAttribute("description", MinaNFT.stringToField("my nft @test"))
+    nft.updatePublicAttribute("image", MinaNFT.stringToField("ipfs:Qm..."))
     const secret: Field = Field.random()
     const pwdHash: Field = Poseidon.hash([secret])
 
     await nft.mint(deployer, pwdHash)
 
     // update public data
-    nft.updatePublicData("twitter", MinaNFT.stringToField("@mytwittername"))
-    nft.updatePublicData("discord", MinaNFT.stringToField("@mydiscordname"))
-    nft.updatePublicData("linkedin", MinaNFT.stringToField("@mylinkedinname"))
+    nft.updatePublicAttribute("twitter", MinaNFT.stringToField("@mytwittername"))
+    nft.updatePublicAttribute("discord", MinaNFT.stringToField("@mydiscordname"))
+    nft.updatePublicAttribute("linkedin", MinaNFT.stringToField("@mylinkedinname"))
+
+    // update private data
+    nft.updatePrivateAttribute("secret key 1", MinaNFT.stringToField("secret value 1"))
+    nft.updatePrivateAttribute("secret key 2", MinaNFT.stringToField("secret value 2"))
+    nft.updatePrivateAttribute("secret key 3", MinaNFT.stringToField("secret value 3"))
 
     await nft.commit(deployer, secret)  // commit the update to blockchain
   })
