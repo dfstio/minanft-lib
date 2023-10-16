@@ -75,10 +75,10 @@ body.dark, :root[data-theme="dark"] {
 classDiagram
   class MinaNFT{
       name
-      publicMapRoot
-      publicFilesRoot
-      privateMapRoot
-      privateFilesRoot
+      publicAttributesRoot
+      publicObjectsRoot
+      privateAttributesRoot
+      privateObjectsRoot
       uri1
       uri2
       pwdHash
@@ -122,21 +122,21 @@ classDiagram
   }
   MinaNFT &quot;uri1&quot; --&gt; uri : uri1
   MinaNFT &quot;uri2&quot; --&gt; uri : uri2
-  MinaNFT &quot;publicMapRoot&quot; --&gt; PublicMerkleMap : publicMapRoot
-  MinaNFT &quot;privateMapRoot&quot; --&gt; PrivateMerkleMap : privateMapRoot
+  MinaNFT &quot;publicAttributesRoot&quot; --&gt; PublicMerkleMap : publicAttributesRoot
+  MinaNFT &quot;privateAttributesRoot&quot; --&gt; PrivateMerkleMap : privateAttributesRoot
   uri --&gt; IPFS
   uri --&gt; Arweave
   PublicFiles &quot;MerkleTree root&quot; --&gt; PublicFileMerkleTree : MerkleTree root
-  MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles
+  MinaNFT &quot;publicObjectsRoot&quot; --&gt; PublicFiles
   PrivateFiles &quot;MerkleTree root&quot; --&gt; PrivateFileMerkleTree : MerkleTree root
-  MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles</div><div class="mermaid light">%%{init:{"theme":"default"}}%%
+  MinaNFT &quot;privateObjectsRoot&quot; --&gt; PrivateFiles</div><div class="mermaid light">%%{init:{"theme":"default"}}%%
 classDiagram
   class MinaNFT{
       name
-      publicMapRoot
-      publicFilesRoot
-      privateMapRoot
-      privateFilesRoot
+      publicAttributesRoot
+      publicObjectsRoot
+      privateAttributesRoot
+      privateObjectsRoot
       uri1
       uri2
       pwdHash
@@ -180,20 +180,20 @@ classDiagram
   }
   MinaNFT &quot;uri1&quot; --&gt; uri : uri1
   MinaNFT &quot;uri2&quot; --&gt; uri : uri2
-  MinaNFT &quot;publicMapRoot&quot; --&gt; PublicMerkleMap : publicMapRoot
-  MinaNFT &quot;privateMapRoot&quot; --&gt; PrivateMerkleMap : privateMapRoot
+  MinaNFT &quot;publicAttributesRoot&quot; --&gt; PublicMerkleMap : publicAttributesRoot
+  MinaNFT &quot;privateAttributesRoot&quot; --&gt; PrivateMerkleMap : privateAttributesRoot
   uri --&gt; IPFS
   uri --&gt; Arweave
   PublicFiles &quot;MerkleTree root&quot; --&gt; PublicFileMerkleTree : MerkleTree root
-  MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles
+  MinaNFT &quot;publicObjectsRoot&quot; --&gt; PublicFiles
   PrivateFiles &quot;MerkleTree root&quot; --&gt; PrivateFileMerkleTree : MerkleTree root
-  MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles</div><pre><code class="language-mermaid">classDiagram
+  MinaNFT &quot;privateObjectsRoot&quot; --&gt; PrivateFiles</div><pre><code class="language-mermaid">classDiagram
   class MinaNFT{
       name
-      publicMapRoot
-      publicFilesRoot
-      privateMapRoot
-      privateFilesRoot
+      publicAttributesRoot
+      publicObjectsRoot
+      privateAttributesRoot
+      privateObjectsRoot
       uri1
       uri2
       pwdHash
@@ -237,14 +237,14 @@ classDiagram
   }
   MinaNFT &quot;uri1&quot; --&gt; uri : uri1
   MinaNFT &quot;uri2&quot; --&gt; uri : uri2
-  MinaNFT &quot;publicMapRoot&quot; --&gt; PublicMerkleMap : publicMapRoot
-  MinaNFT &quot;privateMapRoot&quot; --&gt; PrivateMerkleMap : privateMapRoot
+  MinaNFT &quot;publicAttributesRoot&quot; --&gt; PublicMerkleMap : publicAttributesRoot
+  MinaNFT &quot;privateAttributesRoot&quot; --&gt; PrivateMerkleMap : privateAttributesRoot
   uri --&gt; IPFS
   uri --&gt; Arweave
   PublicFiles &quot;MerkleTree root&quot; --&gt; PublicFileMerkleTree : MerkleTree root
-  MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles
+  MinaNFT &quot;publicObjectsRoot&quot; --&gt; PublicFiles
   PrivateFiles &quot;MerkleTree root&quot; --&gt; PrivateFileMerkleTree : MerkleTree root
-  MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles</code></pre></div></div>
+  MinaNFT &quot;privateObjectsRoot&quot; --&gt; PrivateFiles</code></pre></div></div>
 <div class="tsd-comment tsd-typography"></div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
@@ -269,10 +269,10 @@ classDiagram
 <a href="MinaNFTContract.html#address" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>address</span></a>
 <a href="MinaNFTContract.html#events" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>events</span></a>
 <a href="MinaNFTContract.html#name" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>name</span></a>
-<a href="MinaNFTContract.html#privateFilesRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Files<wbr/>Root</span></a>
-<a href="MinaNFTContract.html#privateMapRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Map<wbr/>Root</span></a>
-<a href="MinaNFTContract.html#publicFilesRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Files<wbr/>Root</span></a>
-<a href="MinaNFTContract.html#publicMapRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Map<wbr/>Root</span></a>
+<a href="MinaNFTContract.html#privateAttributesRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Attributes<wbr/>Root</span></a>
+<a href="MinaNFTContract.html#privateObjectsRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Objects<wbr/>Root</span></a>
+<a href="MinaNFTContract.html#publicAttributesRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Attributes<wbr/>Root</span></a>
+<a href="MinaNFTContract.html#publicObjectsRoot" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Objects<wbr/>Root</span></a>
 <a href="MinaNFTContract.html#pwdHash" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>pwd<wbr/>Hash</span></a>
 <a href="MinaNFTContract.html#tokenId" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>token<wbr/>Id</span></a>
 <a href="MinaNFTContract.html#uri1" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>uri1</span></a>
@@ -309,10 +309,8 @@ classDiagram
 <a href="MinaNFTContract.html#setValue" class="tsd-index-link deprecated tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Value</span></a>
 <a href="MinaNFTContract.html#sign" class="tsd-index-link deprecated tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>sign</span></a>
 <a href="MinaNFTContract.html#skipAuthorization" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>skip<wbr/>Authorization</span></a>
-<a href="MinaNFTContract.html#updatePrivateMap" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Private<wbr/>Map</span></a>
-<a href="MinaNFTContract.html#updatePublicMap" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Public<wbr/>Map</span></a>
-<a href="MinaNFTContract.html#verifyMapProof" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Proof</span></a>
-<a href="MinaNFTContract.html#verifyTreeProof" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Proof</span></a>
+<a href="MinaNFTContract.html#updatePrivateAttributes" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Private<wbr/>Attributes</span></a>
+<a href="MinaNFTContract.html#updatePublicAttributes" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Public<wbr/>Attributes</span></a>
 <a href="MinaNFTContract.html#Proof" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>Proof</span></a>
 <a href="MinaNFTContract.html#analyzeMethods" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>analyze<wbr/>Methods</span></a>
 <a href="MinaNFTContract.html#compile" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>compile</span></a>
@@ -370,26 +368,26 @@ classDiagram
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
 <li>Defined in src/contract/minanft.ts:83</li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="privateFilesRoot" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>private<wbr/>Files<wbr/>Root</span><a href="#privateFilesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Files<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
-<ul>
-<li>Defined in src/contract/minanft.ts:87</li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="privateMapRoot" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>private<wbr/>Map<wbr/>Root</span><a href="#privateMapRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Map<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<section class="tsd-panel tsd-member"><a id="privateAttributesRoot" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>private<wbr/>Attributes<wbr/>Root</span><a href="#privateAttributesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Attributes<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
 <li>Defined in src/contract/minanft.ts:86</li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="publicFilesRoot" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>public<wbr/>Files<wbr/>Root</span><a href="#publicFilesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Files<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<section class="tsd-panel tsd-member"><a id="privateObjectsRoot" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>private<wbr/>Objects<wbr/>Root</span><a href="#privateObjectsRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">private<wbr/>Objects<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in src/contract/minanft.ts:85</li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="publicMapRoot" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>public<wbr/>Map<wbr/>Root</span><a href="#publicMapRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Map<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<li>Defined in src/contract/minanft.ts:87</li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="publicAttributesRoot" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>public<wbr/>Attributes<wbr/>Root</span><a href="#publicAttributesRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Attributes<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
 <li>Defined in src/contract/minanft.ts:84</li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="publicObjectsRoot" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>public<wbr/>Objects<wbr/>Root</span><a href="#publicObjectsRoot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">public<wbr/>Objects<wbr/>Root</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<ul>
+<li>Defined in src/contract/minanft.ts:85</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="pwdHash" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>pwd<wbr/>Hash</span><a href="#pwdHash" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">pwd<wbr/>Hash</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
@@ -783,7 +781,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <section class="tsd-panel tsd-member"><a id="mint-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>mint</span><a href="#mint-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="mint-2.mint-3"><span class="tsd-kind-call-signature">mint</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span>, <span class="tsd-kind-parameter">publicMapRoot</span>, <span class="tsd-kind-parameter">publicFilesRoot</span>, <span class="tsd-kind-parameter">privateMapRoot</span>, <span class="tsd-kind-parameter">privateFilesRoot</span>, <span class="tsd-kind-parameter">uri1</span>, <span class="tsd-kind-parameter">uri2</span>, <span class="tsd-kind-parameter">pwdHash</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#mint-2.mint-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="mint-2.mint-3"><span class="tsd-kind-call-signature">mint</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span>, <span class="tsd-kind-parameter">publicAttributesRoot</span>, <span class="tsd-kind-parameter">publicObjectsRoot</span>, <span class="tsd-kind-parameter">privateAttributesRoot</span>, <span class="tsd-kind-parameter">privateObjectsRoot</span>, <span class="tsd-kind-parameter">uri1</span>, <span class="tsd-kind-parameter">uri2</span>, <span class="tsd-kind-parameter">pwdHash</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#mint-2.mint-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -791,13 +789,13 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <li>
 <h5><span class="tsd-kind-parameter">name</span>: <span class="tsd-signature-type ">Field</span></h5></li>
 <li>
-<h5><span class="tsd-kind-parameter">publicMapRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
+<h5><span class="tsd-kind-parameter">publicAttributesRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
 <li>
-<h5><span class="tsd-kind-parameter">publicFilesRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
+<h5><span class="tsd-kind-parameter">publicObjectsRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
 <li>
-<h5><span class="tsd-kind-parameter">privateMapRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
+<h5><span class="tsd-kind-parameter">privateAttributesRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
 <li>
-<h5><span class="tsd-kind-parameter">privateFilesRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
+<h5><span class="tsd-kind-parameter">privateObjectsRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
 <li>
 <h5><span class="tsd-kind-parameter">uri1</span>: <span class="tsd-signature-type ">Field</span></h5></li>
 <li>
@@ -930,10 +928,10 @@ authorization flow.</p>
 <p>Inherited from SmartContract.skipAuthorization</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:207</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="updatePrivateMap" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>update<wbr/>Private<wbr/>Map</span><a href="#updatePrivateMap" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<section class="tsd-panel tsd-member"><a id="updatePrivateAttributes" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>update<wbr/>Private<wbr/>Attributes</span><a href="#updatePrivateAttributes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="updatePrivateMap.updatePrivateMap-1"><span class="tsd-kind-call-signature">update<wbr/>Private<wbr/>Map</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#updatePrivateMap.updatePrivateMap-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="updatePrivateAttributes.updatePrivateAttributes-1"><span class="tsd-kind-call-signature">update<wbr/>Private<wbr/>Attributes</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#updatePrivateAttributes.updatePrivateAttributes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -944,11 +942,11 @@ authorization flow.</p>
 <h5><span class="tsd-kind-parameter">proof</span>: <span class="tsd-signature-type ">MinaNFTMapProof</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in src/contract/minanft.ts:187</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="updatePublicMap" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>update<wbr/>Public<wbr/>Map</span><a href="#updatePublicMap" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in src/contract/minanft.ts:189</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="updatePublicAttributes" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>update<wbr/>Public<wbr/>Attributes</span><a href="#updatePublicAttributes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="updatePublicMap.updatePublicMap-1"><span class="tsd-kind-call-signature">update<wbr/>Public<wbr/>Map</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#updatePublicMap.updatePublicMap-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="updatePublicAttributes.updatePublicAttributes-1"><span class="tsd-kind-call-signature">update<wbr/>Public<wbr/>Attributes</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#updatePublicAttributes.updatePublicAttributes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -960,36 +958,6 @@ authorization flow.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
 <li>Defined in src/contract/minanft.ts:172</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="verifyMapProof" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>verify<wbr/>Map<wbr/>Proof</span><a href="#verifyMapProof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="verifyMapProof.verifyMapProof-1"><span class="tsd-kind-call-signature">verify<wbr/>Map<wbr/>Proof</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">state</span>, <span class="tsd-kind-parameter">minaNFTStateProof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#verifyMapProof.verifyMapProof-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">state</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">minaNFTStateProof</span>: <span class="tsd-signature-type ">MinaNFTMapProof</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<ul>
-<li>Defined in src/contract/minanft.ts:209</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="verifyTreeProof" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>verify<wbr/>Tree<wbr/>Proof</span><a href="#verifyTreeProof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="verifyTreeProof.verifyTreeProof-1"><span class="tsd-kind-call-signature">verify<wbr/>Tree<wbr/>Proof</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">state</span>, <span class="tsd-kind-parameter">minaNFTTreeProof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#verifyTreeProof.verifyTreeProof-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">state</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">minaNFTTreeProof</span>: <span class="tsd-signature-type ">MinaNFTTreeProof</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<ul>
-<li>Defined in src/contract/minanft.ts:223</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="Proof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>Proof</span><a href="#Proof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -1187,10 +1155,10 @@ a cached verification key can be used.</p>
 <li><a href="#address" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>address</span></a></li>
 <li><a href="#events" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>events</span></a></li>
 <li><a href="#name" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>name</span></a></li>
-<li><a href="#privateFilesRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Files<wbr/>Root</span></a></li>
-<li><a href="#privateMapRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Map<wbr/>Root</span></a></li>
-<li><a href="#publicFilesRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Files<wbr/>Root</span></a></li>
-<li><a href="#publicMapRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Map<wbr/>Root</span></a></li>
+<li><a href="#privateAttributesRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Attributes<wbr/>Root</span></a></li>
+<li><a href="#privateObjectsRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>private<wbr/>Objects<wbr/>Root</span></a></li>
+<li><a href="#publicAttributesRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Attributes<wbr/>Root</span></a></li>
+<li><a href="#publicObjectsRoot" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>public<wbr/>Objects<wbr/>Root</span></a></li>
 <li><a href="#pwdHash" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>pwd<wbr/>Hash</span></a></li>
 <li><a href="#tokenId" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>token<wbr/>Id</span></a></li>
 <li><a href="#uri1" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>uri1</span></a></li>
@@ -1221,10 +1189,8 @@ a cached verification key can be used.</p>
 <li><a href="#setValue" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Value</span></a></li>
 <li><a href="#sign" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>sign</span></a></li>
 <li><a href="#skipAuthorization" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>skip<wbr/>Authorization</span></a></li>
-<li><a href="#updatePrivateMap" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Private<wbr/>Map</span></a></li>
-<li><a href="#updatePublicMap" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Public<wbr/>Map</span></a></li>
-<li><a href="#verifyMapProof" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Map<wbr/>Proof</span></a></li>
-<li><a href="#verifyTreeProof" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>verify<wbr/>Tree<wbr/>Proof</span></a></li>
+<li><a href="#updatePrivateAttributes" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Private<wbr/>Attributes</span></a></li>
+<li><a href="#updatePublicAttributes" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>update<wbr/>Public<wbr/>Attributes</span></a></li>
 <li><a href="#Proof" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>Proof</span></a></li>
 <li><a href="#analyzeMethods" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>analyze<wbr/>Methods</span></a></li>
 <li><a href="#compile" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>compile</span></a></li>
@@ -1239,8 +1205,8 @@ a cached verification key can be used.</p>
 <li><a href="MinaNFTContract.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>MinaNFTContract
 <div class="menu-item-desc">class MinaNFTContract &lt;div class=&quot;mermaid-block&quot;&gt;&lt;div class=&quot;mermaid dark&quot;&gt;%%{init:{&quot;theme&quot;:&quot;dark&quot;}}%%</div></div></a></li>
-<li><a href="MinaNFTfile.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
-<div>MinaNFTfile</div></a></li>
+<li><a href="MinaNFTobject.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
+<div>MinaNFTobject</div></a></li>
 <li><a href="../interfaces/VeificationKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>
 <div>Veification<wbr/>Key</div></a></li>
 <li><a href="../variables/MinaNFTMap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg>

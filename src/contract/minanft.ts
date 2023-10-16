@@ -21,10 +21,10 @@ import { MinaNFTTreeProof, MerkleWitness10 } from './tree'
  *  classDiagram
  *   class MinaNFT{
  *       name
- *       publicMapRoot
- *       publicFilesRoot
- *       privateMapRoot
- *       privateFilesRoot
+ *       publicAttributesRoot
+ *       publicObjectsRoot
+ *       privateAttributesRoot
+ *       privateObjectsRoot
  *       uri1
  *       uri2
  *       pwdHash
@@ -68,23 +68,23 @@ import { MinaNFTTreeProof, MerkleWitness10 } from './tree'
  *   }
  *   MinaNFT "uri1" --> uri : uri1
  *   MinaNFT "uri2" --> uri : uri2
- *   MinaNFT "publicMapRoot" --> PublicMerkleMap : publicMapRoot
- *   MinaNFT "privateMapRoot" --> PrivateMerkleMap : privateMapRoot
+ *   MinaNFT "publicAttributesRoot" --> PublicMerkleMap : publicAttributesRoot
+ *   MinaNFT "privateAttributesRoot" --> PrivateMerkleMap : privateAttributesRoot
  *   uri --> IPFS
  *   uri --> Arweave
  *   PublicFiles "MerkleTree root" --> PublicFileMerkleTree : MerkleTree root
- *   MinaNFT "publicFilesRoot" --> PublicFiles
+ *   MinaNFT "publicObjectsRoot" --> PublicFiles
  *   PrivateFiles "MerkleTree root" --> PrivateFileMerkleTree : MerkleTree root
- *   MinaNFT "privateFilesRoot" --> PrivateFiles   
+ *   MinaNFT "privateObjectsRoot" --> PrivateFiles   
  * ```
  */
 
 export class MinaNFTContract extends SmartContract {
   @state(Field) name = State<Field>();
-  @state(Field) publicMapRoot = State<Field>(); // Merkle root of public key-values Map
-  @state(Field) publicFilesRoot = State<Field>(); // Merkle root of public Files Map
-  @state(Field) privateMapRoot = State<Field>(); // Merkle root of private key-values Map
-  @state(Field) privateFilesRoot = State<Field>(); // Merkle root of private Files Map
+  @state(Field) publicAttributesRoot = State<Field>(); // Merkle root of public key-values attributes Map
+  @state(Field) publicObjectsRoot = State<Field>(); // Merkle root of public Objects Map
+  @state(Field) privateAttributesRoot = State<Field>(); // Merkle root of private key-values attributes Map
+  @state(Field) privateObjectsRoot = State<Field>(); // Merkle root of private Objects Map
   // URI format: ipfs:IPFS_HASH or arweave:ARWEAVE_HASH
   @state(Field) uri1 = State<Field>(); // First part of uri hash converted from string to Field
   @state(Field) uri2 = State<Field>(); // Second part of uri hash converted from string to Field
@@ -116,10 +116,10 @@ export class MinaNFTContract extends SmartContract {
 
   @method mint(
     name: Field,
-    publicMapRoot: Field,
-    publicFilesRoot: Field,
-    privateMapRoot: Field,
-    privateFilesRoot: Field,
+    publicAttributesRoot: Field,
+    publicObjectsRoot: Field,
+    privateAttributesRoot: Field,
+    privateObjectsRoot: Field,
     uri1: Field,
     uri2: Field,
     pwdHash: Field,
@@ -135,21 +135,21 @@ export class MinaNFTContract extends SmartContract {
     this.pwdHash.assertEquals(pwdHashOld);
     this.pwdHash.assertEquals(Field(0));
 
-    const publicMapRootOld = this.publicMapRoot.get();
-    this.publicMapRoot.assertEquals(publicMapRootOld);
-    this.publicMapRoot.assertEquals(Field(0));
+    const publicAttributesRootOld = this.publicAttributesRoot.get();
+    this.publicAttributesRoot.assertEquals(publicAttributesRootOld);
+    this.publicAttributesRoot.assertEquals(Field(0));
 
-    const publicFilesRootOld = this.publicFilesRoot.get();
-    this.publicFilesRoot.assertEquals(publicFilesRootOld);
-    this.publicFilesRoot.assertEquals(Field(0));
+    const publicObjectsRootOld = this.publicObjectsRoot.get();
+    this.publicObjectsRoot.assertEquals(publicObjectsRootOld);
+    this.publicObjectsRoot.assertEquals(Field(0));
 
-    const privateMapRootOld = this.privateMapRoot.get();
-    this.privateMapRoot.assertEquals(privateMapRootOld);
-    this.privateMapRoot.assertEquals(Field(0));
+    const privateAttributesRootOld = this.privateAttributesRoot.get();
+    this.privateAttributesRoot.assertEquals(privateAttributesRootOld);
+    this.privateAttributesRoot.assertEquals(Field(0));
 
-    const privateFilesRootOld = this.privateFilesRoot.get();
-    this.privateFilesRoot.assertEquals(privateFilesRootOld);
-    this.privateFilesRoot.assertEquals(Field(0));
+    const privateObjectsRootOld = this.privateObjectsRoot.get();
+    this.privateObjectsRoot.assertEquals(privateObjectsRootOld);
+    this.privateObjectsRoot.assertEquals(Field(0));
 
     const uri1Old = this.uri1.get();
     this.uri1.assertEquals(uri1Old);
@@ -160,42 +160,46 @@ export class MinaNFTContract extends SmartContract {
     this.uri2.assertEquals(Field(0));
 
     this.name.set(name);
-    this.publicMapRoot.set(publicMapRoot);
-    this.publicFilesRoot.set(publicFilesRoot);
-    this.privateMapRoot.set(privateMapRoot);
-    this.privateFilesRoot.set(privateFilesRoot);
+    this.publicAttributesRoot.set(publicAttributesRoot);
+    this.publicObjectsRoot.set(publicObjectsRoot);
+    this.privateAttributesRoot.set(privateAttributesRoot);
+    this.privateObjectsRoot.set(privateObjectsRoot);
     this.uri1.set(uri1);
     this.uri2.set(uri2);
     this.pwdHash.set(pwdHash);
   }
 
-  @method updatePublicMap(secret: Field, proof: MinaNFTMapProof) {
-    this.account.provedState.assertEquals(this.account.provedState.get());
-    this.account.provedState.get().assertTrue();
+  @method updatePublicAttributes(secret: Field, proof: MinaNFTMapProof) {
+    this.account.provedState.assertEquals(this.account.provedState.get())
+    this.account.provedState.get().assertTrue()
 
-    const pwdHash = this.pwdHash.get();
-    this.pwdHash.assertEquals(pwdHash);
-    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+    const pwdHash = this.pwdHash.get()
+    this.pwdHash.assertEquals(pwdHash)
+    this.pwdHash.assertEquals(Poseidon.hash([secret]))
 
-    const root = this.publicMapRoot.get()
-    this.verifyMapProof(root, proof)
+    const root = this.publicAttributesRoot.get()
+    this.publicAttributesRoot.assertEquals(root)
+    proof.publicInput.initialRoot.assertEquals(root)
+    proof.verify()
 
-    this.publicMapRoot.set( proof.publicInput.latestRoot) 
+    this.publicAttributesRoot.set( proof.publicInput.latestRoot) 
   }
 
   
-  @method updatePrivateMap(secret: Field, proof: MinaNFTMapProof) {
-    this.account.provedState.assertEquals(this.account.provedState.get());
-    this.account.provedState.get().assertTrue();
+  @method updatePrivateAttributes(secret: Field, proof: MinaNFTMapProof) {
+    this.account.provedState.assertEquals(this.account.provedState.get())
+    this.account.provedState.get().assertTrue()
 
-    const pwdHash = this.pwdHash.get();
-    this.pwdHash.assertEquals(pwdHash);
-    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+    const pwdHash = this.pwdHash.get()
+    this.pwdHash.assertEquals(pwdHash)
+    this.pwdHash.assertEquals(Poseidon.hash([secret]))
 
-    const root = this.privateMapRoot.get()
-    this.verifyMapProof(root, proof)
+    const root = this.privateAttributesRoot.get()
+    this.privateAttributesRoot.assertEquals(root)
+    proof.publicInput.initialRoot.assertEquals(root)
+    proof.verify()
 
-    this.privateMapRoot.set( proof.publicInput.latestRoot) 
+    this.privateAttributesRoot.set( proof.publicInput.latestRoot) 
   }
 
 /*
@@ -204,27 +208,27 @@ export class MinaNFTContract extends SmartContract {
     witnessRoot.assertEquals(state)
     witnessKey.assertEquals(key)
   }
-*/
+
 
   @method verifyMapProof(state: Field, minaNFTStateProof: MinaNFTMapProof) {
     minaNFTStateProof.publicInput.initialRoot.assertEquals(state)
     minaNFTStateProof.verify()
   }
 
-  /*
+
   @method verifyTreeWitness(state: Field, index: Field, value: Field, merkleTreeWitness: MerkleWitness10) {
     const witnessRoot = merkleTreeWitness.calculateRoot(value)
     const calculatedIndex = merkleTreeWitness.calculateIndex()
     witnessRoot.assertEquals(state)
     calculatedIndex.assertEquals(index)
   }
- */
+
 
   @method verifyTreeProof(state: Field, minaNFTTreeProof: MinaNFTTreeProof) {
     minaNFTTreeProof.publicInput.root.assertEquals(state);
     minaNFTTreeProof.verify();
   }
-/*
+
   // Make a post - TODO rewrite using new merkle roots structure
   
     @method post(salt: Field, secret: Field, postsRoot: Field) {
@@ -302,7 +306,7 @@ export class MinaNFTContract extends SmartContract {
 
 
     // put NFT to escrow before the transfer in case NFT is sold for fiat money
-    // TODO - rewrite using privateMapRoot
+    // TODO - rewrite using privateAttributesRoot
     @method toEscrow(secret: Field, escrowhash: Field) {
         this.account.provedState.assertEquals(this.account.provedState.get());
         this.account.provedState.get().assertTrue();
