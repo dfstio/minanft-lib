@@ -66,22 +66,22 @@ body.dark, :root[data-theme="dark"] {
 <div class="col-content">
 <div class="tsd-page-title">
 <h2>minanft</h2></div>
-<div class="tsd-panel tsd-typography"><a id="md:mina-nft-nodejs-library-for-typescript-and-javascript" class="tsd-anchor"></a><h1><a href="#md:mina-nft-nodejs-library-for-typescript-and-javascript">Mina NFT nodejs library for TypeScript and Javascript</a></h1><p>This library is designed for the easy integration for third-party developers and 
+<div class="tsd-panel tsd-typography"><a id="md:mina-nft-nodejs-library-for-typescript-and-javascript" class="tsd-anchor"></a><h1><a href="#md:mina-nft-nodejs-library-for-typescript-and-javascript">Mina NFT nodejs library for TypeScript and Javascript</a></h1><p>This library is designed for the easy integration for third-party developers and
 corporations with MinaNFT, allowing to start minting NFTs, adding public and private keys
 and verifying data off-chain and on-chain within one hour with easy and intiutive API</p>
-<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><pre><code><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-0">add</span><span class="hl-1"> </span><span class="hl-0">minanft</span><span class="hl-1">	</span>
+<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><pre><code><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-0">add</span><span class="hl-1"> </span><span class="hl-0">minanft</span>
 </code><button>Copy</button></pre>
 <a id="md:documentation" class="tsd-anchor"></a><h2><a href="#md:documentation">Documentation</a></h2><p><a href="https://lib.minanft.io">https://lib.minanft.io</a></p>
-<a id="md:example" class="tsd-anchor"></a><h2><a href="#md:example">Example:</a></h2><pre><code class="language-typescript"><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft</span><span class="hl-1"> = </span><span class="hl-2">new</span><span class="hl-1"> </span><span class="hl-4">MinaNFT</span><span class="hl-1">(</span><span class="hl-5">&#39;@test&#39;</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-0">nft</span><span class="hl-1">.</span><span class="hl-0">publicData</span><span class="hl-1">.</span><span class="hl-4">set</span><span class="hl-1">(</span><span class="hl-5">&quot;description&quot;</span><span class="hl-1">, </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">stringToField</span><span class="hl-1">(</span><span class="hl-5">&quot;my nft @test&quot;</span><span class="hl-1">))</span><br/><span class="hl-1">    </span><span class="hl-0">nft</span><span class="hl-1">.</span><span class="hl-0">publicData</span><span class="hl-1">.</span><span class="hl-4">set</span><span class="hl-1">(</span><span class="hl-5">&quot;image&quot;</span><span class="hl-1">, </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">stringToField</span><span class="hl-1">(</span><span class="hl-5">&quot;ipfs:Qm...&quot;</span><span class="hl-1">))</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">secret</span><span class="hl-1">: </span><span class="hl-6">Field</span><span class="hl-1"> = </span><span class="hl-0">Field</span><span class="hl-1">.</span><span class="hl-4">random</span><span class="hl-1">()</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">pwdHash</span><span class="hl-1">: </span><span class="hl-6">Field</span><span class="hl-1"> = </span><span class="hl-0">Poseidon</span><span class="hl-1">.</span><span class="hl-4">hash</span><span class="hl-1">([</span><span class="hl-0">secret</span><span class="hl-1">])</span><br/><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft</span><span class="hl-1">.</span><span class="hl-4">mint</span><span class="hl-1">(</span><span class="hl-0">deployer</span><span class="hl-1">, </span><span class="hl-0">pwdHash</span><span class="hl-1">)</span>
+<a id="md:example" class="tsd-anchor"></a><h2><a href="#md:example">Example:</a></h2><pre><code class="language-typescript"><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft</span><span class="hl-1"> = </span><span class="hl-2">new</span><span class="hl-1"> </span><span class="hl-4">MinaNFT</span><span class="hl-1">(</span><span class="hl-5">&quot;@test&quot;</span><span class="hl-1">);</span><br/><span class="hl-0">nft</span><span class="hl-1">.</span><span class="hl-0">publicData</span><span class="hl-1">.</span><span class="hl-4">set</span><span class="hl-1">(</span><span class="hl-5">&quot;description&quot;</span><span class="hl-1">, </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">stringToField</span><span class="hl-1">(</span><span class="hl-5">&quot;my nft @test&quot;</span><span class="hl-1">));</span><br/><span class="hl-0">nft</span><span class="hl-1">.</span><span class="hl-0">publicData</span><span class="hl-1">.</span><span class="hl-4">set</span><span class="hl-1">(</span><span class="hl-5">&quot;image&quot;</span><span class="hl-1">, </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">stringToField</span><span class="hl-1">(</span><span class="hl-5">&quot;ipfs:Qm...&quot;</span><span class="hl-1">));</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">secret</span><span class="hl-1">: </span><span class="hl-6">Field</span><span class="hl-1"> = </span><span class="hl-0">Field</span><span class="hl-1">.</span><span class="hl-4">random</span><span class="hl-1">();</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">pwdHash</span><span class="hl-1">: </span><span class="hl-6">Field</span><span class="hl-1"> = </span><span class="hl-0">Poseidon</span><span class="hl-1">.</span><span class="hl-4">hash</span><span class="hl-1">([</span><span class="hl-0">secret</span><span class="hl-1">]);</span><br/><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft</span><span class="hl-1">.</span><span class="hl-4">mint</span><span class="hl-1">(</span><span class="hl-0">deployer</span><span class="hl-1">, </span><span class="hl-0">pwdHash</span><span class="hl-1">);</span>
 </code><button>Copy</button></pre>
 <a id="md:minanft-on-chain-and-off-chain-data-diagram" class="tsd-anchor"></a><h2><a href="#md:minanft-on-chain-and-off-chain-data-diagram">MinaNFT on-chain and off-chain data diagram</a></h2><div class="mermaid-block"><div class="mermaid dark">%%{init:{"theme":"dark"}}%%
 classDiagram
     class MinaNFT{
         name
-        publicMapRoot
-        publicFilesRoot
-        privateMapRoot
-        privateFilesRoot
+        publicAttributesRoot
+        publicObjectsRoot
+        privateAttributesRoot
+        privateObjectsRoot
         uri1
         uri2
         pwdHash
@@ -95,7 +95,8 @@ classDiagram
     class PublicMerkleMap{
         key : value
     }
-    class PublicFiles{
+    class PublicObjects{
+      type (map, string, file)
       filename
       size
       mime-type
@@ -103,7 +104,8 @@ classDiagram
       sha3-512
       MerkleTree root
     }
-    class PrivateFiles{
+    class PrivateObjects{
+      type (map, string, file)
       filename
       size
       mime-type
@@ -117,29 +119,29 @@ classDiagram
       powerToVerify
       MerkleTree root
     }
-    class PublicFileMerkleTree{
+    class PublicObjectsMerkleTree{
       [file data]
     }
-    class PrivateFileMerkleTree{
+    class PrivateObjectsMerkleTree{
       [file data]
     }
     MinaNFT &quot;uri1&quot; --&gt; uri : uri1
     MinaNFT &quot;uri2&quot; --&gt; uri : uri2
-    MinaNFT &quot;publicMapRoot&quot; --&gt; PublicMerkleMap : publicMapRoot
-    MinaNFT &quot;privateMapRoot&quot; --&gt; PrivateMerkleMap : privateMapRoot
+    MinaNFT &quot;publicAttributesRoot&quot; --&gt; PublicMerkleMap : publicAttributesRoot
+    MinaNFT &quot;privateAttributesRoot&quot; --&gt; PrivateMerkleMap : privateAttributesRoot
     uri --&gt; IPFS
     uri --&gt; Arweave
-    PublicFiles &quot;MerkleTree root&quot; --&gt; PublicFileMerkleTree : MerkleTree root
-    MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles
-    PrivateFiles &quot;MerkleTree root&quot; --&gt; PrivateFileMerkleTree : MerkleTree root
-    MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles</div><div class="mermaid light">%%{init:{"theme":"default"}}%%
+    PublicObjects &quot;MerkleTree root&quot; --&gt; PublicObjectsMerkleTree : MerkleTree root
+    MinaNFT &quot;publicObjectsRoot&quot; --&gt; PublicObjects
+    PrivateObjects &quot;MerkleTree root&quot; --&gt; PrivateObjectsMerkleTree : MerkleTree root
+    MinaNFT &quot;privateObjectsRoot&quot; --&gt; PrivateObjects</div><div class="mermaid light">%%{init:{"theme":"default"}}%%
 classDiagram
     class MinaNFT{
         name
-        publicMapRoot
-        publicFilesRoot
-        privateMapRoot
-        privateFilesRoot
+        publicAttributesRoot
+        publicObjectsRoot
+        privateAttributesRoot
+        privateObjectsRoot
         uri1
         uri2
         pwdHash
@@ -153,7 +155,8 @@ classDiagram
     class PublicMerkleMap{
         key : value
     }
-    class PublicFiles{
+    class PublicObjects{
+      type (map, string, file)
       filename
       size
       mime-type
@@ -161,7 +164,8 @@ classDiagram
       sha3-512
       MerkleTree root
     }
-    class PrivateFiles{
+    class PrivateObjects{
+      type (map, string, file)
       filename
       size
       mime-type
@@ -175,28 +179,28 @@ classDiagram
       powerToVerify
       MerkleTree root
     }
-    class PublicFileMerkleTree{
+    class PublicObjectsMerkleTree{
       [file data]
     }
-    class PrivateFileMerkleTree{
+    class PrivateObjectsMerkleTree{
       [file data]
     }
     MinaNFT &quot;uri1&quot; --&gt; uri : uri1
     MinaNFT &quot;uri2&quot; --&gt; uri : uri2
-    MinaNFT &quot;publicMapRoot&quot; --&gt; PublicMerkleMap : publicMapRoot
-    MinaNFT &quot;privateMapRoot&quot; --&gt; PrivateMerkleMap : privateMapRoot
+    MinaNFT &quot;publicAttributesRoot&quot; --&gt; PublicMerkleMap : publicAttributesRoot
+    MinaNFT &quot;privateAttributesRoot&quot; --&gt; PrivateMerkleMap : privateAttributesRoot
     uri --&gt; IPFS
     uri --&gt; Arweave
-    PublicFiles &quot;MerkleTree root&quot; --&gt; PublicFileMerkleTree : MerkleTree root
-    MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles
-    PrivateFiles &quot;MerkleTree root&quot; --&gt; PrivateFileMerkleTree : MerkleTree root
-    MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles</div><pre><code class="language-mermaid">classDiagram
+    PublicObjects &quot;MerkleTree root&quot; --&gt; PublicObjectsMerkleTree : MerkleTree root
+    MinaNFT &quot;publicObjectsRoot&quot; --&gt; PublicObjects
+    PrivateObjects &quot;MerkleTree root&quot; --&gt; PrivateObjectsMerkleTree : MerkleTree root
+    MinaNFT &quot;privateObjectsRoot&quot; --&gt; PrivateObjects</div><pre><code class="language-mermaid">classDiagram
     class MinaNFT{
         name
-        publicMapRoot
-        publicFilesRoot
-        privateMapRoot
-        privateFilesRoot
+        publicAttributesRoot
+        publicObjectsRoot
+        privateAttributesRoot
+        privateObjectsRoot
         uri1
         uri2
         pwdHash
@@ -210,7 +214,8 @@ classDiagram
     class PublicMerkleMap{
         key : value
     }
-    class PublicFiles{
+    class PublicObjects{
+      type (map, string, file)
       filename
       size
       mime-type
@@ -218,7 +223,8 @@ classDiagram
       sha3-512
       MerkleTree root
     }
-    class PrivateFiles{
+    class PrivateObjects{
+      type (map, string, file)
       filename
       size
       mime-type
@@ -232,24 +238,24 @@ classDiagram
       powerToVerify
       MerkleTree root
     }
-    class PublicFileMerkleTree{
+    class PublicObjectsMerkleTree{
       [file data]
     }
-    class PrivateFileMerkleTree{
+    class PrivateObjectsMerkleTree{
       [file data]
     }
     MinaNFT &quot;uri1&quot; --&gt; uri : uri1
     MinaNFT &quot;uri2&quot; --&gt; uri : uri2
-    MinaNFT &quot;publicMapRoot&quot; --&gt; PublicMerkleMap : publicMapRoot
-    MinaNFT &quot;privateMapRoot&quot; --&gt; PrivateMerkleMap : privateMapRoot
+    MinaNFT &quot;publicAttributesRoot&quot; --&gt; PublicMerkleMap : publicAttributesRoot
+    MinaNFT &quot;privateAttributesRoot&quot; --&gt; PrivateMerkleMap : privateAttributesRoot
     uri --&gt; IPFS
     uri --&gt; Arweave
-    PublicFiles &quot;MerkleTree root&quot; --&gt; PublicFileMerkleTree : MerkleTree root
-    MinaNFT &quot;publicFilesRoot&quot; --&gt; PublicFiles
-    PrivateFiles &quot;MerkleTree root&quot; --&gt; PrivateFileMerkleTree : MerkleTree root
-    MinaNFT &quot;privateFilesRoot&quot; --&gt; PrivateFiles</code></pre></div>
+    PublicObjects &quot;MerkleTree root&quot; --&gt; PublicObjectsMerkleTree : MerkleTree root
+    MinaNFT &quot;publicObjectsRoot&quot; --&gt; PublicObjects
+    PrivateObjects &quot;MerkleTree root&quot; --&gt; PrivateObjectsMerkleTree : MerkleTree root
+    MinaNFT &quot;privateObjectsRoot&quot; --&gt; PrivateObjects</code></pre></div>
 
-<a id="md:usage" class="tsd-anchor"></a><h2><a href="#md:usage">Usage:</a></h2><pre><code class="language-typescript"><span class="hl-1">    </span><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-0">MinaNFT</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-5">&quot;minanft&quot;</span><span class="hl-1">; </span><span class="hl-8">// const { MinaNFT } = require(&quot;minanft&quot;) for JavaScript</span><br/><span class="hl-1">    </span><span class="hl-7">import</span><span class="hl-1"> </span><span class="hl-0">fs</span><span class="hl-1"> </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-5">&quot;fs/promises&quot;</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">minaInit</span><span class="hl-1">(); </span><span class="hl-8">// init Mina network connection</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">//Create NFT from image link</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft1</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">fromImageUrl</span><span class="hl-1">(</span><span class="hl-5">&quot;@mynftname1&quot;</span><span class="hl-1">, </span><span class="hl-5">&quot;https://.../myimage.jpg&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">//Create NFT from text description of image using AI models ChatGPT and DALL-E</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft2</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">fromImageDescription</span><span class="hl-1">(</span><span class="hl-5">&quot;@mynftname2&quot;</span><span class="hl-1">, </span><span class="hl-5">&quot;Description of the image&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">//Create NFT from voice description of image using AI models ChatGPT and DALL-E</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft3</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">fromVoiceUrl</span><span class="hl-1">(</span><span class="hl-5">&quot;@mynftname2&quot;</span><span class="hl-1">, </span><span class="hl-5">&quot;https://.../voicemessage.ogg&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// Add public visible and verifiable on-chain keys</span><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">addPublicKeys</span><span class="hl-1">({</span><span class="hl-0">country:</span><span class="hl-1"> </span><span class="hl-5">&quot;France&quot;</span><span class="hl-1">, </span><span class="hl-0">city:</span><span class="hl-1"> </span><span class="hl-5">&quot;Paris&quot;</span><span class="hl-1">});</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// Add private invisible, but verifiable on-chain keys</span><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">addPrivateKeys</span><span class="hl-1">({</span><span class="hl-0">author:</span><span class="hl-1"> </span><span class="hl-5">&quot;John Blockchain&quot;</span><span class="hl-1">, </span><span class="hl-0">date:</span><span class="hl-1"> </span><span class="hl-5">&quot;16-Aug-2023&quot;</span><span class="hl-1">});</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// Generate proof</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">proof</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">getPrivateProof</span><span class="hl-1">(</span><span class="hl-5">&quot;date&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// verify proof off-chain</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">isValid</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">verifyPrivateProof</span><span class="hl-1">(</span><span class="hl-0">proof</span><span class="hl-1">, </span><span class="hl-5">&quot;16-Aug-2023&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// Get jwtToken at https://t.me/minanft_bot?start=auth</span><br/><span class="hl-1">    </span><span class="hl-8">// and then deploy NFT to MINA blockchain</span><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">deploy</span><span class="hl-1">(</span><span class="hl-0">jwtToken</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">wait</span><span class="hl-1">(); </span><span class="hl-8">// Wait for deployment, can be up to 15 minutes</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-5">&quot;See your new Mina NFT at minnaft.io</span><span class="hl-9">\@</span><span class="hl-5">mynftname1&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// get all private data and keys</span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">privateData</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">getPrivateJson</span><span class="hl-1">(); </span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// Write private keys to local disk</span><br/><span class="hl-1">    </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">fs</span><span class="hl-1">.</span><span class="hl-4">writeFile</span><span class="hl-1">(</span><span class="hl-5">&quot;@nynftname1-private-v1.json&quot;</span><span class="hl-1">, </span><span class="hl-3">JSON</span><span class="hl-1">.</span><span class="hl-4">stringify</span><span class="hl-1">(</span><span class="hl-0">privateData</span><span class="hl-1">));</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">tx</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">getVerifyPrivateProofTransaction</span><span class="hl-1">(</span><span class="hl-0">proof</span><span class="hl-1">, </span><span class="hl-5">&quot;16-Aug-2023&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><span class="hl-8">// then send tx to Mina Network to get verification on-chain</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-8">// Restore NFT from JSON </span><br/><span class="hl-1">    </span><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">formPrivateJson</span><span class="hl-1">(</span><span class="hl-0">privateData</span><span class="hl-1">);</span><br/>
+<a id="md:usage" class="tsd-anchor"></a><h2><a href="#md:usage">Usage:</a></h2><pre><code class="language-typescript"><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-0">MinaNFT</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-5">&quot;minanft&quot;</span><span class="hl-1">; </span><span class="hl-8">// const { MinaNFT } = require(&quot;minanft&quot;) for JavaScript</span><br/><span class="hl-7">import</span><span class="hl-1"> </span><span class="hl-0">fs</span><span class="hl-1"> </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-5">&quot;fs/promises&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">minaInit</span><span class="hl-1">(); </span><span class="hl-8">// init Mina network connection</span><br/><br/><span class="hl-8">//Create NFT from image link</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft1</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">fromImageUrl</span><span class="hl-1">(</span><span class="hl-5">&quot;@mynftname1&quot;</span><span class="hl-1">, </span><span class="hl-5">&quot;https://.../myimage.jpg&quot;</span><span class="hl-1">);</span><br/><br/><span class="hl-8">//Create NFT from text description of image using AI models ChatGPT and DALL-E</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft2</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">fromImageDescription</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">&quot;@mynftname2&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">&quot;Description of the image&quot;</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-8">//Create NFT from voice description of image using AI models ChatGPT and DALL-E</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft3</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">fromVoiceUrl</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">&quot;@mynftname2&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">&quot;https://.../voicemessage.ogg&quot;</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-8">// Add public visible and verifiable on-chain keys</span><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">addPublicKeys</span><span class="hl-1">({ </span><span class="hl-0">country:</span><span class="hl-1"> </span><span class="hl-5">&quot;France&quot;</span><span class="hl-1">, </span><span class="hl-0">city:</span><span class="hl-1"> </span><span class="hl-5">&quot;Paris&quot;</span><span class="hl-1"> });</span><br/><br/><span class="hl-8">// Add private invisible, but verifiable on-chain keys</span><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">addPrivateKeys</span><span class="hl-1">({ </span><span class="hl-0">author:</span><span class="hl-1"> </span><span class="hl-5">&quot;John Blockchain&quot;</span><span class="hl-1">, </span><span class="hl-0">date:</span><span class="hl-1"> </span><span class="hl-5">&quot;16-Aug-2023&quot;</span><span class="hl-1"> });</span><br/><br/><span class="hl-8">// Generate proof</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">proof</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">getPrivateProof</span><span class="hl-1">(</span><span class="hl-5">&quot;date&quot;</span><span class="hl-1">);</span><br/><br/><span class="hl-8">// verify proof off-chain</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">isValid</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">verifyPrivateProof</span><span class="hl-1">(</span><span class="hl-0">proof</span><span class="hl-1">, </span><span class="hl-5">&quot;16-Aug-2023&quot;</span><span class="hl-1">);</span><br/><br/><span class="hl-8">// Get jwtToken at https://t.me/minanft_bot?start=auth</span><br/><span class="hl-8">// and then deploy NFT to MINA blockchain</span><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">deploy</span><span class="hl-1">(</span><span class="hl-0">jwtToken</span><span class="hl-1">);</span><br/><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">wait</span><span class="hl-1">(); </span><span class="hl-8">// Wait for deployment, can be up to 15 minutes</span><br/><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-5">&quot;See your new Mina NFT at minnaft.io@mynftname1&quot;</span><span class="hl-1">);</span><br/><br/><span class="hl-8">// get all private data and keys</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">privateData</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">getPrivateJson</span><span class="hl-1">();</span><br/><br/><span class="hl-8">// Write private keys to local disk</span><br/><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">fs</span><span class="hl-1">.</span><span class="hl-4">writeFile</span><span class="hl-1">(</span><span class="hl-5">&quot;@nynftname1-private-v1.json&quot;</span><span class="hl-1">, </span><span class="hl-3">JSON</span><span class="hl-1">.</span><span class="hl-4">stringify</span><span class="hl-1">(</span><span class="hl-0">privateData</span><span class="hl-1">));</span><br/><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">tx</span><span class="hl-1"> = </span><span class="hl-7">await</span><span class="hl-1"> </span><span class="hl-0">nft1</span><span class="hl-1">.</span><span class="hl-4">getVerifyPrivateProofTransaction</span><span class="hl-1">(</span><span class="hl-0">proof</span><span class="hl-1">, </span><span class="hl-5">&quot;16-Aug-2023&quot;</span><span class="hl-1">);</span><br/><span class="hl-8">// then send tx to Mina Network to get verification on-chain</span><br/><br/><span class="hl-8">// Restore NFT from JSON</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">nft</span><span class="hl-1"> = </span><span class="hl-0">MinaNFT</span><span class="hl-1">.</span><span class="hl-4">formPrivateJson</span><span class="hl-1">(</span><span class="hl-0">privateData</span><span class="hl-1">);</span>
 </code><button>Copy</button></pre>
 <a id="md:website" class="tsd-anchor"></a><h2><a href="#md:website">Website</a></h2><p><a href="https://minanft.io">https://minanft.io</a></p>
 <a id="md:library-on-npm" class="tsd-anchor"></a><h2><a href="#md:library-on-npm">Library on NPM</a></h2><p><a href="https://www.npmjs.com/package/minanft">https://www.npmjs.com/package/minanft</a></p>
