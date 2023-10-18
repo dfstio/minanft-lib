@@ -104,6 +104,9 @@ describe("MinaNFT contract on Berkeley", () => {
     );
 
     await nft.commit(deployer, secret); // commit the update to blockchain
+
+    const newSecret: Field = Field.random();
+    await nft.changePassword(deployer, secret, newSecret);
   });
 });
 
