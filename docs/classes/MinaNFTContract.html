@@ -303,11 +303,11 @@ classDiagram
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
 <div class="tsd-index-list"><a href="MinaNFTContract.html#approve" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>approve</span></a>
+<a href="MinaNFTContract.html#changePassword" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>change<wbr/>Password</span></a>
 <a href="MinaNFTContract.html#deploy" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>deploy</span></a>
 <a href="MinaNFTContract.html#emitEvent" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>emit<wbr/>Event</span></a>
 <a href="MinaNFTContract.html#fetchEvents" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>fetch<wbr/>Events</span></a>
-<a href="MinaNFTContract.html#init" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>init</span></a>
-<a href="MinaNFTContract.html#mint-2" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>mint</span></a>
+<a href="MinaNFTContract.html#init" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>init</span></a>
 <a href="MinaNFTContract.html#newSelf" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>new<wbr/>Self</span></a>
 <a href="MinaNFTContract.html#requireSignature" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>require<wbr/>Signature</span></a>
 <a href="MinaNFTContract.html#send-2" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>send</span></a>
@@ -704,6 +704,21 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <p>Inherited from SmartContract.approve</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:282</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="changePassword" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>change<wbr/>Password</span><a href="#changePassword" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="changePassword.changePassword-1"><span class="tsd-kind-call-signature">change<wbr/>Password</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">newsecret</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#changePassword.changePassword-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">secret</span>: <span class="tsd-signature-type ">Field</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">newsecret</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in src/contract/minanft.ts:147</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="deploy" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>deploy</span><a href="#deploy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -774,42 +789,21 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <p>Inherited from SmartContract.fetchEvents</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:323</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="init" class="tsd-anchor"></a>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="init" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>init</span><a href="#init" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
+<ul class="tsd-signatures tsd-is-inherited tsd-is-external">
 <li class="tsd-signature tsd-anchor-link" id="init.init-1"><span class="tsd-kind-call-signature">init</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#init.init-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<p>Overrides SmartContract.init</p>
+<div class="tsd-comment tsd-typography"><p><code>SmartContract.init()</code> will be called only when a SmartContract will be first deployed, not for redeployment.
+This method can be overridden as follows</p>
+<pre><code><span class="hl-2">class</span><span class="hl-1"> </span><span class="hl-6">MyContract</span><span class="hl-1"> </span><span class="hl-2">extends</span><span class="hl-1"> </span><span class="hl-6">SmartContract</span><span class="hl-1"> {</span><br/><span class="hl-1"> </span><span class="hl-4">init</span><span class="hl-1">() {</span><br/><span class="hl-1">   </span><span class="hl-2">super</span><span class="hl-1">.</span><span class="hl-4">init</span><span class="hl-1">();</span><br/><span class="hl-1">   </span><span class="hl-2">this</span><span class="hl-1">.</span><span class="hl-0">account</span><span class="hl-1">.</span><span class="hl-0">permissions</span><span class="hl-1">.</span><span class="hl-4">set</span><span class="hl-1">(...);</span><br/><span class="hl-1">   </span><span class="hl-2">this</span><span class="hl-1">.</span><span class="hl-0">x</span><span class="hl-1">.</span><span class="hl-4">set</span><span class="hl-1">(</span><span class="hl-4">Field</span><span class="hl-1">(</span><span class="hl-9">1</span><span class="hl-1">));</span><br/><span class="hl-1"> }</span><br/><span class="hl-1">}</span>
+</code><button>Copy</button></pre>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Inherited from SmartContract.init</p>
 <ul>
-<li>Defined in src/contract/minanft.ts:107</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="mint-2" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>mint</span><a href="#mint-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="mint-2.mint-3"><span class="tsd-kind-call-signature">mint</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span>, <span class="tsd-kind-parameter">publicAttributesRoot</span>, <span class="tsd-kind-parameter">publicObjectsRoot</span>, <span class="tsd-kind-parameter">privateAttributesRoot</span>, <span class="tsd-kind-parameter">privateObjectsRoot</span>, <span class="tsd-kind-parameter">uri1</span>, <span class="tsd-kind-parameter">uri2</span>, <span class="tsd-kind-parameter">pwdHash</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#mint-2.mint-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">name</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">publicAttributesRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">publicObjectsRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">privateAttributesRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">privateObjectsRoot</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">uri1</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">uri2</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">pwdHash</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
-<ul>
-<li>Defined in src/contract/minanft.ts:116</li></ul></aside></li></ul></section>
+<li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:182</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="newSelf" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>new<wbr/>Self</span><a href="#newSelf" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -947,7 +941,7 @@ authorization flow.</p>
 <h5><span class="tsd-kind-parameter">proof</span>: <a href="MinaNFTStateProof.html" class="tsd-signature-type tsd-kind-class">MinaNFTStateProof</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in src/contract/minanft.ts:171</li></ul></aside></li></ul></section>
+<li>Defined in src/contract/minanft.ts:107</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="Proof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>Proof</span><a href="#Proof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -1167,11 +1161,11 @@ a cached verification key can be used.</p>
 <li><a href="#token" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-262144"></use></svg><span>token</span></a></li>
 <li><a href="#tokenSymbol" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-262144"></use></svg><span>token<wbr/>Symbol</span></a></li>
 <li><a href="#approve" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>approve</span></a></li>
+<li><a href="#changePassword" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>change<wbr/>Password</span></a></li>
 <li><a href="#deploy" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>deploy</span></a></li>
 <li><a href="#emitEvent" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>emit<wbr/>Event</span></a></li>
 <li><a href="#fetchEvents" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>fetch<wbr/>Events</span></a></li>
-<li><a href="#init" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>init</span></a></li>
-<li><a href="#mint-2" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>mint</span></a></li>
+<li><a href="#init" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>init</span></a></li>
 <li><a href="#newSelf" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>new<wbr/>Self</span></a></li>
 <li><a href="#requireSignature" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>require<wbr/>Signature</span></a></li>
 <li><a href="#send-2" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>send</span></a></li>
