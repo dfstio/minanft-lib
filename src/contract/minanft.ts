@@ -104,6 +104,55 @@ export class MinaNFTContract extends SmartContract {
     });
   }
 
+  @method update(secret: Field, proof: MinaNFTStateProof) {
+    this.pwdHash.assertEquals(this.pwdHash.get());
+    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+
+    const publicAttributesRoot: Field = this.publicAttributesRoot.get();
+    this.publicAttributesRoot.assertEquals(publicAttributesRoot);
+
+    const publicObjectsRoot: Field = this.publicObjectsRoot.get();
+    this.publicObjectsRoot.assertEquals(publicObjectsRoot);
+
+    const privateAttributesRoot: Field = this.privateAttributesRoot.get();
+    this.privateAttributesRoot.assertEquals(privateAttributesRoot);
+
+    const privateObjectsRoot: Field = this.privateObjectsRoot.get();
+    this.privateObjectsRoot.assertEquals(privateObjectsRoot);
+
+    proof.publicInput.publicAttributes.initialRoot.assertEquals(
+      publicAttributesRoot
+    );
+    proof.publicInput.publicObjects.initialRoot.assertEquals(publicObjectsRoot);
+    proof.publicInput.privateAttributes.initialRoot.assertEquals(
+      privateAttributesRoot
+    );
+    proof.publicInput.privateObjects.initialRoot.assertEquals(
+      privateObjectsRoot
+    );
+
+    proof.verify();
+
+    this.publicAttributesRoot.set(
+      proof.publicInput.publicAttributes.latestRoot
+    );
+    this.publicObjectsRoot.set(proof.publicInput.publicObjects.latestRoot);
+    this.privateAttributesRoot.set(
+      proof.publicInput.privateAttributes.latestRoot
+    );
+    this.privateObjectsRoot.set(proof.publicInput.privateObjects.latestRoot);
+  }
+
+  // Change password
+  @method changePassword(secret: Field, newsecret: Field) {
+    this.pwdHash.assertEquals(this.pwdHash.get());
+    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+
+    this.pwdHash.set(Poseidon.hash([newsecret]));
+  }
+}
+
+/*
   @method init() {
     this.account.provedState.assertEquals(this.account.provedState.get());
     this.account.provedState.get().assertFalse();
@@ -167,51 +216,6 @@ export class MinaNFTContract extends SmartContract {
     this.uri2.set(uri2);
     this.pwdHash.set(pwdHash);
   }
-
-  @method update(secret: Field, proof: MinaNFTStateProof) {
-    this.account.provedState.assertEquals(this.account.provedState.get());
-    this.account.provedState.get().assertTrue();
-
-    const pwdHash = this.pwdHash.get();
-    this.pwdHash.assertEquals(pwdHash);
-    this.pwdHash.assertEquals(Poseidon.hash([secret]));
-
-    const publicAttributesRoot: Field = this.publicAttributesRoot.get();
-    this.publicAttributesRoot.assertEquals(publicAttributesRoot);
-
-    const publicObjectsRoot: Field = this.publicObjectsRoot.get();
-    this.publicObjectsRoot.assertEquals(publicObjectsRoot);
-
-    const privateAttributesRoot: Field = this.privateAttributesRoot.get();
-    this.privateAttributesRoot.assertEquals(privateAttributesRoot);
-
-    const privateObjectsRoot: Field = this.privateObjectsRoot.get();
-    this.privateObjectsRoot.assertEquals(privateObjectsRoot);
-
-    proof.publicInput.publicAttributes.initialRoot.assertEquals(
-      publicAttributesRoot
-    );
-    proof.publicInput.publicObjects.initialRoot.assertEquals(publicObjectsRoot);
-    proof.publicInput.privateAttributes.initialRoot.assertEquals(
-      privateAttributesRoot
-    );
-    proof.publicInput.privateObjects.initialRoot.assertEquals(
-      privateObjectsRoot
-    );
-
-    proof.verify();
-
-    this.publicAttributesRoot.set(
-      proof.publicInput.publicAttributes.latestRoot
-    );
-    this.publicObjectsRoot.set(proof.publicInput.publicObjects.latestRoot);
-    this.privateAttributesRoot.set(
-      proof.publicInput.privateAttributes.latestRoot
-    );
-    this.privateObjectsRoot.set(proof.publicInput.privateObjects.latestRoot);
-  }
-
-  /*
 
   @method updatePublicAttributes(secret: Field, proof: MinaNFTMapProof) {
     this.account.provedState.assertEquals(this.account.provedState.get())
@@ -405,4 +409,3 @@ export class MinaNFTContract extends SmartContract {
         this.username.set(username);
     }
 */
-}

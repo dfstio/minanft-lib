@@ -9,6 +9,7 @@ import {
   Proof,
   verify,
   fetchAccount,
+  Poseidon,
 } from "o1js";
 //import cliProgress from "cli-progress";
 import { MinaNFTContract } from "./contract/minanft";
@@ -193,9 +194,12 @@ class MinaNFT {
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.zkAppPublicKey });
     const zkApp = new MinaNFTContract(this.zkAppPublicKey);
-    const tx = await Mina.transaction({ sender, fee: transactionFee }, () => {
-      zkApp.update(secret, proof);
-    });
+    const tx = await Mina.transaction(
+      { sender, fee: transactionFee, memo: "minanft.io" },
+      () => {
+        zkApp.update(secret, proof);
+      }
+    );
     await tx.prove();
     tx.sign([deployer]);
     const res = await tx.send();
@@ -485,7 +489,7 @@ class MinaNFT {
   /**
    * Deploys the MinaNFT contract (takes a long time, and compiles the contract if needed)
    * @param deployer Private key of the account that will deploy the contract
-   */
+
   public async deploy(deployer: PrivateKey): Promise<void> {
     if (this.zkAppPublicKey !== undefined) {
       console.error("already deployed");
@@ -516,6 +520,7 @@ class MinaNFT {
     const res = await transaction.send();
     await MinaNFT.transactionInfo(res);
   }
+   */
 
   /**
    * Mints an NFT. Deploys and compiles the MinaNFT contract if needed. Takes a long time.
@@ -523,17 +528,13 @@ class MinaNFT {
    * @param pwdHash Hash of the password used to prove transactions
    */
   public async mint(deployer: PrivateKey, pwdHash: Field): Promise<void> {
-    if (this.zkAppPublicKey === undefined) {
-      await this.deploy(deployer);
-      await sleep(30 * 1000);
-    }
-    if (this.zkAppPublicKey === undefined) {
-      console.error("Error deploying NFT contract...");
-      return;
-    }
-    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    await MinaNFT.compile();
     console.log("Minting NFT...");
     const sender = deployer.toPublicKey();
+    const zkAppPrivateKey = PrivateKey.random();
+    this.zkAppPublicKey = zkAppPrivateKey.toPublicKey();
+    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+
     const publicAttributesData = await this.getPublicMapRootAndMap();
     const privateAttributesData = await this.getPrivateMapRootAndMap();
     const emptyMap = new MerkleMap(); // TODO: generate map for files
@@ -547,45 +548,123 @@ class MinaNFT {
     }
     const { root: publicAttributesRoot } = publicAttributesData;
     const { root: privateAttributesRoot } = privateAttributesData;
+
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.zkAppPublicKey });
     /*
-        @method mint(
-          name: Field,
-          publicAttributesRoot: Field,
-          publicObjectsRoot: Field,
-          privateAttributesRoot: Field,
-          privateObjectsRoot: Field,
-          uri1: Field,
-          uri2: Field,
-          pwdHash: Field,
+        export class MinaNFTContract extends SmartContract {
+          @state(Field) name = State<Field>();
+          @state(Field) publicAttributesRoot = State<Field>(); // Merkle root of public key-values attributes Map
+          @state(Field) publicObjectsRoot = State<Field>(); // Merkle root of public Objects Map
+          @state(Field) privateAttributesRoot = State<Field>(); // Merkle root of private key-values attributes Map
+          @state(Field) privateObjectsRoot = State<Field>(); // Merkle root of private Objects Map
+          // URI format: ipfs:IPFS_HASH or arweave:ARWEAVE_HASH
+          @state(Field) uri1 = State<Field>(); // First part of uri hash converted from string to Field
+          @state(Field) uri2 = State<Field>(); // Second part of uri hash converted from string to Field
+          @state(Field) pwdHash = State<Field>(); // Hash of password used to prove transactions
         )
     */
-    const tx = await Mina.transaction(
+    const transaction = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
-        zkApp.mint(
-          MinaNFT.stringToField(this.name),
-          publicAttributesRoot,
-          emptyRoot,
-          privateAttributesRoot,
-          emptyRoot,
-          MinaNFT.stringToField("ipfs:"),
-          MinaNFT.stringToField("none"),
-          pwdHash
-        );
+        AccountUpdate.fundNewAccount(sender);
+        zkApp.deploy({});
+        zkApp.name.set(MinaNFT.stringToField(this.name));
+        zkApp.publicAttributesRoot.set(publicAttributesRoot);
+        zkApp.publicObjectsRoot.set(emptyRoot);
+        zkApp.privateAttributesRoot.set(privateAttributesRoot);
+        zkApp.privateObjectsRoot.set(emptyRoot);
+        zkApp.uri1.set(MinaNFT.stringToField("ipfs:"));
+        zkApp.uri2.set(MinaNFT.stringToField("none"));
+        zkApp.pwdHash.set(pwdHash);
       }
     );
-
-    await tx.prove();
-    tx.sign([deployer]);
-    const sentTx = await tx.send();
+    await transaction.prove();
+    transaction.sign([deployer, zkAppPrivateKey]);
+    const sentTx = await transaction.send();
     await MinaNFT.transactionInfo(sentTx);
     this.isMinted = true;
     this.publicAttributesRoot = publicAttributesRoot;
     this.publicObjectsRoot = emptyRoot;
     this.privateAttributesRoot = privateAttributesRoot;
     this.privateObjectsRoot = emptyRoot;
+    await sleep(10 * 1000);
+    await fetchAccount({ publicKey: this.zkAppPublicKey });
+    const newName = zkApp.name.get();
+    if (newName.toJSON() !== MinaNFT.stringToField(this.name).toJSON())
+      throw new Error("Wrong name");
+    const newPublicAttributesRoot = zkApp.publicAttributesRoot.get();
+    if (newPublicAttributesRoot.toJSON() !== publicAttributesRoot.toJSON())
+      throw new Error("Wrong publicAttributesRoot");
+    const newPublicObjectsRoot = zkApp.publicObjectsRoot.get();
+    if (newPublicObjectsRoot.toJSON() !== emptyRoot.toJSON())
+      throw new Error("Wrong publicObjectsRoot");
+    const newPrivateAttributesRoot = zkApp.privateAttributesRoot.get();
+    if (newPrivateAttributesRoot.toJSON() !== privateAttributesRoot.toJSON())
+      throw new Error("Wrong privateAttributesRoot");
+    const newPrivateObjectsRoot = zkApp.privateObjectsRoot.get();
+    if (newPrivateObjectsRoot.toJSON() !== emptyRoot.toJSON())
+      throw new Error("Wrong privateObjectsRoot");
+    const newUri1 = zkApp.uri1.get();
+    if (newUri1.toJSON() !== MinaNFT.stringToField("ipfs:").toJSON())
+      throw new Error("Wrong uri1");
+    const newUri2 = zkApp.uri2.get();
+    if (newUri2.toJSON() !== MinaNFT.stringToField("none").toJSON())
+      throw new Error("Wrong uri2");
+    const newPwdHash = zkApp.pwdHash.get();
+    if (newPwdHash.toJSON() !== pwdHash.toJSON())
+      throw new Error("Wrong pwdHash");
+  }
+
+  /**
+   * Commit updates of the MinaNFT to blockchain
+   * Generates recursive proofs for all updates,
+   * than verify the proof locally and send the transaction to the blockchain
+   *
+   * @param deployer Private key of the account that will commit the updates
+   */
+  public async changePassword(
+    deployer: PrivateKey,
+    secret: Field,
+    newSecret: Field
+  ) {
+    if (this.zkAppPublicKey === undefined) {
+      console.error("NFT contract is not deployed");
+      return;
+    }
+
+    if (this.isMinted === false) {
+      console.error("NFT is not minted");
+      return;
+    }
+
+    await MinaNFT.compile();
+    if (MinaNFT.updateVerificationKey === undefined) {
+      console.error("Compilation error");
+      return;
+    }
+
+    console.log("Changing password...");
+    const sender = deployer.toPublicKey();
+    await fetchAccount({ publicKey: sender });
+    await fetchAccount({ publicKey: this.zkAppPublicKey });
+    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    const tx = await Mina.transaction(
+      { sender, fee: transactionFee, memo: "minanft.io" },
+      () => {
+        zkApp.changePassword(secret, newSecret);
+      }
+    );
+    await tx.prove();
+    tx.sign([deployer]);
+    const res = await tx.send();
+    await MinaNFT.transactionInfo(res);
+
+    await sleep(10 * 1000);
+    await fetchAccount({ publicKey: this.zkAppPublicKey });
+    const newPwdHash = zkApp.pwdHash.get();
+    if (newPwdHash.toJSON() !== Poseidon.hash([newSecret]).toJSON())
+      throw new Error("Wrong new pwdHash");
   }
 }
 

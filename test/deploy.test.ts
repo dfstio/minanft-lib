@@ -21,7 +21,7 @@ const transactionFee = 100_000_000;
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = false;
+const useLocal: boolean = true;
 
 class KeyValue extends SmartContract {
   @state(Field) key = State<Field>();
@@ -42,9 +42,21 @@ class KeyValue extends SmartContract {
     });
   }
 
+  init() {
+    super.init();
+  }
+
   @method mint(key: Field, value: Field) {
     this.key.assertEquals(Field(0));
     this.value.assertEquals(Field(0));
+    this.key.set(key);
+    this.value.set(value);
+  }
+
+  @method update(key: Field, value: Field) {
+    this.key.assertEquals(this.key.get());
+    this.value.assertEquals(this.value.get());
+
     this.key.set(key);
     this.value.set(value);
   }
@@ -101,7 +113,7 @@ describe("Deploy and set initial values", () => {
     await transaction.prove();
     transaction.sign([deployer, zkAppPrivateKey]);
 
-    console.log("Sending the deploy transaction...");
+    //console.log("Sending the deploy transaction...");
     const tx = await transaction.send();
     if (!useLocal) {
       if (tx.hash() !== undefined) {
@@ -126,6 +138,44 @@ describe("Deploy and set initial values", () => {
     const newValue = zkApp.value.get();
     expect(newKey.toJSON()).toBe(key.toJSON());
     expect(newValue.toJSON()).toBe(value.toJSON());
+
+    const key1: Field = Field.random();
+    const value1: Field = Field.random();
+    const transaction1 = await Mina.transaction(
+      { sender, fee: transactionFee },
+      () => {
+        zkApp.update(key1, value1);
+      }
+    );
+
+    await transaction1.prove();
+    transaction1.sign([deployer]);
+
+    //console.log("Sending the update transaction...");
+    const tx1 = await transaction1.send();
+    if (!useLocal) {
+      if (tx1.hash() !== undefined) {
+        console.log(`
+      Success! Update transaction sent.
+    
+      Your smart contract state will be updated
+      as soon as the transaction is included in a block:
+      https://berkeley.minaexplorer.com/transaction/${tx1.hash()}
+      `);
+        try {
+          await tx1.wait();
+        } catch (error) {
+          console.log("Error waiting for transaction");
+        }
+      } else console.error("Send fail", tx1);
+      await sleep(30 * 1000);
+    }
+
+    await fetchAccount({ publicKey: zkAppPublicKey });
+    const newKey1 = zkApp.key.get();
+    const newValue1 = zkApp.value.get();
+    expect(newKey1.toJSON()).toBe(key1.toJSON());
+    expect(newValue1.toJSON()).toBe(value1.toJSON());
   });
 
   it("should deploy and set values in one transaction - variant 2", async () => {
@@ -182,6 +232,44 @@ describe("Deploy and set initial values", () => {
     const newValue = zkApp.value.get();
     expect(newKey.toJSON()).toBe(key.toJSON());
     expect(newValue.toJSON()).toBe(value.toJSON());
+
+    const key1: Field = Field.random();
+    const value1: Field = Field.random();
+    const transaction1 = await Mina.transaction(
+      { sender, fee: transactionFee },
+      () => {
+        zkApp.update(key1, value1);
+      }
+    );
+
+    await transaction1.prove();
+    transaction1.sign([deployer]);
+
+    //console.log("Sending the update transaction...");
+    const tx1 = await transaction1.send();
+    if (!useLocal) {
+      if (tx1.hash() !== undefined) {
+        console.log(`
+      Success! Update transaction sent.
+    
+      Your smart contract state will be updated
+      as soon as the transaction is included in a block:
+      https://berkeley.minaexplorer.com/transaction/${tx1.hash()}
+      `);
+        try {
+          await tx1.wait();
+        } catch (error) {
+          console.log("Error waiting for transaction");
+        }
+      } else console.error("Send fail", tx1);
+      await sleep(30 * 1000);
+    }
+
+    await fetchAccount({ publicKey: zkAppPublicKey });
+    const newKey1 = zkApp.key.get();
+    const newValue1 = zkApp.value.get();
+    expect(newKey1.toJSON()).toBe(key1.toJSON());
+    expect(newValue1.toJSON()).toBe(value1.toJSON());
   });
 });
 
