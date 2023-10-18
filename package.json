@@ -24,7 +24,7 @@
     "lint": "eslint src/*.ts",
     "testold": "ts-node tests/test.ts",
     "test": "jest",
-    "addtest": "ts-node tests/add.ts",
+    "deploytest": "ts-node test/deploy.ts",
     "rollup": "ts-node tests/rollup.ts",
     "coverage": "jest --coverage",
     "style": "prettier --tab-width 4 --write {,!(node_modules)/**/}*.ts",
