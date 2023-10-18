@@ -78,7 +78,7 @@ beforeAll(async () => {
   if (balanceDeployer <= 2) return;
 });
 
-describe("Deploy and set initial values values", () => {
+describe("Deploy and set initial values", () => {
   it("should deploy and set values in one transaction", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
