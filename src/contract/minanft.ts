@@ -9,7 +9,7 @@ import {
   SmartContract,
 } from "o1js";
 
-import { MinaNFTStateProof } from "./map";
+import { MinaNFTStateProof, MinaNFTState } from "./map";
 
 /**
  * class MinaNFTContract
@@ -89,6 +89,12 @@ export class MinaNFTContract extends SmartContract {
   @state(Field) uri2 = State<Field>(); // Second part of uri hash converted from string to Field
   @state(Field) pwdHash = State<Field>(); // Hash of password used to prove transactions
 
+  events = {
+    mint: Field,
+    update: MinaNFTState,
+    changePassword: Field,
+  };
+
   deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({
@@ -102,6 +108,7 @@ export class MinaNFTContract extends SmartContract {
       setVotingFor: Permissions.proof(),
       setTiming: Permissions.proof(),
     });
+    this.emitEvent("mint", Field(0));
   }
 
   @method update(secret: Field, proof: MinaNFTStateProof) {
@@ -141,6 +148,7 @@ export class MinaNFTContract extends SmartContract {
       proof.publicInput.privateAttributes.latestRoot
     );
     this.privateObjectsRoot.set(proof.publicInput.privateObjects.latestRoot);
+    this.emitEvent("update", proof.publicInput);
   }
 
   // Change password
@@ -149,6 +157,7 @@ export class MinaNFTContract extends SmartContract {
     this.pwdHash.assertEquals(Poseidon.hash([secret]));
 
     this.pwdHash.set(Poseidon.hash([newsecret]));
+    this.emitEvent("changePassword", newsecret);
   }
 }
 
