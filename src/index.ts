@@ -8,3 +8,4 @@ export {
   MapUpdate,
 } from "./contract/map";
 export { MinaNFTTree } from "./contract/tree";
+export { IPFS } from "./storage/ipfs";

@@ -328,26 +328,24 @@ class MinaNFT {
     return { root: map.getRoot(), map };
   }
 
-  /*
-  public async getPublicJson(): Promise<Object | undefined> {
-    if (!this.publicAttributes.get("name") || !this.publicAttributes.get("image"))
-      return undefined;
+  public async getPublicJson(): Promise<object | undefined> {
+    if (!this.publicAttributes.get("image")) return undefined;
     const publicAttributes: MerkleMap = new MerkleMap();
     Object.keys(this.publicAttributes).map((key) => {
       const value = this.publicAttributes.get(key);
-      if (value)
-        publicAttributes.set(
-          MinaNFT.stringToField(key),
-          MinaNFT.stringToField(value)
-        );
+      if (value) publicAttributes.set(MinaNFT.stringToField(key), value);
       else {
         console.error("Map error");
         return undefined;
       }
     });
     const publicMapRoot: string = publicAttributes.getRoot().toJSON();
-    return { publicMapRoot, publicAttributes: MinaNFT.mapToJSON(this.publicAttributes) };
+    return {
+      publicMapRoot,
+      publicAttributes: MinaNFT.mapToJSON(this.publicAttributes),
+    };
   }
+  /*
 
   public async getPrivateJson(): Promise<Object | undefined> {
     if (!this.publicAttributes.get("name") || !this.publicAttributes.get("image"))
@@ -414,7 +412,7 @@ class MinaNFT {
    * @param map map to convert
    * @returns map as JSON object
    */
-  public static mapToJSON(map: Map<string, string>): Object {
+  public static mapToJSON(map: Map<string, Field>): object {
     return Object.fromEntries(map);
   }
 
