@@ -13,6 +13,7 @@ import {
   Mina,
   PublicKey,
   UInt64,
+  Struct,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
@@ -21,11 +22,22 @@ const transactionFee = 100_000_000;
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = true;
+const useLocal: boolean = false;
+
+class KeyValueEvent extends Struct({
+  key: Field,
+  value: Field,
+}) {}
 
 class KeyValue extends SmartContract {
   @state(Field) key = State<Field>();
   @state(Field) value = State<Field>();
+
+  events = {
+    deploy: Field,
+    mint: KeyValueEvent,
+    update: KeyValueEvent,
+  };
 
   deploy(args: DeployArgs) {
     super.deploy(args);
@@ -40,6 +52,7 @@ class KeyValue extends SmartContract {
       setVotingFor: Permissions.proof(),
       setTiming: Permissions.proof(),
     });
+    this.emitEvent("deploy", Field(0));
   }
 
   init() {
@@ -51,6 +64,7 @@ class KeyValue extends SmartContract {
     this.value.assertEquals(Field(0));
     this.key.set(key);
     this.value.set(value);
+    this.emitEvent("mint", new KeyValueEvent({ key, value }));
   }
 
   @method update(key: Field, value: Field) {
@@ -59,6 +73,8 @@ class KeyValue extends SmartContract {
 
     this.key.set(key);
     this.value.set(value);
+
+    this.emitEvent("update", new KeyValueEvent({ key, value }));
   }
 }
 

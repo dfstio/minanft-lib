@@ -400,7 +400,12 @@ class MinaNFT {
    * @returns string as a Field
    */
   public static stringToField(item: string): Field {
-    return Encoding.stringToFields(item)[0];
+    const fields: Field[] = Encoding.stringToFields(item);
+    if (fields.length === 1) return fields[0];
+    else
+      throw new Error(
+        `stringToField error: string ${item} is too long, requires ${fields.length} Fields`
+      );
   }
 
   // TODO: change string to Field in maps
