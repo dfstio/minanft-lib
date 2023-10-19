@@ -17,7 +17,7 @@ import {
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
-const transactionFee = 100_000_000;
+const transactionFee = 150_000_000;
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
