@@ -37,7 +37,7 @@ class RedactedMinaNFTMapState extends Struct({
       originalRoot: element.originalRoot,
       redactedRoot: element.redactedRoot,
       hash: Poseidon.hash([element.key, element.value]),
-      count: Field(0),
+      count: Field(1),
     });
   }
 
@@ -76,6 +76,7 @@ class RedactedMinaNFTMapState extends Struct({
   }
 }
 
+/*
 class RedactedMinaNFTState extends Struct({
   publicAttributes: RedactedMinaNFTMapState,
   publicObjects: RedactedMinaNFTMapState,
@@ -154,6 +155,7 @@ class RedactedMinaNFTState extends Struct({
     );
   }
 }
+*/
 
 const RedactedMinaNFTMapCalculation = Experimental.ZkProgram({
   publicInput: RedactedMinaNFTMapState,
@@ -202,6 +204,7 @@ const RedactedMinaNFTMapStateProofClass = Experimental.ZkProgram.Proof(
 );
 class RedactedMinaNFTMapStateProof extends RedactedMinaNFTMapStateProofClass {}
 
+/*
 const RedactedMinaNFTCalculation = Experimental.ZkProgram({
   publicInput: RedactedMinaNFTState,
 
@@ -273,13 +276,14 @@ const RedactedMinaNFTStateProofClass = Experimental.ZkProgram.Proof(
   RedactedMinaNFTCalculation
 );
 class RedactedMinaNFTStateProof extends RedactedMinaNFTStateProofClass {}
+*/
 
 export {
-  RedactedMinaNFTCalculation,
+  //RedactedMinaNFTCalculation,
   RedactedMinaNFTMapCalculation,
-  RedactedMinaNFTState,
+  //RedactedMinaNFTState,
   RedactedMinaNFTMapState,
-  RedactedMinaNFTStateProof,
+  //RedactedMinaNFTStateProof,
   RedactedMinaNFTMapStateProof,
   MapElement,
 };

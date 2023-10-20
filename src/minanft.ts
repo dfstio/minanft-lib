@@ -15,11 +15,11 @@ import {
 import { MinaNFTContract } from "./contract/minanft";
 import { MinaNFTUpdate, MinaNFTState, MapUpdate } from "./contract/map";
 import {
-  RedactedMinaNFTCalculation,
+  //RedactedMinaNFTCalculation,
   RedactedMinaNFTMapCalculation,
-  RedactedMinaNFTState,
+  //RedactedMinaNFTState,
   RedactedMinaNFTMapState,
-  RedactedMinaNFTStateProof,
+  //RedactedMinaNFTStateProof,
   RedactedMinaNFTMapStateProof,
   MapElement,
 } from "./contract/redactedmap";
@@ -63,7 +63,7 @@ class BaseMinaNFT {
   static verificationKey: VeificationKey | undefined;
   static updateVerificationKey?: string;
   static redactedMapVerificationKey?: string;
-  static redactedVerificationKey?: string;
+  //static redactedVerificationKey?: string;
 
   constructor() {
     this.publicAttributes = new Map<string, Field>();
@@ -211,8 +211,8 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compile(): Promise<VeificationKey> {
-    if (this.verificationKey !== undefined) {
-      return this.verificationKey;
+    if (MinaNFT.verificationKey !== undefined) {
+      return MinaNFT.verificationKey;
     }
 
     /*     
@@ -225,7 +225,7 @@ class BaseMinaNFT {
     console.log("MinaNFTContract rows:", methods1) 
     */
 
-    console.log("compiling MinaNFT contracts...");
+    console.log("compiling MinaNFT helper contracts...");
     //const { verificationKey : treeKey } = await MinaNFTTree.compile()
     //console.log("Tree", MinaNFTTree.analyzeMethods())
     //MinaNFT.treeVerificationKey = treeKey
@@ -244,8 +244,8 @@ class BaseMinaNFT {
 
     console.log("compiling MinaNFTContract...");
     const { verificationKey } = await MinaNFTContract.compile();
-    this.verificationKey = verificationKey as VeificationKey;
-    return this.verificationKey;
+    MinaNFT.verificationKey = verificationKey as VeificationKey;
+    return MinaNFT.verificationKey;
   }
 }
 
@@ -717,7 +717,11 @@ class MinaNFT extends BaseMinaNFT {
    * @param deployer Private key of the account that will commit the updates
    * @param proof Redacted MinaNFT proof
    */
-  public async verify(deployer: PrivateKey, proof: RedactedMinaNFTStateProof) {
+  public async verify(
+    deployer: PrivateKey,
+    publicAttributesProof: RedactedMinaNFTMapStateProof,
+    privateAttributesProof: RedactedMinaNFTMapStateProof
+  ) {
     if (this.zkAppPublicKey === undefined) {
       console.error("NFT contract is not deployed");
       return;
@@ -739,18 +743,18 @@ class MinaNFT extends BaseMinaNFT {
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.zkAppPublicKey });
     const zkApp = new MinaNFTContract(this.zkAppPublicKey);
-    /*
+
     const tx = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
-        zkApp.verify(proof);
+        zkApp.verifyPublicAttributes(publicAttributesProof);
+        zkApp.verifyPrivateAttributes(privateAttributesProof);
       }
     );
     await tx.prove();
     tx.sign([deployer]);
     const res = await tx.send();
     await MinaNFT.transactionInfo(res);
-    */
   }
 }
 
@@ -782,12 +786,12 @@ class RedactedMinaNFT extends BaseMinaNFT {
     else throw new Error("Map error");
   }
 
-  public async proof(): Promise<RedactedMinaNFTStateProof> {
-    await RedactedMinaNFT.compile();
-    if (RedactedMinaNFT.redactedMapVerificationKey === undefined) {
-      throw new Error("Compilation error");
-    }
-    if (RedactedMinaNFT.redactedVerificationKey === undefined) {
+  public async proof(): Promise<{
+    publicAttributesProof: RedactedMinaNFTMapStateProof;
+    privateAttributesProof: RedactedMinaNFTMapStateProof;
+  }> {
+    await MinaNFT.compile();
+    if (MinaNFT.redactedMapVerificationKey === undefined) {
       throw new Error("Compilation error");
     }
     const publicAttributes = this.getMapRootAndMap(this.publicAttributes);
@@ -814,8 +818,9 @@ class RedactedMinaNFT extends BaseMinaNFT {
       redactedWitness: MerkleMapWitness,
     }) {}
     */
-    const publicAttributesProofs: Proof<RedactedMinaNFTMapState, void>[] = [];
-    this.publicAttributes.forEach(async (value: Field, key: string) => {
+
+    const publicAttributesElements: MapElement[] = [];
+    this.publicAttributes.forEach((value: Field, key: string) => {
       const keyField = MinaNFT.stringToField(key);
       const redactedWitness = publicAttributes.map.getWitness(keyField);
       const originalWitness = originalPublicAttributes.map.getWitness(keyField);
@@ -827,10 +832,28 @@ class RedactedMinaNFT extends BaseMinaNFT {
         originalWitness,
         redactedWitness,
       };
-      const state = RedactedMinaNFTMapState.create(element);
-      const proof = await RedactedMinaNFTMapCalculation.create(state, element);
-      publicAttributesProofs.push(proof);
+      publicAttributesElements.push(element);
     });
+
+    const publicAttributesProofs: Proof<RedactedMinaNFTMapState, void>[] = [];
+    for (let i = 0; i < publicAttributesElements.length; i++) {
+      const state = RedactedMinaNFTMapState.create(publicAttributesElements[i]);
+      const proof = await RedactedMinaNFTMapCalculation.create(
+        state,
+        publicAttributesElements[i]
+      );
+      publicAttributesProofs.push(proof);
+      /*
+      console.log(
+        "Proof",
+        i,
+        "count",
+        proof.publicInput.count.toJSON(),
+        "hash",
+        proof.publicInput.hash.toJSON()
+      );
+      */
+    }
     if (publicAttributesProofs.length === 0) {
       const state = RedactedMinaNFTMapState.createEmpty(
         originalPublicAttributes.root
@@ -842,6 +865,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
       publicAttributesProofs.push(proof);
     }
 
+    /*
     const privateAttributesProofs: Proof<RedactedMinaNFTMapState, void>[] = [];
     this.privateAttributes.forEach(async (value: Field, key: string) => {
       const keyField = MinaNFT.stringToField(key);
@@ -870,21 +894,126 @@ class RedactedMinaNFT extends BaseMinaNFT {
       );
       privateAttributesProofs.push(proof);
     }
-
-    console.log("Merging redacted proofs...");
-    let publicProof: RedactedMinaNFTMapStateProof = publicAttributesProofs[0];
+    */
+    //console.log("Merging redacted proofs...");
+    let publicAttributesProof: RedactedMinaNFTMapStateProof =
+      publicAttributesProofs[0];
     for (let i = 1; i < publicAttributesProofs.length; i++) {
       const state = RedactedMinaNFTMapState.merge(
-        publicProof.publicInput,
+        publicAttributesProof.publicInput,
         publicAttributesProofs[i].publicInput
       );
       const mergedProof = await RedactedMinaNFTMapCalculation.merge(
         state,
-        publicProof,
+        publicAttributesProof,
         publicAttributesProofs[i]
       );
-      publicProof = mergedProof;
+      publicAttributesProof = mergedProof;
+      /*
+      console.log(
+        "Proof merge",
+        i,
+        "count",
+        publicProof.publicInput.count.toJSON(),
+        "hash",
+        publicProof.publicInput.hash.toJSON()
+      );
+      */
     }
+
+    let verificationResult: boolean = await verify(
+      publicAttributesProof.toJSON(),
+      MinaNFT.redactedMapVerificationKey
+    );
+
+    //console.log("Proof verification result:", verificationResult);
+    if (verificationResult === false) {
+      throw new Error("Proof verification error");
+    }
+
+    const privateAttributesElements: MapElement[] = [];
+    this.privateAttributes.forEach((value: Field, key: string) => {
+      const keyField = MinaNFT.stringToField(key);
+      const redactedWitness = privateAttributes.map.getWitness(keyField);
+      const originalWitness =
+        originalPrivateAttributes.map.getWitness(keyField);
+      const element: MapElement = {
+        originalRoot: originalPrivateAttributes.root,
+        redactedRoot: privateAttributes.root,
+        key: keyField,
+        value,
+        originalWitness,
+        redactedWitness,
+      };
+      privateAttributesElements.push(element);
+    });
+
+    const privateAttributesProofs: Proof<RedactedMinaNFTMapState, void>[] = [];
+    for (let i = 0; i < privateAttributesElements.length; i++) {
+      const state = RedactedMinaNFTMapState.create(
+        privateAttributesElements[i]
+      );
+      const proof = await RedactedMinaNFTMapCalculation.create(
+        state,
+        privateAttributesElements[i]
+      );
+      privateAttributesProofs.push(proof);
+      /*
+      console.log(
+        "Proof",
+        i,
+        "count",
+        proof.publicInput.count.toJSON(),
+        "hash",
+        proof.publicInput.hash.toJSON()
+      );
+      */
+    }
+    if (privateAttributesProofs.length === 0) {
+      const state = RedactedMinaNFTMapState.createEmpty(
+        originalPrivateAttributes.root
+      );
+      const proof = await RedactedMinaNFTMapCalculation.createEmpty(
+        state,
+        originalPrivateAttributes.root
+      );
+      privateAttributesProofs.push(proof);
+    }
+
+    //console.log("Merging redacted proofs...");
+    let privateAttributesProof: RedactedMinaNFTMapStateProof =
+      privateAttributesProofs[0];
+    for (let i = 1; i < privateAttributesProofs.length; i++) {
+      const state = RedactedMinaNFTMapState.merge(
+        privateAttributesProof.publicInput,
+        privateAttributesProofs[i].publicInput
+      );
+      const mergedProof = await RedactedMinaNFTMapCalculation.merge(
+        state,
+        privateAttributesProof,
+        privateAttributesProofs[i]
+      );
+      privateAttributesProof = mergedProof;
+      /*
+      console.log(
+        "Proof merge",
+        i,
+        "count",
+        privateProof.publicInput.count.toJSON(),
+        "hash",
+        privateProof.publicInput.hash.toJSON()
+      );
+      */
+    }
+    verificationResult = await verify(
+      privateAttributesProof.toJSON(),
+      MinaNFT.redactedMapVerificationKey
+    );
+    if (verificationResult === false) {
+      throw new Error("Proof verification error");
+    }
+
+    /*
     let privateProof: RedactedMinaNFTMapStateProof = privateAttributesProofs[0];
     for (let i = 1; i < privateAttributesProofs.length; i++) {
       const state = RedactedMinaNFTMapState.merge(
@@ -947,8 +1076,8 @@ class RedactedMinaNFT extends BaseMinaNFT {
     if (verificationResult === false) {
       throw new Error("Proof verification error");
     }
-
-    return proof;
+    */
+    return { publicAttributesProof, privateAttributesProof };
   }
 }
 

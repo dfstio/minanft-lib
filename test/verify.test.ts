@@ -24,7 +24,7 @@ const transactionFee = 150_000_000;
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = true;
+const useLocal: boolean = false;
 
 /*
 class Grant extends Struct({
@@ -111,8 +111,8 @@ beforeAll(async () => {
   await MinaNFT.compile();
 });
 
-describe("Deploy and set initial values", () => {
-  it("should deploy and set values in one transaction - variant 1", async () => {
+describe("Verify proof of a redacted MinNFT", () => {
+  it("should deploy, generate proof and verify it", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
 
@@ -147,8 +147,48 @@ describe("Deploy and set initial values", () => {
     disclosure.copyPublicAttribute("hasMinaNavigatorsBadge");
     disclosure.copyPublicAttribute("numberOfCommits");
     disclosure.copyPrivateAttribute("MinaNavigatorsBadgeHash");
-    const disclosureProof = await disclosure.proof();
-    await nft.verify(deployer, disclosureProof);
+    const { publicAttributesProof, privateAttributesProof } =
+      await disclosure.proof();
+    /*
+    console.log(
+      "Disclosure proof",
+      disclosureProof.publicInput.count.toJSON(),
+      disclosureProof.publicInput.hash.toJSON(),
+      disclosureProof.publicInput.originalRoot.toJSON(),
+      disclosureProof.publicInput.redactedRoot.toJSON()
+    );
+    */
+    expect(publicAttributesProof.publicInput.count.toJSON()).toBe(
+      Field(2).toJSON()
+    );
+    expect(privateAttributesProof.publicInput.count.toJSON()).toBe(
+      Field(1).toJSON()
+    );
+    const hash1 = Poseidon.hash([
+      MinaNFT.stringToField("hasMinaNavigatorsBadge"),
+      MinaNFT.stringToField("true"),
+    ]);
+    const hash2 = Poseidon.hash([
+      MinaNFT.stringToField("numberOfCommits"),
+      Field(12),
+    ]);
+    const hash3 = Poseidon.hash([hash1, hash2]);
+    const hash4 = Poseidon.hash([
+      MinaNFT.stringToField("MinaNavigatorsBadgeHash"),
+      badgeHash,
+    ]);
+    /*
+    console.log("hash1", hash1.toJSON());
+    console.log("hash2", hash2.toJSON());
+    console.log("hash3", hash3.toJSON());
+    */
+    expect(publicAttributesProof.publicInput.hash.toJSON()).toBe(
+      hash3.toJSON()
+    );
+    expect(privateAttributesProof.publicInput.hash.toJSON()).toBe(
+      hash4.toJSON()
+    );
+    await nft.verify(deployer, publicAttributesProof, privateAttributesProof);
   });
   /*
   it("should deploy and set values in one transaction - variant 1", async () => {
