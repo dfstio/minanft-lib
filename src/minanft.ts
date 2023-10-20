@@ -748,7 +748,7 @@ class MinaNFT extends BaseMinaNFT {
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
         zkApp.verifyPublicAttributes(publicAttributesProof);
-        zkApp.verifyPrivateAttributes(privateAttributesProof);
+        //zkApp.verifyPrivateAttributes(privateAttributesProof);
       }
     );
     await tx.prove();
