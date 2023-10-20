@@ -1,4 +1,9 @@
-export { MinaNFT, MinaNFTobject, VeificationKey } from "./minanft";
+export {
+  MinaNFT,
+  RedactedMinaNFT,
+  MinaNFTobject,
+  VeificationKey,
+} from "./minanft";
 export { MinaNFTContract } from "./contract/minanft";
 export {
   MinaNFTState,

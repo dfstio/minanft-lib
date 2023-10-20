@@ -13,16 +13,25 @@ import {
   Mina,
   PublicKey,
   UInt64,
+  Poseidon,
   Struct,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
+import { MinaNFT, RedactedMinaNFT } from "../src/minanft";
 const transactionFee = 150_000_000;
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
 const useLocal: boolean = false;
+
+/*
+class Grant extends Struct({
+hasBadge
+commitsnumber
+@method send
+
 
 class KeyValueEvent extends Struct({
   key: Field,
@@ -77,6 +86,7 @@ class KeyValue extends SmartContract {
     this.emitEvent("update", new KeyValueEvent({ key, value }));
   }
 }
+*/
 
 beforeAll(async () => {
   if (useLocal) {
@@ -97,10 +107,90 @@ beforeAll(async () => {
   );
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
-  await KeyValue.compile();
+  //await KeyValue.compile();
+  await MinaNFT.compile();
 });
 
-describe("Deploy and set initial values", () => {
+describe("Verify proof of a redacted MinNFT", () => {
+  it("should deploy, generate proof and verify it", async () => {
+    expect(deployer).not.toBeUndefined();
+    if (deployer === undefined) return;
+
+    const builderName = "@builder";
+    const grantorSecret: Field = Field.random();
+    const builderSecret: Field = Field.random();
+    const pwdHash: Field = Poseidon.hash([builderSecret]);
+    const badgeHash: Field = Poseidon.hash([
+      grantorSecret,
+      MinaNFT.stringToField(builderName),
+    ]);
+
+    const nft = new MinaNFT(builderName);
+    nft.updatePublicAttribute(
+      "description",
+      MinaNFT.stringToField("Mina Navigators Builder")
+    );
+    nft.updatePublicAttribute("image", MinaNFT.stringToField("ipfs:Qm..."));
+    nft.updatePublicAttribute(
+      "project",
+      MinaNFT.stringToField("Mina zk toolkit")
+    );
+    nft.updatePublicAttribute(
+      "hasMinaNavigatorsBadge",
+      MinaNFT.stringToField("true")
+    );
+    nft.updatePublicAttribute("numberOfCommits", Field(12));
+    nft.updatePrivateAttribute("MinaNavigatorsBadgeHash", badgeHash);
+
+    await nft.mint(deployer, pwdHash);
+    const disclosure = new RedactedMinaNFT(nft);
+    disclosure.copyPublicAttribute("hasMinaNavigatorsBadge");
+    disclosure.copyPublicAttribute("numberOfCommits");
+    disclosure.copyPrivateAttribute("MinaNavigatorsBadgeHash");
+    const { publicAttributesProof, privateAttributesProof } =
+      await disclosure.proof();
+    /*
+    console.log(
+      "Disclosure proof",
+      disclosureProof.publicInput.count.toJSON(),
+      disclosureProof.publicInput.hash.toJSON(),
+      disclosureProof.publicInput.originalRoot.toJSON(),
+      disclosureProof.publicInput.redactedRoot.toJSON()
+    );
+    */
+    expect(publicAttributesProof.publicInput.count.toJSON()).toBe(
+      Field(2).toJSON()
+    );
+    expect(privateAttributesProof.publicInput.count.toJSON()).toBe(
+      Field(1).toJSON()
+    );
+    const hash1 = Poseidon.hash([
+      MinaNFT.stringToField("hasMinaNavigatorsBadge"),
+      MinaNFT.stringToField("true"),
+    ]);
+    const hash2 = Poseidon.hash([
+      MinaNFT.stringToField("numberOfCommits"),
+      Field(12),
+    ]);
+    const hash3 = Poseidon.hash([hash1, hash2]);
+    const hash4 = Poseidon.hash([
+      MinaNFT.stringToField("MinaNavigatorsBadgeHash"),
+      badgeHash,
+    ]);
+    /*
+    console.log("hash1", hash1.toJSON());
+    console.log("hash2", hash2.toJSON());
+    console.log("hash3", hash3.toJSON());
+    */
+    expect(publicAttributesProof.publicInput.hash.toJSON()).toBe(
+      hash3.toJSON()
+    );
+    expect(privateAttributesProof.publicInput.hash.toJSON()).toBe(
+      hash4.toJSON()
+    );
+    await nft.verify(deployer, publicAttributesProof, privateAttributesProof);
+  });
+  /*
   it("should deploy and set values in one transaction - variant 1", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
@@ -287,6 +377,7 @@ describe("Deploy and set initial values", () => {
     expect(newKey1.toJSON()).toBe(key1.toJSON());
     expect(newValue1.toJSON()).toBe(value1.toJSON());
   });
+  */
 });
 
 async function accountBalance(address: PublicKey): Promise<UInt64> {
