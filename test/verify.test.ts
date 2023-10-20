@@ -24,7 +24,7 @@ const transactionFee = 150_000_000;
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = false;
+const useLocal: boolean = true;
 
 /*
 class Grant extends Struct({
@@ -189,6 +189,8 @@ describe("Verify proof of a redacted MinNFT", () => {
       hash4.toJSON()
     );
     await nft.verify(deployer, publicAttributesProof, privateAttributesProof);
+    //console.log("publicAttributesProof", publicAttributesProof.toJSON());
+    //console.log("privateAttributesProof", privateAttributesProof.toJSON());
   });
   /*
   it("should deploy and set values in one transaction - variant 1", async () => {
