@@ -96,6 +96,42 @@ class RedactedMinaNFTState extends Struct({
     });
   }
 
+  static createPublic(
+    publicAttributes: RedactedMinaNFTMapState,
+    publicObjects: RedactedMinaNFTMapState
+  ) {
+    return new RedactedMinaNFTState({
+      publicAttributes,
+      publicObjects,
+      privateAttributes: RedactedMinaNFTMapState.createEmpty(Field(0)),
+      privateObjects: RedactedMinaNFTMapState.createEmpty(Field(0)),
+    });
+  }
+
+  static createPrivate(
+    privateAttributes: RedactedMinaNFTMapState,
+    privateObjects: RedactedMinaNFTMapState
+  ) {
+    return new RedactedMinaNFTState({
+      publicAttributes: RedactedMinaNFTMapState.createEmpty(Field(0)),
+      publicObjects: RedactedMinaNFTMapState.createEmpty(Field(0)),
+      privateAttributes,
+      privateObjects,
+    });
+  }
+
+  static merge(
+    publicState: RedactedMinaNFTState,
+    privateState: RedactedMinaNFTState
+  ) {
+    return new RedactedMinaNFTState({
+      publicAttributes: publicState.publicAttributes,
+      publicObjects: publicState.publicObjects,
+      privateAttributes: privateState.privateAttributes,
+      privateObjects: privateState.privateObjects,
+    });
+  }
+
   static assertEquals(
     state1: RedactedMinaNFTState,
     state2: RedactedMinaNFTState
@@ -132,6 +168,15 @@ const RedactedMinaNFTMapCalculation = Experimental.ZkProgram({
       },
     },
 
+    createEmpty: {
+      privateInputs: [Field],
+
+      method(state: RedactedMinaNFTMapState, originalRoot: Field) {
+        const computedState = RedactedMinaNFTMapState.createEmpty(originalRoot);
+        RedactedMinaNFTMapState.assertEquals(computedState, state);
+      },
+    },
+
     merge: {
       privateInputs: [SelfProof, SelfProof],
 
@@ -161,10 +206,8 @@ const RedactedMinaNFTCalculation = Experimental.ZkProgram({
   publicInput: RedactedMinaNFTState,
 
   methods: {
-    create: {
+    createPublic: {
       privateInputs: [
-        RedactedMinaNFTMapStateProof,
-        RedactedMinaNFTMapStateProof,
         RedactedMinaNFTMapStateProof,
         RedactedMinaNFTMapStateProof,
       ],
@@ -172,19 +215,53 @@ const RedactedMinaNFTCalculation = Experimental.ZkProgram({
       method(
         state: RedactedMinaNFTState,
         publicAttributesProof: RedactedMinaNFTMapStateProof,
-        publicObjectsProof: RedactedMinaNFTMapStateProof,
-        privateAttributesProof: RedactedMinaNFTMapStateProof,
-        privateObjectsProof: RedactedMinaNFTMapStateProof
+        publicObjectsProof: RedactedMinaNFTMapStateProof
       ) {
         publicAttributesProof.verify();
         publicObjectsProof.verify();
+        const computedState = RedactedMinaNFTState.createPublic(
+          publicAttributesProof.publicInput,
+          publicObjectsProof.publicInput
+        );
+        RedactedMinaNFTState.assertEquals(computedState, state);
+      },
+    },
+    createPrivate: {
+      privateInputs: [
+        RedactedMinaNFTMapStateProof,
+        RedactedMinaNFTMapStateProof,
+      ],
+
+      method(
+        state: RedactedMinaNFTState,
+        privateAttributesProof: RedactedMinaNFTMapStateProof,
+        privateObjectsProof: RedactedMinaNFTMapStateProof
+      ) {
         privateAttributesProof.verify();
         privateObjectsProof.verify();
-        const computedState = RedactedMinaNFTState.create(
-          publicAttributesProof.publicInput,
-          publicObjectsProof.publicInput,
+        const computedState = RedactedMinaNFTState.createPrivate(
           privateAttributesProof.publicInput,
           privateObjectsProof.publicInput
+        );
+        RedactedMinaNFTState.assertEquals(computedState, state);
+      },
+    },
+    merge: {
+      privateInputs: [
+        SelfProof<RedactedMinaNFTState, void>,
+        SelfProof<RedactedMinaNFTState, void>,
+      ],
+
+      method(
+        state: RedactedMinaNFTState,
+        publicState: SelfProof<RedactedMinaNFTState, void>,
+        privateState: SelfProof<RedactedMinaNFTState, void>
+      ) {
+        publicState.verify();
+        privateState.verify();
+        const computedState = RedactedMinaNFTState.merge(
+          publicState.publicInput,
+          privateState.publicInput
         );
         RedactedMinaNFTState.assertEquals(computedState, state);
       },

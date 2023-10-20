@@ -151,7 +151,7 @@ export class MinaNFTContract extends SmartContract {
     this.privateObjectsRoot.set(proof.publicInput.privateObjects.latestRoot);
     this.emitEvent("update", proof.publicInput);
   }
-
+  /*
   @method verify(proof: RedactedMinaNFTStateProof) {
     const publicAttributesRoot: Field = this.publicAttributesRoot.get();
     this.publicAttributesRoot.assertEquals(publicAttributesRoot);
@@ -180,6 +180,7 @@ export class MinaNFTContract extends SmartContract {
 
     proof.verify();
   }
+*/
 
   // Change password
   @method changePassword(secret: Field, newsecret: Field) {
