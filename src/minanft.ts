@@ -23,7 +23,7 @@ import {
   RedactedMinaNFTMapStateProof,
   MapElement,
 } from "./contract/redactedmap";
-//import { MinaNFTTree } from "./contract/tree";
+import { MinaNFTVerifier } from "./contract/verifier";
 
 const transactionFee = 150_000_000; // TODO: use current market fees
 
@@ -61,9 +61,9 @@ class BaseMinaNFT {
   protected privateAttributes: Map<string, Field>; // private data
   protected privateObjects?: Map<string, MinaNFTobject>; // private files and long text fields
   static verificationKey: VeificationKey | undefined;
+  static verifierVerificationKey: VeificationKey | undefined;
   static updateVerificationKey?: string;
   static redactedMapVerificationKey?: string;
-  //static redactedVerificationKey?: string;
 
   constructor() {
     this.publicAttributes = new Map<string, Field>();
@@ -232,11 +232,11 @@ class BaseMinaNFT {
     //console.log("compiling MinaNFTMap...")
     const { verificationKey: updateKey } = await MinaNFTUpdate.compile();
     MinaNFT.updateVerificationKey = updateKey;
-
+    /*
     const { verificationKey: redactedMapKey } =
       await RedactedMinaNFTMapCalculation.compile();
     MinaNFT.redactedMapVerificationKey = redactedMapKey;
-    /*
+    
     const { verificationKey: redactedKey } =
       await RedactedMinaNFTCalculation.compile();
     MinaNFT.redactedVerificationKey = redactedKey;
@@ -717,37 +717,35 @@ class MinaNFT extends BaseMinaNFT {
    * @param deployer Private key of the account that will commit the updates
    * @param proof Redacted MinaNFT proof
    */
-  public async verify(
+  public static async verify(
     deployer: PrivateKey,
+    verifyer: PublicKey,
+    nft: PublicKey,
     publicAttributesProof: RedactedMinaNFTMapStateProof,
     privateAttributesProof: RedactedMinaNFTMapStateProof
   ) {
-    if (this.zkAppPublicKey === undefined) {
-      console.error("NFT contract is not deployed");
-      return;
-    }
+    const zkAppPublicKey = nft;
 
-    if (this.isMinted === false) {
-      console.error("NFT is not minted");
-      return;
+    if (MinaNFT.redactedMapVerificationKey === undefined) {
+      const { verificationKey: redactedMapKey } =
+        await RedactedMinaNFTMapCalculation.compile();
+      MinaNFT.redactedMapVerificationKey = redactedMapKey;
     }
-
-    await MinaNFT.compile();
-    if (MinaNFT.updateVerificationKey === undefined) {
-      console.error("Compilation error");
-      return;
+    if (MinaNFT.verifierVerificationKey === undefined) {
+      const { verificationKey: verifierKey } = await MinaNFTVerifier.compile();
+      MinaNFT.verifierVerificationKey = verifierKey as VeificationKey;
     }
 
     console.log("Verifying the proof...");
     const sender = deployer.toPublicKey();
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: this.zkAppPublicKey });
-    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    await fetchAccount({ publicKey: zkAppPublicKey });
+    const zkApp = new MinaNFTVerifier(verifyer);
 
     const tx = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
-        zkApp.verifyPublicAttributes(publicAttributesProof);
+        zkApp.verifyPublicAttributes(zkAppPublicKey, publicAttributesProof);
         //zkApp.verifyPrivateAttributes(privateAttributesProof);
       }
     );
@@ -792,7 +790,8 @@ class RedactedMinaNFT extends BaseMinaNFT {
   }> {
     await MinaNFT.compile();
     if (MinaNFT.redactedMapVerificationKey === undefined) {
-      throw new Error("Compilation error");
+      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      MinaNFT.redactedMapVerificationKey = verificationKey;
     }
     const publicAttributes = this.getMapRootAndMap(this.publicAttributes);
     const privateAttributes = this.getMapRootAndMap(this.privateAttributes);

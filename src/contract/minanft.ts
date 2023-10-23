@@ -151,7 +151,7 @@ export class MinaNFTContract extends SmartContract {
     this.privateObjectsRoot.set(proof.publicInput.privateObjects.latestRoot);
     this.emitEvent("update", proof.publicInput);
   }
-
+  /*
   @method verifyPublicAttributes(proof: RedactedMinaNFTMapStateProof) {
     const publicAttributesRoot: Field = this.publicAttributesRoot.get();
     this.publicAttributesRoot.assertEquals(publicAttributesRoot);
@@ -160,7 +160,7 @@ export class MinaNFTContract extends SmartContract {
 
     proof.verify();
   }
-  /*
+
   @method verifyPrivateAttributes(proof: RedactedMinaNFTMapStateProof) {
     const privateAttributesRoot: Field = this.privateAttributesRoot.get();
     this.privateAttributesRoot.assertEquals(privateAttributesRoot);
@@ -169,8 +169,8 @@ export class MinaNFTContract extends SmartContract {
 
     proof.verify();
   }
-*/
-  /*
+
+ 
   @method verify(proof: RedactedMinaNFTStateProof) {
     const publicAttributesRoot: Field = this.publicAttributesRoot.get();
     this.publicAttributesRoot.assertEquals(publicAttributesRoot);
