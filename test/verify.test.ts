@@ -1,12 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
+import os from "os";
 import {
   Field,
-  state,
-  State,
-  method,
-  DeployArgs,
-  Permissions,
-  SmartContract,
   AccountUpdate,
   fetchAccount,
   PrivateKey,
@@ -14,17 +9,44 @@ import {
   PublicKey,
   UInt64,
   Poseidon,
-  Struct,
+  JsonProof,
+  SmartContract,
+  state,
+  State,
+  method,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
-import { MinaNFT, RedactedMinaNFT } from "../src/minanft";
+import { MinaNFT } from "../src/minanft";
+import {
+  RedactedMinaNFTMapCalculation,
+  RedactedMinaNFTMapStateProof,
+} from "../src/contract/redactedmap";
+import { MinaNFTVerifier } from "../src/contract/verifier";
+import { MinaNFTUpdate } from "../src/contract/map";
+import {
+  nft,
+  publicAttributesProof as publicProof,
+  privateAttributesProof as privateProof,
+} from "../proof.json";
 const transactionFee = 150_000_000;
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = true;
+const useLocal: boolean = false;
+let verifyer: PublicKey | undefined = PublicKey.fromBase58(
+  "B62qq31bXgYULonJp4QdBeekdnQtUZe5DdF8VtWi4MtJ94HKRVwU8Xz"
+);
+
+class Key extends SmartContract {
+  @state(Field) key = State<Field>();
+
+  @method mint(key: Field) {
+    this.key.assertEquals(Field(0));
+    this.key.set(key);
+  }
+}
 
 /*
 class Grant extends Struct({
@@ -114,56 +136,38 @@ beforeAll(async () => {
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
   //await KeyValue.compile();
-  await MinaNFT.compile();
+  //await MinaNFT.compile();
+  console.log("Compiling, free memory: ", os.freemem() / 1024 / 1024 / 1024);
+  //await MinaNFT.compile();
+  //await MinaNFTUpdate.compile();
+  await Key.compile();
+  console.log("Compiling RedactedMinaNFTMapCalculation");
+  await RedactedMinaNFTMapCalculation.compile();
+  console.log("Compiling MinaNFTVerifier");
+  await MinaNFTVerifier.compile();
 });
 
 describe("Verify proof of a redacted MinNFT", () => {
-  it("should deploy, generate proof and verify it", async () => {
+  it("should verify proof", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
+    expect(nft).not.toBeUndefined();
+    if (nft === undefined) return;
+    expect(publicProof).not.toBeUndefined();
+    if (publicProof === undefined) return;
+    expect(privateProof).not.toBeUndefined();
+    if (privateProof === undefined) return;
+    const publicAttributesProof: RedactedMinaNFTMapStateProof =
+      RedactedMinaNFTMapStateProof.fromJSON(publicProof as JsonProof);
+    const privateAttributesProof: RedactedMinaNFTMapStateProof =
+      RedactedMinaNFTMapStateProof.fromJSON(privateProof as JsonProof);
+    const zkAppPublicKey = PublicKey.fromBase58(nft);
 
-    const builderName = "@builder";
-    const grantorSecret: Field = Field.random();
-    const builderSecret: Field = Field.random();
-    const pwdHash: Field = Poseidon.hash([builderSecret]);
-    const badgeHash: Field = Poseidon.hash([
-      grantorSecret,
-      MinaNFT.stringToField(builderName),
-    ]);
-
-    const nft = new MinaNFT(builderName);
-    nft.updatePublicAttribute(
-      "description",
-      MinaNFT.stringToField("Mina Navigators Builder")
-    );
-    nft.updatePublicAttribute("image", MinaNFT.stringToField("ipfs:Qm..."));
-    nft.updatePublicAttribute(
-      "project",
-      MinaNFT.stringToField("Mina zk toolkit")
-    );
-    nft.updatePublicAttribute(
-      "hasMinaNavigatorsBadge",
-      MinaNFT.stringToField("true")
-    );
-    nft.updatePublicAttribute("numberOfCommits", Field(12));
-    nft.updatePrivateAttribute("MinaNavigatorsBadgeHash", badgeHash);
-
-    await nft.mint(deployer, pwdHash);
-    const disclosure = new RedactedMinaNFT(nft);
-    disclosure.copyPublicAttribute("hasMinaNavigatorsBadge");
-    disclosure.copyPublicAttribute("numberOfCommits");
-    disclosure.copyPrivateAttribute("MinaNavigatorsBadgeHash");
-    const { publicAttributesProof, privateAttributesProof } =
-      await disclosure.proof();
-    /*
     console.log(
-      "Disclosure proof",
-      disclosureProof.publicInput.count.toJSON(),
-      disclosureProof.publicInput.hash.toJSON(),
-      disclosureProof.publicInput.originalRoot.toJSON(),
-      disclosureProof.publicInput.redactedRoot.toJSON()
+      "Checking proof, free memory: ",
+      os.freemem() / 1024 / 1024 / 1024
     );
-    */
+
     expect(publicAttributesProof.publicInput.count.toJSON()).toBe(
       Field(2).toJSON()
     );
@@ -179,10 +183,6 @@ describe("Verify proof of a redacted MinNFT", () => {
       Field(12),
     ]);
     const hash3 = Poseidon.hash([hash1, hash2]);
-    const hash4 = Poseidon.hash([
-      MinaNFT.stringToField("MinaNavigatorsBadgeHash"),
-      badgeHash,
-    ]);
     /*
     console.log("hash1", hash1.toJSON());
     console.log("hash2", hash2.toJSON());
@@ -191,10 +191,17 @@ describe("Verify proof of a redacted MinNFT", () => {
     expect(publicAttributesProof.publicInput.hash.toJSON()).toBe(
       hash3.toJSON()
     );
-    expect(privateAttributesProof.publicInput.hash.toJSON()).toBe(
-      hash4.toJSON()
+
+    if (verifyer === undefined) verifyer = await deployVerifyer();
+    expect(verifyer).not.toBeUndefined();
+    if (verifyer === undefined) return;
+    await MinaNFT.verify(
+      deployer,
+      verifyer,
+      zkAppPublicKey,
+      publicAttributesProof,
+      privateAttributesProof
     );
-    await nft.verify(deployer, publicAttributesProof, privateAttributesProof);
     //console.log("publicAttributesProof", publicAttributesProof.toJSON());
     //console.log("privateAttributesProof", privateAttributesProof.toJSON());
   });
@@ -397,6 +404,65 @@ async function accountBalance(address: PublicKey): Promise<UInt64> {
   }
   const balance = Mina.getBalance(address);
   return balance;
+}
+
+async function deployVerifyer(): Promise<PublicKey | undefined> {
+  if (deployer === undefined) return undefined;
+  const sender = deployer.toPublicKey();
+  const zkAppPrivateKey = PrivateKey.random();
+  const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
+  console.log(
+    `deploying the Verifyer contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+  );
+  await fetchAccount({ publicKey: sender });
+  await fetchAccount({ publicKey: zkAppPublicKey });
+
+  console.log(
+    "Deploying verifier, free memory: ",
+    os.freemem() / 1024 / 1024 / 1024
+  );
+
+  const zkApp = new MinaNFTVerifier(zkAppPublicKey);
+  const transaction = await Mina.transaction(
+    { sender, fee: transactionFee },
+    () => {
+      AccountUpdate.fundNewAccount(sender);
+      zkApp.deploy({});
+    }
+  );
+
+  await transaction.prove();
+  transaction.sign([deployer, zkAppPrivateKey]);
+
+  //console.log("Sending the deploy transaction...");
+  const tx = await transaction.send();
+  console.log(
+    "Deployed verifier, free memory: ",
+    os.freemem() / 1024 / 1024 / 1024
+  );
+  if (!useLocal) {
+    if (tx.hash() !== undefined) {
+      console.log(`
+    Success! Deploy transaction sent.
+  
+    Your smart contract state will be updated
+    as soon as the transaction is included in a block:
+    https://berkeley.minaexplorer.com/transaction/${tx.hash()}
+    `);
+      try {
+        await tx.wait();
+      } catch (error) {
+        console.log("Error waiting for transaction");
+        return undefined;
+      }
+    } else {
+      console.error("Send fail", tx);
+      return undefined;
+    }
+    await sleep(30 * 1000);
+  }
+  await fetchAccount({ publicKey: zkAppPublicKey });
+  return zkAppPublicKey;
 }
 
 function sleep(ms: number) {
