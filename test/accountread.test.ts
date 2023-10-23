@@ -154,6 +154,7 @@ describe("Should access other contract state", () => {
     console.log(`Calling @read method...`);
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkReaderPublicKey });
+    await fetchAccount({ publicKey: zkAppPublicKey });
 
     const zkReader = new Reader(zkReaderPublicKey);
     const keyReader: Field = Field(1);
@@ -172,7 +173,7 @@ describe("Should access other contract state", () => {
     if (!useLocal) {
       if (txReader.hash() !== undefined) {
         console.log(`
-      Success! Deploy transaction sent.
+      Success! Read transaction sent.
     
       Your smart contract state will be updated
       as soon as the transaction is included in a block:
@@ -209,6 +210,7 @@ describe("Should access other contract state", () => {
     console.log(`Calling @read method with wrong value...`);
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkReaderPublicKey });
+    await fetchAccount({ publicKey: zkAppPublicKey });
 
     const zkReader = new Reader(zkReaderPublicKey);
     const keyReader: Field = Field(1);
