@@ -38,6 +38,12 @@ class KeyValueEvent extends Struct({
   value: Field,
 }) {}
 
+
+class Dummy extends SmartContract {
+  @state(Field) state = State<Field>();
+}
+
+
 class KeyValue extends SmartContract {
   @state(Field) key = State<Field>();
   @state(Field) value = State<Field>();
