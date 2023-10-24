@@ -140,9 +140,9 @@ beforeAll(async () => {
   console.log("Compiling, free memory: ", os.freemem() / 1024 / 1024 / 1024);
   //await MinaNFT.compile();
   //await MinaNFTUpdate.compile();
-  await Key.compile();
+  await Key.compile(); // If this is not compiled, the next compilation will fail. Contaract Key is not used in this test.
   console.log("Compiling RedactedMinaNFTMapCalculation");
-  await RedactedMinaNFTMapCalculation.compile();
+  await RedactedMinaNFTMapCalculation.compile(); // Succeed only if compiled after any other contract
   console.log("Compiling MinaNFTVerifier");
   await MinaNFTVerifier.compile();
 });
