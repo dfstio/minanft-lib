@@ -85,7 +85,7 @@ export class MinaNFTContract extends SmartContract {
   @state(Field) publicObjectsRoot = State<Field>(); // Merkle root of public Objects Map
   @state(Field) privateAttributesRoot = State<Field>(); // Merkle root of private key-values attributes Map
   @state(Field) privateObjectsRoot = State<Field>(); // Merkle root of private Objects Map
-  // URI format: ipfs:IPFS_HASH or arweave:ARWEAVE_HASH
+  // URI format: i:IPFS_HASH or a:ARWEAVE_HASH, converted to Field[2]
   @state(Field) uri1 = State<Field>(); // First part of uri hash converted from string to Field
   @state(Field) uri2 = State<Field>(); // Second part of uri hash converted from string to Field
   @state(Field) pwdHash = State<Field>(); // Hash of password used to prove transactions

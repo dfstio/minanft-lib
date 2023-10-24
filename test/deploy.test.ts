@@ -14,6 +14,7 @@ import {
   PublicKey,
   UInt64,
   Struct,
+  UInt32,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
@@ -67,12 +68,15 @@ class KeyValue extends SmartContract {
     this.emitEvent("mint", new KeyValueEvent({ key, value }));
   }
 
-  @method update(key: Field, value: Field) {
+  @method update(key: Field, value: Field, address: PublicKey, nonce: UInt32) {
     this.key.assertEquals(this.key.get());
     this.value.assertEquals(this.value.get());
 
     this.key.set(key);
     this.value.set(value);
+
+    address.assertEquals(this.address);
+    this.account.nonce.assertEquals(nonce);
 
     this.emitEvent("update", new KeyValueEvent({ key, value }));
   }
@@ -158,10 +162,11 @@ describe("Deploy and set initial values", () => {
 
     const key1: Field = Field.random();
     const value1: Field = Field.random();
+    const nonce = zkApp.account.nonce.get();
     const transaction1 = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
-        zkApp.update(key1, value1);
+        zkApp.update(key1, value1, zkAppPublicKey, nonce);
       }
     );
 
@@ -254,10 +259,11 @@ describe("Deploy and set initial values", () => {
 
     const key1: Field = Field.random();
     const value1: Field = Field.random();
+    const nonce = zkApp.account.nonce.get();
     const transaction1 = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
-        zkApp.update(key1, value1);
+        zkApp.update(key1, value1, zkAppPublicKey, nonce);
       }
     );
 
