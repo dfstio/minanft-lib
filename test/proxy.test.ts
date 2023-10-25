@@ -14,29 +14,101 @@ import {
   PublicKey,
   UInt64,
   Struct,
+  Poseidon,
+  MerkleMap,
+  Encoding,
 } from "o1js";
-import { MINAURL } from "../src/config.json";
-import { DEPLOYER } from "../env.json";
+import { MINAURL, ARCHIVEURL } from "../src/config.json";
+import { MinaNFT } from "../src/minanft";
+import { DEPLOYER, DEPLOYERS } from "../env.json";
+
+const useLocal: boolean = true;
+
 const transactionFee = 150_000_000;
+const DEPLOYERS_NUMBER = 3;
+const tokenSymbol = "UPDATE";
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = true;
+const deployers: PrivateKey[] = [];
 
-class KeyValueEvent extends Struct({
-  key: Field,
-  value: Field,
+class Storage extends Struct({
+  hash: [Field, Field, Field], // IPFS or Arweave url
 }) {}
 
-class KeyValue extends SmartContract {
-  @state(Field) key = State<Field>();
-  @state(Field) value = State<Field>();
-  @state(PublicKey) pk = State<PublicKey>();
+class Update extends Struct({
+  oldRoot: Field,
+  newRoot: Field,
+  storage: Storage,
+  verifier: PublicKey,
+  version: Field,
+}) {}
+
+class Metadata extends Struct({
+  data: Field,
+  kind: Field,
+}) {}
+
+class NFTproxy extends SmartContract {
+  @state(Field) root = State<Field>();
+  @state(Metadata) metadata = State<Metadata>();
+  @state(Field) pwdHash = State<Field>();
+  @state(Field) version = State<Field>();
 
   events = {
+    mint: Field,
+    update: Update,
+  };
+
+  deploy(args: DeployArgs) {
+    super.deploy(args);
+    this.account.permissions.set({
+      ...Permissions.default(),
+      setDelegate: Permissions.proof(),
+      setPermissions: Permissions.proof(),
+      setVerificationKey: Permissions.proof(),
+      setZkappUri: Permissions.proof(),
+      setTokenSymbol: Permissions.proof(),
+      incrementNonce: Permissions.proof(),
+      setVotingFor: Permissions.proof(),
+      setTiming: Permissions.proof(),
+    });
+    this.emitEvent("mint", Field(0));
+  }
+
+  init() {
+    super.init();
+  }
+
+  @method update(data: Update, secret: Field) {
+    this.pwdHash.assertEquals(this.pwdHash.get());
+    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+
+    this.root.assertEquals(this.root.get());
+    this.root.assertEquals(data.oldRoot);
+
+    const version = this.version.get();
+    this.version.assertEquals(version);
+    const newVersion = version.add(Field(1));
+    newVersion.assertEquals(data.version);
+
+    this.root.set(data.newRoot);
+    this.version.set(newVersion);
+
+    this.emitEvent("update", data);
+  }
+}
+
+class ImplementationEvent extends Struct({
+  address: PublicKey,
+  update: Update,
+}) {}
+
+class StatelessImplementation extends SmartContract {
+  events = {
     deploy: Field,
-    update: KeyValueEvent,
+    update: ImplementationEvent,
   };
 
   deploy(args: DeployArgs) {
@@ -59,63 +131,25 @@ class KeyValue extends SmartContract {
     super.init();
   }
 
-  @method update(key: Field, value: Field, pk: PublicKey) {
-    this.key.assertEquals(this.key.get());
-    this.value.assertEquals(this.value.get());
-    this.pk.assertEquals(this.pk.get());
-    pk.assertEquals(this.pk.get());
+  @method update(data: Update, address: PublicKey, secret: Field) {
+    const nft = new NFTproxy(address);
+    const root = nft.root.get();
+    root.assertEquals(data.oldRoot);
+    this.address.assertEquals(data.verifier);
 
-    this.key.set(key);
-    this.value.set(value);
+    nft.update(data, secret);
+    this.token.mint({ address, amount: 1_000_000_000n });
 
-    this.emitEvent("update", new KeyValueEvent({ key, value }));
+    this.emitEvent(
+      "update",
+      new ImplementationEvent({ address, update: data })
+    );
   }
 }
 
-class Reader extends SmartContract {
-  @state(Field) key = State<Field>();
-  @state(Field) value = State<Field>();
-
-  events = {
-    deploy: Field,
-    read: KeyValueEvent,
-  };
-
-  deploy(args: DeployArgs) {
-    super.deploy(args);
-    this.account.permissions.set({
-      ...Permissions.default(),
-      setDelegate: Permissions.proof(),
-      setPermissions: Permissions.proof(),
-      setVerificationKey: Permissions.proof(),
-      setZkappUri: Permissions.proof(),
-      setTokenSymbol: Permissions.proof(),
-      incrementNonce: Permissions.proof(),
-      setVotingFor: Permissions.proof(),
-      setTiming: Permissions.proof(),
-    });
-    this.emitEvent("deploy", Field(0));
-  }
-
-  init() {
-    super.init();
-  }
-
-  @method read(key: Field, value: Field, address: PublicKey) {
-    this.key.assertEquals(this.key.get());
-    this.value.assertEquals(this.value.get());
-    const keyvalue = new KeyValue(address);
-    const otherKey = keyvalue.key.get();
-    const otherValue = keyvalue.value.get();
-    otherKey.assertEquals(key);
-    otherValue.assertEquals(value);
-
-    this.key.set(key);
-    this.value.set(value);
-
-    this.emitEvent("read", new KeyValueEvent({ key, value }));
-  }
-}
+let implementation: PublicKey | undefined = undefined;
+//let implementationPrivateKey: PrivateKey | undefined = undefined;
+let implementationTx: Mina.TransactionId | undefined = undefined;
 
 beforeAll(async () => {
   if (useLocal) {
@@ -123,10 +157,31 @@ beforeAll(async () => {
     Mina.setActiveInstance(Local);
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
+    for (let i = 1; i <= DEPLOYERS_NUMBER; i++) {
+      const { privateKey } = Local.testAccounts[i];
+      const balanceDeployer =
+        Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) /
+        1e9;
+      expect(balanceDeployer).toBeGreaterThan(3);
+      if (balanceDeployer <= 3) return;
+      deployers.push(privateKey);
+    }
   } else {
-    const network = Mina.Network(MINAURL);
+    const network = Mina.Network({
+      mina: MINAURL,
+      archive: ARCHIVEURL,
+    });
     Mina.setActiveInstance(network);
     deployer = PrivateKey.fromBase58(DEPLOYER);
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);
+      const balanceDeployer =
+        Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) /
+        1e9;
+      expect(balanceDeployer).toBeGreaterThan(3);
+      if (balanceDeployer <= 3) return;
+      deployers.push(privateKey);
+    }
   }
   const balanceDeployer =
     Number((await accountBalance(deployer.toPublicKey())).toBigInt()) / 1e9;
@@ -136,13 +191,15 @@ beforeAll(async () => {
   );
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
-  await KeyValue.compile();
-  await Reader.compile();
+  console.time("compile");
+  await NFTproxy.compile();
+  await StatelessImplementation.compile();
+  console.timeEnd("compile");
   console.log("Compiled");
 });
 
-describe("Should access other contract state", () => {
-  it("should deploy and set values", async () => {
+describe("NFT Proxy contract", () => {
+  it("should deploy StatelessImplementation contract", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
 
@@ -150,102 +207,214 @@ describe("Should access other contract state", () => {
     const zkAppPrivateKey = PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     console.log(
-      `deploying the KeyValue contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      `deploying the StatelessImplementation contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
 
-    const zkApp = new KeyValue(zkAppPublicKey);
-    const key: Field = Field(1);
-    const value: Field = Field(2);
+    const zkApp = new StatelessImplementation(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
         AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
-        zkApp.key.set(key);
-        zkApp.value.set(value);
+        zkApp.account.tokenSymbol.set(tokenSymbol);
       }
     );
-
     await transaction.prove();
     transaction.sign([deployer, zkAppPrivateKey]);
 
     //console.log("Sending the deploy transaction...");
     const tx = await transaction.send();
-    if (!useLocal) {
-      if (tx.hash() !== undefined) {
-        console.log(`
-      Success! Deploy transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${tx.hash()}
-      `);
-        try {
-          await tx.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
+    //if (!useLocal) await MinaNFT.transactionInfo(tx);
+    //await fetchAccount({ publicKey: zkAppPublicKey });
+    implementation = zkAppPublicKey;
+    //implementationPrivateKey = zkAppPrivateKey;
+    implementationTx = tx;
+  });
+
+  it("should deploy NFTproxy contracts and update their state", async () => {
+    expect(implementation).not.toBeUndefined();
+    if (implementation === undefined) return;
+    const zkAppPublicKeys: PublicKey[] = [];
+    const maps: MerkleMap[] = [];
+    const roots: Field[] = [];
+    const roots2: Field[] = [];
+    const roots3: Field[] = [];
+    const secrets: Field[] = [];
+    const pwdHashes: Field[] = [];
+    const txs: Mina.TransactionId[] = [];
+    const txs2: Mina.TransactionId[] = [];
+    const txs3: Mina.TransactionId[] = [];
+    const ipfs = `ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
+
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      const sender = deployers[i].toPublicKey();
+      const zkAppPrivateKey = PrivateKey.random();
+      const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
+      console.log(
+        `deploying the NFTproxy contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      );
+      await fetchAccount({ publicKey: sender });
+      await fetchAccount({ publicKey: zkAppPublicKey });
+
+      const zkApp = new NFTproxy(zkAppPublicKey);
+      const map = new MerkleMap();
+      map.set(Field.random(), Field.random());
+      map.set(Field.random(), Field.random());
+      const root = map.getRoot();
+      const secret = Field.random();
+      const pwdHash = Poseidon.hash([secret]);
+
+      expect(NFTproxy._verificationKey).not.toBeUndefined();
+      if (NFTproxy._verificationKey === undefined) return;
+
+      const transaction = await Mina.transaction(
+        { sender, fee: transactionFee, memo: "minanft.io" },
+        () => {
+          AccountUpdate.fundNewAccount(sender);
+          zkApp.deploy({});
+          zkApp.root.set(root);
+          zkApp.pwdHash.set(pwdHash);
+          zkApp.account.tokenSymbol.set("NFT");
+          zkApp.account.zkappUri.set(ipfs);
         }
-      } else console.error("Send fail", tx);
-      await sleep(30 * 1000);
+      );
+
+      await transaction.prove();
+      transaction.sign([deployers[i], zkAppPrivateKey]);
+
+      //console.log("Sending the deploy transaction...");
+      const tx = await transaction.send();
+      zkAppPublicKeys.push(zkAppPublicKey);
+      maps.push(map);
+      roots.push(root);
+      map.set(Field.random(), Field.random());
+      map.set(Field.random(), Field.random());
+      roots2.push(map.getRoot());
+      map.set(Field.random(), Field.random());
+      map.set(Field.random(), Field.random());
+      roots3.push(map.getRoot());
+      secrets.push(secret);
+      pwdHashes.push(pwdHash);
+      txs.push(tx);
+    }
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      if (!useLocal) await MinaNFT.transactionInfo(txs[i]);
+      await fetchAccount({ publicKey: zkAppPublicKeys[i] });
+      const zkApp = new NFTproxy(zkAppPublicKeys[i]);
+      const newRoot = zkApp.root.get();
+      expect(newRoot.toJSON()).toBe(roots[i].toJSON());
+      const newPwdHash = zkApp.pwdHash.get();
+      expect(newPwdHash.toJSON()).toBe(pwdHashes[i].toJSON());
+    }
+    const ipfs_fields = Encoding.stringToFields(ipfs);
+    expect(ipfs_fields.length).toEqual(3);
+    const storage: Storage = new Storage({ hash: ipfs_fields });
+
+    expect(implementation).not.toBeUndefined();
+    if (implementation === undefined) return;
+    //expect(implementationPrivateKey).not.toBeUndefined();
+    //if (implementationPrivateKey === undefined) return;
+    expect(implementationTx).not.toBeUndefined();
+    if (implementationTx === undefined) return;
+    if (!useLocal) await MinaNFT.transactionInfo(implementationTx);
+    await fetchAccount({ publicKey: implementation });
+    const zkAppImplementation = new StatelessImplementation(implementation);
+    const tokenSymbol = Mina.getAccount(implementation).tokenSymbol;
+    expect(tokenSymbol).toBeDefined();
+    expect(tokenSymbol).toEqual(tokenSymbol);
+    const tokenId = zkAppImplementation.token.id;
+
+    console.log("Updating 1...");
+
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      const sender = deployers[i].toPublicKey();
+      await fetchAccount({ publicKey: zkAppPublicKeys[i] });
+      const zkApp = new NFTproxy(zkAppPublicKeys[i]);
+      const version: Field = zkApp.version.get();
+      const newVersion: Field = version.add(Field(1));
+      const data = new Update({
+        oldRoot: roots[i],
+        newRoot: roots2[i],
+        storage,
+        version: newVersion,
+        verifier: implementation,
+      });
+      const transaction = await Mina.transaction(
+        { sender, fee: transactionFee },
+        () => {
+          AccountUpdate.fundNewAccount(sender);
+          zkAppImplementation.update(data, zkAppPublicKeys[i], secrets[i]);
+        }
+      );
+
+      await transaction.prove();
+      transaction.sign([deployers[i]]);
+
+      const tx = await transaction.send();
+      txs2.push(tx);
+    }
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      if (!useLocal) await MinaNFT.transactionInfo(txs2[i]);
+      await fetchAccount({ publicKey: zkAppPublicKeys[i] });
+      await fetchAccount({ publicKey: zkAppPublicKeys[i], tokenId });
+      const zkApp = new NFTproxy(zkAppPublicKeys[i]);
+      const newRoot = zkApp.root.get();
+      expect(newRoot.toJSON()).toBe(roots2[i].toJSON());
+      const version = zkApp.version.get();
+      const tokenBalance = Mina.getBalance(
+        zkAppPublicKeys[i],
+        tokenId
+      ).value.toBigInt();
+      expect(version.toJSON()).toBe(Field(1).toJSON());
+      expect(tokenBalance).toEqual(BigInt(1_000_000_000n));
     }
 
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    const newKey = zkApp.key.get();
-    const newValue = zkApp.value.get();
-    expect(newKey.toJSON()).toBe(key.toJSON());
-    expect(newValue.toJSON()).toBe(value.toJSON());
+    console.log("Updating 2...");
 
-    const zkReaderPrivateKey = PrivateKey.random();
-    const zkReaderPublicKey = zkReaderPrivateKey.toPublicKey();
-    console.log(
-      `deploying the Reader contract to an address ${zkReaderPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
-    );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkReaderPublicKey });
-
-    const zkReader = new Reader(zkReaderPublicKey);
-    const keyReader: Field = Field.random();
-    const valueReader: Field = Field.random();
-    const transactionReader = await Mina.transaction(
-      { sender, fee: transactionFee },
-      () => {
-        AccountUpdate.fundNewAccount(sender);
-        zkReader.deploy({});
-        zkReader.key.set(keyReader);
-        zkReader.value.set(valueReader);
-      }
-    );
-
-    await transactionReader.prove();
-    transactionReader.sign([deployer, zkReaderPrivateKey]);
-
-    //console.log("Sending the deploy transaction...");
-    const txReader = await transactionReader.send();
-    if (!useLocal) {
-      if (txReader.hash() !== undefined) {
-        console.log(`
-      Success! Deploy transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${txReader.hash()}
-      `);
-        try {
-          await txReader.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      const sender = deployers[i].toPublicKey();
+      await fetchAccount({ publicKey: zkAppPublicKeys[i] });
+      const zkApp = new NFTproxy(zkAppPublicKeys[i]);
+      const version: Field = zkApp.version.get();
+      const newVersion: Field = version.add(Field(1));
+      const data = new Update({
+        oldRoot: roots2[i],
+        newRoot: roots3[i],
+        storage,
+        version: newVersion,
+        verifier: implementation,
+      });
+      const transaction = await Mina.transaction(
+        { sender, fee: transactionFee },
+        () => {
+          zkAppImplementation.update(data, zkAppPublicKeys[i], secrets[i]);
         }
-      } else console.error("Send fail", txReader);
-      await sleep(30 * 1000);
-    }
+      );
 
-    await fetchAccount({ publicKey: zkReaderPublicKey });
-    const newKeyReader = zkReader.key.get();
-    const newValueReader = zkReader.value.get();
-    expect(newKeyReader.toJSON()).toBe(keyReader.toJSON());
-    expect(newValueReader.toJSON()).toBe(valueReader.toJSON());
+      await transaction.prove();
+      transaction.sign([deployers[i]]);
+
+      const tx = await transaction.send();
+      txs3.push(tx);
+    }
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      if (!useLocal) await MinaNFT.transactionInfo(txs3[i]);
+      await fetchAccount({ publicKey: zkAppPublicKeys[i] });
+      await fetchAccount({ publicKey: zkAppPublicKeys[i], tokenId });
+      const zkApp = new NFTproxy(zkAppPublicKeys[i]);
+      const newRoot = zkApp.root.get();
+      expect(newRoot.toJSON()).toBe(roots3[i].toJSON());
+      const version = zkApp.version.get();
+      const tokenBalance = Mina.getBalance(
+        zkAppPublicKeys[i],
+        tokenId
+      ).value.toBigInt();
+      expect(version.toJSON()).toBe(Field(2).toJSON());
+      expect(tokenBalance).toEqual(BigInt(2_000_000_000n));
+      if (i === 0) await displayEvents(zkApp);
+    }
   });
 });
 
@@ -258,6 +427,16 @@ async function accountBalance(address: PublicKey): Promise<UInt64> {
   }
   const balance = Mina.getBalance(address);
   return balance;
+}
+
+async function displayEvents(contract: SmartContract) {
+  const events = await contract.fetchEvents();
+  console.log(
+    `events on ${contract.address.toBase58()}`,
+    events.map((e) => {
+      return { type: e.type, data: JSON.stringify(e.event) };
+    })
+  );
 }
 
 function sleep(ms: number) {
