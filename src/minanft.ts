@@ -10,6 +10,7 @@ import {
   verify,
   fetchAccount,
   Poseidon,
+  fetchLastBlock,
 } from "o1js";
 //import cliProgress from "cli-progress";
 import { MinaNFTContract } from "./contract/minanft";
@@ -24,6 +25,7 @@ import {
   MapElement,
 } from "./contract/redactedmap";
 import { MinaNFTVerifier } from "./contract/verifier";
+import { MINAURL } from "../src/config.json";
 
 const transactionFee = 150_000_000; // TODO: use current market fees
 
@@ -501,15 +503,17 @@ class MinaNFT extends BaseMinaNFT {
   }
   */
 
-  private static async transactionInfo(tx: Mina.TransactionId): Promise<void> {
+  public static async transactionInfo(tx: Mina.TransactionId): Promise<void> {
     let showInfo: boolean = false;
     try {
-      const state = Mina.getNetworkState();
-      const blockchainLength = state.blockchainLength.toJSON();
+      const block = await fetchLastBlock(MINAURL);
+      //console.log("Block:", block.totalCurrency.toBigInt());
+      //const state = Mina.getNetworkState();
+      const blockchainLength = block.blockchainLength.toBigint();
       if (Number(blockchainLength) > 100) showInfo = true;
     } catch (error) {
       showInfo = true;
-      console.log("Mina.getNetworkState() error");
+      console.log("fetchLastBlock error");
     }
 
     if (showInfo) {
