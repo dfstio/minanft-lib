@@ -17,10 +17,10 @@ import {
   Reducer,
   Poseidon,
   MerkleMap,
-  Provable,
   Bool,
 } from "o1js";
-import { MINAURL, ARCHIVEURL } from "../src/config.json";
+import { MINAURL, ARCHIVEURL, ARCHIVEURL2 } from "../src/config.json";
+import { MinaNFT } from "../src/minanft";
 import { DEPLOYER } from "../env.json";
 const transactionFee = 150_000_000;
 
@@ -104,66 +104,7 @@ class NFT extends SmartContract {
     this.actionState.set(newActionState);
     this.isDispatched.set(Bool(false));
   }
-
-  /*
-  @method update(key: Field, value: Field) {
-    this.key.assertEquals(this.key.get());
-    this.value.assertEquals(this.value.get());
-
-    this.key.set(key);
-    this.value.set(value);
-
-    this.emitEvent("update", new KeyValueEvent({ key, value }));
-  }
- */
 }
-
-/*
-class Reader extends SmartContract {
-  @state(Field) key = State<Field>();
-  @state(Field) value = State<Field>();
-
-  events = {
-    deploy: Field,
-    read: KeyValueEvent,
-  };
-
-  deploy(args: DeployArgs) {
-    super.deploy(args);
-    this.account.permissions.set({
-      ...Permissions.default(),
-      setDelegate: Permissions.proof(),
-      setPermissions: Permissions.proof(),
-      setVerificationKey: Permissions.proof(),
-      setZkappUri: Permissions.proof(),
-      setTokenSymbol: Permissions.proof(),
-      incrementNonce: Permissions.proof(),
-      setVotingFor: Permissions.proof(),
-      setTiming: Permissions.proof(),
-    });
-    this.emitEvent("deploy", Field(0));
-  }
-
-  init() {
-    super.init();
-  }
-
-  @method read(key: Field, value: Field, address: PublicKey) {
-    this.key.assertEquals(this.key.get());
-    this.value.assertEquals(this.value.get());
-    const keyvalue = new KeyValue(address);
-    const otherKey = keyvalue.key.get();
-    const otherValue = keyvalue.value.get();
-    otherKey.assertEquals(key);
-    otherValue.assertEquals(value);
-
-    this.key.set(key);
-    this.value.set(value);
-
-    this.emitEvent("read", new KeyValueEvent({ key, value }));
-  }
-}
-*/
 
 beforeAll(async () => {
   if (useLocal) {
@@ -172,7 +113,10 @@ beforeAll(async () => {
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
   } else {
-    const network = Mina.Network({ mina: MINAURL, archive: ARCHIVEURL });
+    const network = Mina.Network({
+      mina: MINAURL,
+      archive: "https://archive.berkeley.minaexplorer.com",
+    });
     /*
     const Network = Mina.Network({
       mina: '', // Use https://proxy.berkeley.minaexplorer.com/graphql or https://api.minascan.io/node/berkeley/v1/graphql
@@ -237,53 +181,19 @@ describe("Actions and Reducer", () => {
 
     //console.log("Sending the deploy transaction...");
     let tx = await transaction.send();
-    if (!useLocal) {
-      if (tx.hash() !== undefined) {
-        console.log(`
-      Success! Deploy transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${tx.hash()}
-      `);
-        try {
-          await tx.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
-        }
-      } else console.error("Send fail", tx);
-      await sleep(30 * 1000);
-    }
-
+    if (!useLocal) await MinaNFT.transactionInfo(tx);
     await fetchAccount({ publicKey: zkAppPublicKey });
-    /*
-            type NetworkConfig = {
-          minaEndpoint: string;
-          minaFallbackEndpoints: string[];
-          archiveEndpoint: string;
-          archiveFallbackEndpoints: string[];
-          lightnetAccountManagerEndpoint: string;
-        };
 
-        let networkConfig = {
-          minaEndpoint: '',
-          minaFallbackEndpoints: [] as string[],
-          archiveEndpoint: '',
-          archiveFallbackEndpoints: [] as string[],
-          lightnetAccountManagerEndpoint: '',
-        } satisfies NetworkConfig;
-*/
-    // graphqlEndpoint = networkConfig.archiveEndpoint
     let pendingActions = await zkApp.reducer.fetchActions({
       fromActionState: actionState,
     });
-    console.log("Pending actions", pendingActions);
+    console.log("Pending actions", pendingActions.length);
     map.set(Field(3), Field(4));
     map.set(Field(5), Field(6));
     const root2 = map.getRoot();
     console.log("Root2", root2.toJSON());
     let data = new Update({ oldRoot: root, newRoot: root2 });
-
+    console.log("Dispatch 1");
     transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
@@ -296,30 +206,13 @@ describe("Actions and Reducer", () => {
 
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
-    if (!useLocal) {
-      if (tx.hash() !== undefined) {
-        console.log(`
-      Success! Dispatch 1 transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${tx.hash()}
-      `);
-        try {
-          await tx.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
-        }
-      } else console.error("Send fail", tx);
-      await sleep(30 * 1000);
-    }
-
+    if (!useLocal) await MinaNFT.transactionInfo(tx);
     await fetchAccount({ publicKey: zkAppPublicKey });
     pendingActions = await zkApp.reducer.fetchActions({
       fromActionState: actionState,
     });
-    console.log("Pending actions", pendingActions);
-
+    console.log("Pending actions", pendingActions.length);
+    console.log("Reduce 1");
     transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
@@ -332,29 +225,13 @@ describe("Actions and Reducer", () => {
 
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
-    if (!useLocal) {
-      if (tx.hash() !== undefined) {
-        console.log(`
-      Success! Reduce 1 transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${tx.hash()}
-      `);
-        try {
-          await tx.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
-        }
-      } else console.error("Send fail", tx);
-      await sleep(30 * 1000);
-    }
+    if (!useLocal) await MinaNFT.transactionInfo(tx);
 
     await fetchAccount({ publicKey: zkAppPublicKey });
     pendingActions = await zkApp.reducer.fetchActions({
       fromActionState: actionState,
     });
-    console.log("Pending actions", pendingActions);
+    console.log("Pending actions", pendingActions.length);
     const newRoot = zkApp.root.get();
     expect(newRoot.toJSON()).toBe(root2.toJSON());
 
@@ -364,7 +241,7 @@ describe("Actions and Reducer", () => {
     const root3 = map.getRoot();
     console.log("Root3", root3.toJSON());
     data = new Update({ oldRoot: root2, newRoot: root3 });
-
+    console.log("Dispatch 2");
     transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
@@ -377,26 +254,14 @@ describe("Actions and Reducer", () => {
 
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
-    if (!useLocal) {
-      if (tx.hash() !== undefined) {
-        console.log(`
-      Success! Dispatch 2 transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${tx.hash()}
-      `);
-        try {
-          await tx.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
-        }
-      } else console.error("Send fail", tx);
-      await sleep(30 * 1000);
-    }
-    await sleep(60 * 1000);
+    if (!useLocal) await MinaNFT.transactionInfo(tx);
+    await sleep(600 * 1000);
     await fetchAccount({ publicKey: zkAppPublicKey });
-
+    pendingActions = await zkApp.reducer.fetchActions({
+      fromActionState: actionState,
+    });
+    console.log("Pending actions", pendingActions.length);
+    console.log("Reduce 2");
     transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
@@ -409,85 +274,16 @@ describe("Actions and Reducer", () => {
 
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
-    if (!useLocal) {
-      if (tx.hash() !== undefined) {
-        console.log(`
-      Success! Reduce 2 transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${tx.hash()}
-      `);
-        try {
-          await tx.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction", error);
-        }
-      } else console.error("Send fail", tx);
-      await sleep(30 * 1000);
-    }
+    if (!useLocal) await MinaNFT.transactionInfo(tx);
+    await sleep(600 * 1000);
 
     await fetchAccount({ publicKey: zkAppPublicKey });
     const newRoot3 = zkApp.root.get();
     expect(newRoot3.toJSON()).toBe(root3.toJSON());
-
-    /*
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    const newRoot = zkApp.root.get();
-    expect(newRoot.toJSON()).toBe(root.toJSON());
-    const newVersion = zkApp.version.get();
-    expect(newVersion.toJSON()).toBe(version.toJSON());
-    
-    const zkReaderPrivateKey = PrivateKey.random();
-    const zkReaderPublicKey = zkReaderPrivateKey.toPublicKey();
-    console.log(
-      `deploying the Reader contract to an address ${zkReaderPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
-    );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkReaderPublicKey });
-
-    const zkReader = new Reader(zkReaderPublicKey);
-    const keyReader: Field = Field.random();
-    const valueReader: Field = Field.random();
-    const transactionReader = await Mina.transaction(
-      { sender, fee: transactionFee },
-      () => {
-        AccountUpdate.fundNewAccount(sender);
-        zkReader.deploy({});
-        zkReader.key.set(keyReader);
-        zkReader.value.set(valueReader);
-      }
-    );
-
-    await transactionReader.prove();
-    transactionReader.sign([deployer, zkReaderPrivateKey]);
-
-    //console.log("Sending the deploy transaction...");
-    const txReader = await transactionReader.send();
-    if (!useLocal) {
-      if (txReader.hash() !== undefined) {
-        console.log(`
-      Success! Deploy transaction sent.
-    
-      Your smart contract state will be updated
-      as soon as the transaction is included in a block:
-      https://berkeley.minaexplorer.com/transaction/${txReader.hash()}
-      `);
-        try {
-          await txReader.wait();
-        } catch (error) {
-          console.log("Error waiting for transaction");
-        }
-      } else console.error("Send fail", txReader);
-      await sleep(30 * 1000);
-    }
-
-    await fetchAccount({ publicKey: zkReaderPublicKey });
-    const newKeyReader = zkReader.key.get();
-    const newValueReader = zkReader.value.get();
-    expect(newKeyReader.toJSON()).toBe(keyReader.toJSON());
-    expect(newValueReader.toJSON()).toBe(valueReader.toJSON());
-  */
+    pendingActions = await zkApp.reducer.fetchActions({
+      fromActionState: actionState,
+    });
+    console.log("Pending actions", pendingActions.length);
   });
 });
 
