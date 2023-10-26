@@ -1,3 +1,5 @@
+export { MinaNFTContract, Metadata, Storage, Update };
+
 import {
   Field,
   state,
@@ -11,8 +13,6 @@ import {
   Struct,
   UInt64,
 } from "o1js";
-
-export { MinaNFTContract, Metadata, Storage, Update };
 
 class Metadata extends Struct({
   data: Field,
@@ -29,8 +29,8 @@ class Storage extends Struct({
 }) {}
 
 class Update extends Struct({
-  oldMetadata: Metadata,
-  newMetadata: Metadata,
+  oldRoot: Metadata,
+  newRoot: Metadata,
   storage: Storage,
   verifier: PublicKey,
   version: UInt64,
@@ -74,14 +74,14 @@ class MinaNFTContract extends SmartContract {
     this.owner.assertEquals(Poseidon.hash([secret]));
 
     this.metadata.assertEquals(this.metadata.get());
-    this.metadata.assertEquals(data.oldMetadata);
+    this.metadata.assertEquals(data.oldRoot);
 
     const version = this.version.get();
     this.version.assertEquals(version);
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
 
-    this.metadata.set(data.newMetadata);
+    this.metadata.set(data.newRoot);
     this.version.set(newVersion);
     this.storage.set(data.storage);
 

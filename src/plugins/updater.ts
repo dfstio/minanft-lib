@@ -1,3 +1,5 @@
+export { MinaNFTUpdater, MinaNFTUpdaterEvent };
+
 import {
   Account,
   Field,
@@ -10,8 +12,7 @@ import {
   DeployArgs,
 } from "o1js";
 import { MinaNFTContract, Update, Metadata } from "../contract/nft";
-
-export { MinaNFTUpdater, MinaNFTUpdaterEvent };
+import { MinaNFTMetadataUpdateProof } from "../contract/metadata";
 
 class MinaNFTUpdaterEvent extends Struct({
   address: PublicKey,
@@ -44,10 +45,18 @@ class MinaNFTUpdater extends SmartContract {
     super.init();
   }
 
-  @method update(data: Update, address: PublicKey, secret: Field) {
+  @method update(
+    data: Update,
+    address: PublicKey,
+    secret: Field,
+    proof: MinaNFTMetadataUpdateProof
+  ) {
     const nft = new MinaNFTContract(address);
+
+    // Check that the metadata is correct
     const metadata = nft.metadata.get();
-    Metadata.assertEquals(metadata, data.oldMetadata);
+    Metadata.assertEquals(metadata, data.oldRoot);
+    Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
     this.address.assertEquals(data.verifier);
 
     // Check that all versions are properly verified
@@ -55,13 +64,18 @@ class MinaNFTUpdater extends SmartContract {
     const account = Account(address, this.token.id);
     const tokenBalance = account.balance.get();
     account.balance.assertEquals(tokenBalance);
-    //Provable.log("tokenBalance", tokenBalance);
-    //Provable.log("version", version);
     tokenBalance.assertEquals(version.mul(UInt64.from(1_000_000_000n)));
 
+    // Check that the proof verifies
+    proof.verify();
+
+    // Update metadata
     nft.update(data, secret);
+
+    // Issue verification badge
     this.token.mint({ address, amount: 1_000_000_000n });
 
+    // Emit event
     this.emitEvent(
       "update",
       new MinaNFTUpdaterEvent({ address, update: data })

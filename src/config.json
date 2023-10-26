@@ -3,7 +3,7 @@
   "ARCHIVEURL": "https://archive.berkeley.minaexplorer.com",
   "ARCHIVEURL2": "https://api.minascan.io/archive/berkeley/v1/graphql",
   "MINAFEE": "0.1",
-  "MINAEXPLORER": "https://berkeley.minaexplorer.com/wallet/",
+  "MINAEXPLORER": "https://berkeley.minaexplorer.com",
   "MINNFTAPIAUTH": "***********************************************",
   "MINNFTAPI": "https://************.execute-api.eu-west-1.amazonaws.com/dev/api"
 }
