@@ -17,16 +17,18 @@ import {
   Poseidon,
   MerkleMap,
   Encoding,
+  Account,
+  Provable,
 } from "o1js";
 import { MINAURL, ARCHIVEURL } from "../src/config.json";
 import { MinaNFT } from "../src/minanft";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
-const useLocal: boolean = true;
+const useLocal: boolean = false;
 
 const transactionFee = 150_000_000;
 const DEPLOYERS_NUMBER = 3;
-const tokenSymbol = "UPDATE";
+const tokenSymbol = "VBADGE";
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
@@ -42,7 +44,7 @@ class Update extends Struct({
   newRoot: Field,
   storage: Storage,
   verifier: PublicKey,
-  version: Field,
+  version: UInt64,
 }) {}
 
 class Metadata extends Struct({
@@ -54,7 +56,7 @@ class NFTproxy extends SmartContract {
   @state(Field) root = State<Field>();
   @state(Metadata) metadata = State<Metadata>();
   @state(Field) pwdHash = State<Field>();
-  @state(Field) version = State<Field>();
+  @state(UInt64) version = State<UInt64>();
 
   events = {
     mint: Field,
@@ -90,7 +92,7 @@ class NFTproxy extends SmartContract {
 
     const version = this.version.get();
     this.version.assertEquals(version);
-    const newVersion = version.add(Field(1));
+    const newVersion = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
 
     this.root.set(data.newRoot);
@@ -136,6 +138,15 @@ class StatelessImplementation extends SmartContract {
     const root = nft.root.get();
     root.assertEquals(data.oldRoot);
     this.address.assertEquals(data.verifier);
+
+    // Check that all versions are properly verified
+    const version = nft.version.get();
+    const account = Account(address, this.token.id);
+    const tokenBalance = account.balance.get();
+    account.balance.assertEquals(tokenBalance);
+    //Provable.log("tokenBalance", tokenBalance);
+    //Provable.log("version", version);
+    tokenBalance.assertEquals(version.mul(UInt64.from(1_000_000_000n)));
 
     nft.update(data, secret);
     this.token.mint({ address, amount: 1_000_000_000n });
@@ -195,7 +206,8 @@ beforeAll(async () => {
   await NFTproxy.compile();
   await StatelessImplementation.compile();
   console.timeEnd("compile");
-  console.log("Compiled");
+  //console.timeStamp;
+  //console.log("Compiled");
 });
 
 describe("NFT Proxy contract", () => {
@@ -332,8 +344,8 @@ describe("NFT Proxy contract", () => {
       const sender = deployers[i].toPublicKey();
       await fetchAccount({ publicKey: zkAppPublicKeys[i] });
       const zkApp = new NFTproxy(zkAppPublicKeys[i]);
-      const version: Field = zkApp.version.get();
-      const newVersion: Field = version.add(Field(1));
+      const version: UInt64 = zkApp.version.get();
+      const newVersion: UInt64 = version.add(UInt64.from(1));
       const data = new Update({
         oldRoot: roots[i],
         newRoot: roots2[i],
@@ -341,6 +353,7 @@ describe("NFT Proxy contract", () => {
         version: newVersion,
         verifier: implementation,
       });
+
       const transaction = await Mina.transaction(
         { sender, fee: transactionFee },
         () => {
@@ -349,6 +362,14 @@ describe("NFT Proxy contract", () => {
         }
       );
 
+      /* Should fail if not sent thru StatelessImplementation
+      const transaction = await Mina.transaction(
+        { sender, fee: transactionFee },
+        () => {
+          zkApp.update(data, secrets[i]);
+        }
+      );
+      */
       await transaction.prove();
       transaction.sign([deployers[i]]);
 
@@ -363,12 +384,14 @@ describe("NFT Proxy contract", () => {
       const newRoot = zkApp.root.get();
       expect(newRoot.toJSON()).toBe(roots2[i].toJSON());
       const version = zkApp.version.get();
+      expect(version.toJSON()).toBe(Field(1).toJSON());
+      /*
       const tokenBalance = Mina.getBalance(
         zkAppPublicKeys[i],
         tokenId
       ).value.toBigInt();
-      expect(version.toJSON()).toBe(Field(1).toJSON());
       expect(tokenBalance).toEqual(BigInt(1_000_000_000n));
+      */
     }
 
     console.log("Updating 2...");
@@ -377,8 +400,8 @@ describe("NFT Proxy contract", () => {
       const sender = deployers[i].toPublicKey();
       await fetchAccount({ publicKey: zkAppPublicKeys[i] });
       const zkApp = new NFTproxy(zkAppPublicKeys[i]);
-      const version: Field = zkApp.version.get();
-      const newVersion: Field = version.add(Field(1));
+      const version: UInt64 = zkApp.version.get();
+      const newVersion: UInt64 = version.add(UInt64.from(1));
       const data = new Update({
         oldRoot: roots2[i],
         newRoot: roots3[i],
@@ -389,6 +412,7 @@ describe("NFT Proxy contract", () => {
       const transaction = await Mina.transaction(
         { sender, fee: transactionFee },
         () => {
+          //AccountUpdate.fundNewAccount(sender);
           zkAppImplementation.update(data, zkAppPublicKeys[i], secrets[i]);
         }
       );
