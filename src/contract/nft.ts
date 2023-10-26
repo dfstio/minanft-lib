@@ -12,6 +12,8 @@ import {
   UInt64,
 } from "o1js";
 
+export { MinaNFTContract, Metadata, Storage, Update };
+
 class Metadata extends Struct({
   data: Field,
   kind: Field,
@@ -22,20 +24,8 @@ class Metadata extends Struct({
   }
 }
 
-class Sale extends Struct({
-  tokenId: Field,
-  price: UInt64,
-  approvedHash: Field,
-}) {
-  static assertEquals(state1: Sale, state2: Sale) {
-    state1.tokenId.assertEquals(state2.tokenId);
-    state1.price.assertEquals(state2.price);
-    state1.approvedHash.assertEquals(state2.approvedHash);
-  }
-}
-
 class Storage extends Struct({
-  hash: [Field, Field, Field], // IPFS or Arweave url
+  url: [Field, Field, Field], // IPFS or Arweave url
 }) {}
 
 class Update extends Struct({
@@ -43,27 +33,24 @@ class Update extends Struct({
   newMetadata: Metadata,
   storage: Storage,
   verifier: PublicKey,
-  version: Field,
+  version: UInt64,
 }) {}
 
 /**
  * class MinaNFTContract
  *
  */
-export class MinaNFTContract extends SmartContract {
+class MinaNFTContract extends SmartContract {
   @state(Field) name = State<Field>();
-  @state(Field) version = State<Field>();
   @state(Metadata) metadata = State<Metadata>();
-  @state(Sale) sale = State<Sale>();
-  @state(Field) pwdHash = State<Field>();
+  @state(Storage) storage = State<Storage>();
+  @state(Field) owner = State<Field>();
+  @state(UInt64) version = State<UInt64>();
 
   events = {
     mint: Field,
     update: Update,
-    changePassword: Field,
     transfer: Field,
-    approve: Field,
-    sale: Sale,
   };
 
   deploy(args: DeployArgs) {
@@ -83,65 +70,29 @@ export class MinaNFTContract extends SmartContract {
   }
 
   @method update(data: Update, secret: Field) {
-    this.pwdHash.assertEquals(this.pwdHash.get());
-    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+    this.owner.assertEquals(this.owner.get());
+    this.owner.assertEquals(Poseidon.hash([secret]));
 
     this.metadata.assertEquals(this.metadata.get());
     this.metadata.assertEquals(data.oldMetadata);
 
     const version = this.version.get();
     this.version.assertEquals(version);
-    const newVersion = version.add(Field(1));
+    const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
 
     this.metadata.set(data.newMetadata);
     this.version.set(newVersion);
+    this.storage.set(data.storage);
 
     this.emitEvent("update", data);
   }
 
-  @method changePassword(secret: Field, newPwdHash: Field) {
-    this.pwdHash.assertEquals(this.pwdHash.get());
-    this.pwdHash.assertEquals(Poseidon.hash([secret]));
+  @method transfer(secret: Field, newOwner: Field) {
+    this.owner.assertEquals(this.owner.get());
+    this.owner.assertEquals(Poseidon.hash([secret]));
 
-    this.pwdHash.set(newPwdHash);
-    this.emitEvent("changePassword", newPwdHash);
-  }
-  /*
-  @method transfer(approvedSecret: Field, newPwdHash: Field) {
-    const approved = this.approved.get();
-    this.approved.assertEquals(approved);
-    approved.assertEquals(Poseidon.hash([approvedSecret]));
-    approved.assertNotEquals(Field(0));
-
-    this.pwdHash.set(newPwdHash);
-    this.emitEvent("transfer", newPwdHash);
-  }
-
-  @method transfer(approvedSecret: Field, newPwdHash: Field) {
-    this.sale.assertEquals(this.sale.get());
-    this.sale.approvedHash.assertEquals(Sale.default());
-    const token = new MinaNFTContract(this.address, this.sale.get().tokenId);
-    
-    const balance: UInt64 = token.account.balance;
-    const price: UInt64 = this.sale.get().price;
-    this.sale.assertEquals(this.sale.get());
-    balance.assertGreaterThan(price);
-    const approved = this.approved.get();
-    this.approved.assertEquals(approved);
-    approved.assertEquals(Poseidon.hash([approvedSecret]));
-    approved.assertNotEquals(Field(0));
-
-    this.pwdHash.set(newPwdHash);
-    this.emitEvent("transfer", newPwdHash);
-  }
-  */
-
-  @method sell(secret: Field, sale: Sale) {
-    this.pwdHash.assertEquals(this.pwdHash.get());
-    this.pwdHash.assertEquals(Poseidon.hash([secret]));
-
-    this.sale.set(sale);
-    this.emitEvent("sale", sale);
+    this.owner.set(newOwner);
+    this.emitEvent("transfer", newOwner);
   }
 }
