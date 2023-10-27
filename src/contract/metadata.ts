@@ -1,181 +1,135 @@
-import { Field, SelfProof, Experimental, Struct, MerkleMapWitness } from "o1js";
+export {
+  MetadataUpdate,
+  MetadataTransition,
+  MetadataWitness,
+  MetadataMap,
+  MinaNFTMetadataUpdate,
+  MinaNFTMetadataUpdateProof,
+};
 
-class MapUpdate extends Struct({
-  initialRoot: Field,
-  latestRoot: Field,
-  currentValue: Field,
-  newValue: Field,
-  witness: MerkleMapWitness,
-}) {}
+import {
+  Field,
+  SelfProof,
+  Experimental,
+  Struct,
+  MerkleMapWitness,
+  MerkleMap,
+} from "o1js";
+import { Metadata } from "./nft";
 
-class DoubleMapUpdate extends Struct({
+class MetadataWitness extends Struct({
+  data: MerkleMapWitness,
+  kind: MerkleMapWitness,
+}) {
+  static assertEquals(state1: Metadata, state2: Metadata) {
+    state1.data.assertEquals(state2.data);
+    state1.kind.assertEquals(state2.kind);
+  }
+}
+
+class MetadataMap {
+  data: MerkleMap;
+  kind: MerkleMap;
+
+  constructor() {
+    this.data = new MerkleMap();
+    this.kind = new MerkleMap();
+  }
+
+  getRoot(): Metadata {
+    return new Metadata({
+      data: this.data.getRoot(),
+      kind: this.kind.getRoot(),
+    });
+  }
+
+  get(key: Field): Metadata {
+    return new Metadata({
+      data: this.data.get(key),
+      kind: this.kind.get(key),
+    });
+  }
+
+  set(key: Field, value: Metadata): void {
+    this.data.set(key, value.data);
+    this.kind.set(key, value.kind);
+  }
+
+  getWitness(key: Field): MetadataWitness {
+    return new MetadataWitness({
+      data: this.data.getWitness(key),
+      kind: this.kind.getWitness(key),
+    });
+  }
+}
+
+class MetadataUpdate extends Struct({
+  oldRoot: Metadata,
+  newRoot: Metadata,
   key: Field,
-  metadata: MapUpdate,
-  metatype: MapUpdate,
+  oldValue: Metadata,
+  newValue: Metadata,
+  witness: MetadataWitness,
 }) {}
 
-class MinaNFTMapState extends Struct({
-  initialRoot: Field,
-  latestRoot: Field,
+class MetadataTransition extends Struct({
+  oldRoot: Metadata,
+  newRoot: Metadata,
 }) {
-  static create(update: MapUpdate) {
-    const [witnessRootBefore, witnessKey] = update.witness.computeRootAndKey(
-      update.currentValue
-    );
-    update.initialRoot.assertEquals(witnessRootBefore);
-    witnessKey.assertEquals(update.key);
-    const [witnessRootAfter, _] = update.witness.computeRootAndKey(
-      update.newValue
-    );
-    update.latestRoot.assertEquals(witnessRootAfter);
+  static create(update: MetadataUpdate) {
+    const [dataWitnessRootBefore, dataWitnessKey] =
+      update.witness.data.computeRootAndKey(update.oldValue.data);
+    update.oldRoot.data.assertEquals(dataWitnessRootBefore);
+    dataWitnessKey.assertEquals(update.key);
+    const [kindWitnessRootBefore, kindWitnessKey] =
+      update.witness.kind.computeRootAndKey(update.oldValue.kind);
+    update.oldRoot.kind.assertEquals(kindWitnessRootBefore);
+    kindWitnessKey.assertEquals(update.key);
 
-    return new MinaNFTMapState({
-      initialRoot: update.initialRoot,
-      latestRoot: update.latestRoot,
+    const [dataWitnessRootAfter, _] = update.witness.data.computeRootAndKey(
+      update.newValue.data
+    );
+    update.newRoot.data.assertEquals(dataWitnessRootAfter);
+    const [kindWitnessRootAfter, __] = update.witness.kind.computeRootAndKey(
+      update.newValue.kind
+    );
+    update.newRoot.kind.assertEquals(kindWitnessRootAfter);
+
+    return new MetadataTransition({
+      oldRoot: update.oldRoot,
+      newRoot: update.newRoot,
     });
   }
 
-  static merge(state1: MinaNFTMapState, state2: MinaNFTMapState) {
-    return new MinaNFTMapState({
-      initialRoot: state1.initialRoot,
-      latestRoot: state2.latestRoot,
+  static merge(
+    transition1: MetadataTransition,
+    transition2: MetadataTransition
+  ) {
+    return new MetadataTransition({
+      oldRoot: transition1.oldRoot,
+      newRoot: transition2.newRoot,
     });
   }
 
-  static assertEquals(state1: MinaNFTMapState, state2: MinaNFTMapState) {
-    state1.initialRoot.assertEquals(state2.initialRoot);
-    state1.latestRoot.assertEquals(state2.latestRoot);
+  static assertEquals(
+    transition1: MetadataTransition,
+    transition2: MetadataTransition
+  ) {
+    Metadata.assertEquals(transition1.oldRoot, transition2.oldRoot);
+    Metadata.assertEquals(transition1.newRoot, transition2.newRoot);
   }
 }
 
-class MinaNFTState extends Struct({
-  publicAttributes: MinaNFTMapState,
-  publicObjects: MinaNFTMapState,
-  privateAttributes: MinaNFTMapState,
-  privateObjects: MinaNFTMapState,
-}) {
-  static updatePublicAttributes(
-    update: MapUpdate,
-    publicObjectsRoot: Field,
-    privateAttributesRoot: Field,
-    privateObjectsRoot: Field
-  ) {
-    return new MinaNFTState({
-      publicAttributes: MinaNFTMapState.create(update),
-      publicObjects: new MinaNFTMapState({
-        initialRoot: publicObjectsRoot,
-        latestRoot: publicObjectsRoot,
-      }),
-      privateAttributes: new MinaNFTMapState({
-        initialRoot: privateAttributesRoot,
-        latestRoot: privateAttributesRoot,
-      }),
-      privateObjects: new MinaNFTMapState({
-        initialRoot: privateObjectsRoot,
-        latestRoot: privateObjectsRoot,
-      }),
-    });
-  }
-
-  static updatePrivateAttributes(
-    publicAttributesRoot: Field,
-    publicObjectsRoot: Field,
-    update: MapUpdate,
-    privateObjectsRoot: Field
-  ) {
-    return new MinaNFTState({
-      publicAttributes: new MinaNFTMapState({
-        initialRoot: publicAttributesRoot,
-        latestRoot: publicAttributesRoot,
-      }),
-      publicObjects: new MinaNFTMapState({
-        initialRoot: publicObjectsRoot,
-        latestRoot: publicObjectsRoot,
-      }),
-      privateAttributes: MinaNFTMapState.create(update),
-      privateObjects: new MinaNFTMapState({
-        initialRoot: privateObjectsRoot,
-        latestRoot: privateObjectsRoot,
-      }),
-    });
-  }
-
-  static merge(state1: MinaNFTState, state2: MinaNFTState) {
-    return new MinaNFTState({
-      publicAttributes: MinaNFTMapState.merge(
-        state1.publicAttributes,
-        state2.publicAttributes
-      ),
-      publicObjects: MinaNFTMapState.merge(
-        state1.publicObjects,
-        state2.publicObjects
-      ),
-      privateAttributes: MinaNFTMapState.merge(
-        state1.privateAttributes,
-        state2.privateAttributes
-      ),
-      privateObjects: MinaNFTMapState.merge(
-        state1.privateObjects,
-        state2.privateObjects
-      ),
-    });
-  }
-
-  static assertEquals(state1: MinaNFTState, state2: MinaNFTState) {
-    MinaNFTMapState.assertEquals(
-      state1.publicAttributes,
-      state2.publicAttributes
-    );
-    MinaNFTMapState.assertEquals(state1.publicObjects, state2.publicObjects);
-    MinaNFTMapState.assertEquals(
-      state1.privateAttributes,
-      state2.privateAttributes
-    );
-    MinaNFTMapState.assertEquals(state1.privateObjects, state2.privateObjects);
-  }
-}
-
-const MinaNFTUpdate = Experimental.ZkProgram({
-  publicInput: MinaNFTState,
+const MinaNFTMetadataUpdate = Experimental.ZkProgram({
+  publicInput: MetadataTransition,
 
   methods: {
-    updatePublicAttributes: {
-      privateInputs: [MapUpdate, Field, Field, Field],
+    update: {
+      privateInputs: [MetadataUpdate],
 
-      method(
-        state: MinaNFTState,
-        update: MapUpdate,
-        publicObjectsRoot: Field,
-        privateAttributesRoot: Field,
-        privateObjectsRoot: Field
-      ) {
-        const computedState = MinaNFTState.updatePublicAttributes(
-          update,
-          publicObjectsRoot,
-          privateAttributesRoot,
-          privateObjectsRoot
-        );
-        MinaNFTState.assertEquals(computedState, state);
-      },
-    },
-
-    updatePrivateAttributes: {
-      privateInputs: [Field, Field, MapUpdate, Field],
-
-      method(
-        state: MinaNFTState,
-        publicAttributesRoot: Field,
-        publicObjectsRoot: Field,
-        update: MapUpdate,
-        privateObjectsRoot: Field
-      ) {
-        const computedState = MinaNFTState.updatePrivateAttributes(
-          publicAttributesRoot,
-          publicObjectsRoot,
-          update,
-          privateObjectsRoot
-        );
-        MinaNFTState.assertEquals(computedState, state);
+      method(state: MetadataTransition, update: MetadataUpdate) {
+        const computedState = MetadataTransition.create(update);
+        MetadataTransition.assertEquals(computedState, state);
       },
     },
 
@@ -183,63 +137,24 @@ const MinaNFTUpdate = Experimental.ZkProgram({
       privateInputs: [SelfProof, SelfProof],
 
       method(
-        newState: MinaNFTState,
-        proof1: SelfProof<MinaNFTState, void>,
-        proof2: SelfProof<MinaNFTState, void>
+        newState: MetadataTransition,
+        proof1: SelfProof<MetadataTransition, void>,
+        proof2: SelfProof<MetadataTransition, void>
       ) {
         proof1.verify();
         proof2.verify();
 
-        proof1.publicInput.publicAttributes.latestRoot.assertEquals(
-          proof2.publicInput.publicAttributes.initialRoot
+        Metadata.assertEquals(
+          proof1.publicInput.newRoot,
+          proof2.publicInput.oldRoot
         );
-        proof1.publicInput.publicObjects.latestRoot.assertEquals(
-          proof2.publicInput.publicObjects.initialRoot
-        );
-        proof1.publicInput.privateAttributes.latestRoot.assertEquals(
-          proof2.publicInput.privateAttributes.initialRoot
-        );
-        proof1.publicInput.privateObjects.latestRoot.assertEquals(
-          proof2.publicInput.privateObjects.initialRoot
-        );
-
-        proof1.publicInput.publicAttributes.initialRoot.assertEquals(
-          newState.publicAttributes.initialRoot
-        );
-        proof1.publicInput.publicObjects.initialRoot.assertEquals(
-          newState.publicObjects.initialRoot
-        );
-        proof1.publicInput.privateAttributes.initialRoot.assertEquals(
-          newState.privateAttributes.initialRoot
-        );
-        proof1.publicInput.privateObjects.initialRoot.assertEquals(
-          newState.privateObjects.initialRoot
-        );
-
-        proof2.publicInput.publicAttributes.latestRoot.assertEquals(
-          newState.publicAttributes.latestRoot
-        );
-        proof2.publicInput.publicObjects.latestRoot.assertEquals(
-          newState.publicObjects.latestRoot
-        );
-        proof2.publicInput.privateAttributes.latestRoot.assertEquals(
-          newState.privateAttributes.latestRoot
-        );
-        proof2.publicInput.privateObjects.latestRoot.assertEquals(
-          newState.privateObjects.latestRoot
-        );
+        Metadata.assertEquals(proof1.publicInput.oldRoot, newState.oldRoot);
+        Metadata.assertEquals(proof2.publicInput.newRoot, newState.newRoot);
       },
     },
   },
 });
 
-const MinaNFTStateProofClass = Experimental.ZkProgram.Proof(MinaNFTUpdate);
-class MinaNFTStateProof extends MinaNFTStateProofClass {}
-
-export {
-  MinaNFTUpdate,
-  MinaNFTState,
-  MinaNFTStateProof,
-  MapUpdate,
-  MinaNFTMapState,
-};
+class MinaNFTMetadataUpdateProof extends Experimental.ZkProgram.Proof(
+  MinaNFTMetadataUpdate
+) {}

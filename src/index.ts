@@ -1,16 +1,12 @@
+export { MinaNFT, MinaNFTobject, VeificationKey } from "./minanft";
+export { MinaNFTContract, Metadata, Storage, Update } from "./contract/nft";
 export {
-  MinaNFT,
-  RedactedMinaNFT,
-  MinaNFTobject,
-  VeificationKey,
-} from "./minanft";
-export { MinaNFTContract } from "./contract/minanft";
-export {
-  MinaNFTState,
-  MinaNFTMapState,
-  MinaNFTStateProof,
-  MinaNFTUpdate,
-  MapUpdate,
-} from "./contract/map";
-export { MinaNFTTree } from "./contract/tree";
+  MetadataUpdate,
+  MetadataTransition,
+  MetadataWitness,
+  MetadataMap,
+  MinaNFTMetadataUpdate,
+  MinaNFTMetadataUpdateProof,
+} from "./contract/metadata";
+export { MinaNFTUpdater, MinaNFTUpdaterEvent } from "./plugins/updater";
 export { IPFS } from "./storage/ipfs";

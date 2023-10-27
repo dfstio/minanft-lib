@@ -18,8 +18,10 @@
     "entryPoints": ["src/index.ts"],
     "out": "docs",
     "plugin": ["typedoc-plugin-mermaid", "@mxssfd/typedoc-theme"],
-    "theme": "my-theme"
+    "theme": "my-theme",
+    "sourceLinkTemplate": "https://github.com/dfstio/minanft-lib/blob/master/{path}#L{line}"
   },
+  "files": ["src/config.json"],
   "include": ["src/**/*"],
-  "exclude": ["dist/**", "tests/**", "node_modules"]
+  "exclude": ["dist/**", "tests/**", "node_modules", "deprecated/**"]
 }
