@@ -19,13 +19,13 @@ import { MinaNFT } from "../src/minanft";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
 // use local blockchain or Berkeley
-const useLocal: boolean = true;
+const useLocal: boolean = false;
 
 const transactionFee = 150_000_000;
-const DEPLOYERS_NUMBER = 2;
+const DEPLOYERS_NUMBER = 1;
 const tokenSymbol = "VBADGE";
 
-jest.setTimeout(1000 * 60 * 60); // 1 hour
+jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
 
 let deployer: PrivateKey | undefined = undefined;
 const deployers: PrivateKey[] = [];
@@ -115,6 +115,7 @@ describe("MinaNFT contract", () => {
     expect(updater).not.toBeUndefined();
     if (updater === undefined) return;
     const nfts: MinaNFT[] = [];
+    const nfts2: MinaNFT[] = [];
     const secrets: Field[] = [];
     const owners: Field[] = [];
 
@@ -150,12 +151,13 @@ describe("MinaNFT contract", () => {
       nft.update("discord", "string", "@mydiscordname");
       nft.update("linkedin", "string", "@mylinkedinname");
       await nft.commit(deployers[i], secrets[i], updater); // commit the update to blockchain
+      nfts2.push(nft);
     }
 
     console.log("Updating, iteration 2...");
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft: MinaNFT = nfts[i];
+      const nft: MinaNFT = nfts2[i];
       // update metadata
       nft.update("twitter2", "string", "@mytwittername2");
       nft.update("discord2", "string", "@mydiscordname2");

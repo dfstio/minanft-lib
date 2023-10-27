@@ -41,7 +41,7 @@ import {
 import { MinaNFTVerifier } from "./contract/verifier";
 */
 
-import { MINAURL, ARCHIVEURL, MINAEXPLORER } from "./config.json";
+import { MINAURL, ARCHIVEURL, MINAEXPLORER } from "../src/config.json";
 
 const transactionFee = 150_000_000; // TODO: use current market fees
 
@@ -86,15 +86,14 @@ class BaseMinaNFT {
    * @returns MapUpdate object
    */
   protected updateMetadataMap(
-    mapToUpdate: Map<string, Metadata>,
     keyToUpdate: string,
     newValue: Metadata
   ): MetadataUpdate {
-    const { root, map } = this.getMapRootAndMap(mapToUpdate);
+    const { root, map } = this.getMetadataRootAndMap();
     const key = MinaNFT.stringToField(keyToUpdate);
     const witness: MetadataWitness = map.getWitness(key);
     const oldValue: Metadata = map.get(key);
-    mapToUpdate.set(keyToUpdate, newValue);
+    this.metadata.set(keyToUpdate, newValue);
     map.set(key, newValue);
     const newRoot: Metadata = map.getRoot();
 
@@ -236,18 +235,12 @@ class BaseMinaNFT {
   }
 }
 
-interface UpdateInfo {
-  update: MetadataUpdate;
-  key: string;
-  value: Metadata;
-}
-
 class MinaNFT extends BaseMinaNFT {
   name: string;
   isMinted: boolean;
   zkAppPublicKey: PublicKey | undefined;
 
-  private updates: UpdateInfo[];
+  private updates: MetadataUpdate[];
   private metadataRoot: Metadata;
 
   /**
@@ -288,16 +281,7 @@ class MinaNFT extends BaseMinaNFT {
    */
   public updateMetadata(key: string, value: Metadata): void {
     if (this.isMinted) {
-      const metadataUpdate: MetadataUpdate = this.updateMetadataMap(
-        this.metadata,
-        key,
-        value
-      );
-      const update: UpdateInfo = {
-        update: metadataUpdate,
-        key,
-        value,
-      } as UpdateInfo;
+      const update: MetadataUpdate = this.updateMetadataMap(key, value);
       this.updates.push(update);
     } else this.metadata.set(key, value);
   }
@@ -373,19 +357,34 @@ class MinaNFT extends BaseMinaNFT {
     };
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: updater });
-
-    const tx = await Mina.transaction(
-      { sender, fee: transactionFee, memo: "minanft.io" },
-      () => {
-        if (version.equals(UInt64.from(0)))
+    const needsOneMina: boolean = version.toBigInt() === BigInt(0);
+    console.log("version:", version.toString(), "needs 1 MINA:", needsOneMina);
+    if (needsOneMina) {
+      console.log("Sending update and 1 MINA for the verification badge...");
+      const tx = await Mina.transaction(
+        { sender, fee: transactionFee, memo: "minanft.io" },
+        () => {
           AccountUpdate.fundNewAccount(sender);
-        zkUpdater.update(update, zkAppPublicKey, secret, proof);
-      }
-    );
-    await tx.prove();
-    tx.sign([deployer]);
-    const res = await tx.send();
-    await MinaNFT.transactionInfo(res, "update");
+          zkUpdater.update(update, zkAppPublicKey, secret, proof);
+        }
+      );
+      await tx.prove();
+      tx.sign([deployer]);
+      const res = await tx.send();
+      await MinaNFT.transactionInfo(res, "update and 1 MINA");
+    } else {
+      console.log("Sending update...");
+      const tx = await Mina.transaction(
+        { sender, fee: transactionFee, memo: "minanft.io" },
+        () => {
+          zkUpdater.update(update, zkAppPublicKey, secret, proof);
+        }
+      );
+      await tx.prove();
+      tx.sign([deployer]);
+      const res = await tx.send();
+      await MinaNFT.transactionInfo(res, "update");
+    }
     this.metadataRoot = proof.publicInput.newRoot;
   }
 
@@ -402,11 +401,11 @@ class MinaNFT extends BaseMinaNFT {
     console.time("Proofs created");
     const proofs: MinaNFTMetadataUpdateProof[] = [];
     for (const update of this.updates) {
-      const state = MetadataTransition.create(update.update);
-      const proof = await MinaNFTMetadataUpdate.update(state, update.update);
+      const state = MetadataTransition.create(update);
+      const proof = await MinaNFTMetadataUpdate.update(state, update);
       proofs.push(proof);
-      this.metadata.set(update.key, update.value);
     }
+    this.updates = [];
 
     //console.log("Merging proofs...");
     let proof: MinaNFTMetadataUpdateProof = proofs[0];
@@ -495,21 +494,25 @@ class MinaNFT extends BaseMinaNFT {
     tx: Mina.TransactionId,
     description: string = ""
   ): Promise<void> {
-    const hash = tx.hash();
-    if (hash === undefined) {
-      console.error("Send fail", tx);
-      return;
-    }
-    if (hash.substring(0, 4) === "Info") return; // We are on local blockchain
+    try {
+      Mina.getNetworkState();
+    } catch (error) {
+      const hash = tx.hash();
+      if (hash === undefined) {
+        console.error("Send fail", tx);
+        return;
+      }
+      if (hash.substring(0, 4) === "Info") return; // We are on local blockchain
 
-    console.log(`
+      console.log(`
       Success! MinaNFT ${description} transaction sent, see details at:
       ${MINAEXPLORER}/transaction/${hash}
       `);
-    try {
-      await tx.wait({ maxAttempts: 60, interval: 60000 }); // wait 60 minutes max
-    } catch (error) {
-      console.log("Error waiting for transaction");
+      try {
+        await tx.wait({ maxAttempts: 120, interval: 60000 }); // wait 2 hours max
+      } catch (error) {
+        console.log("Error waiting for transaction");
+      }
     }
   }
 
