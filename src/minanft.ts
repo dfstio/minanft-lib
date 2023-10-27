@@ -504,10 +504,10 @@ class MinaNFT extends BaseMinaNFT {
       }
       if (hash.substring(0, 4) === "Info") return; // We are on local blockchain
 
-      console.log(`
-      Success! MinaNFT ${description} transaction sent, see details at:
-      ${MINAEXPLORER}/transaction/${hash}
-      `);
+      console.log(
+        `MinaNFT ${description} transaction sent, see details at:
+${MINAEXPLORER}/transaction/${hash}`
+      );
       try {
         await tx.wait({ maxAttempts: 120, interval: 60000 }); // wait 2 hours max
       } catch (error) {
