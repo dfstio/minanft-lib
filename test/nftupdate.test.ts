@@ -136,7 +136,7 @@ describe("MinaNFT contract", () => {
     if (updater === undefined) return;
     expect(updaterTx).not.toBeUndefined();
     if (updaterTx === undefined) return;
-    if (!useLocal) await MinaNFT.transactionInfo(updaterTx);
+    if (!useLocal) await MinaNFT.transactionInfo(updaterTx, "deploy updater");
     await fetchAccount({ publicKey: updater });
     const tokenSymbol = Mina.getAccount(updater).tokenSymbol;
     expect(tokenSymbol).toBeDefined();
@@ -154,6 +154,7 @@ describe("MinaNFT contract", () => {
       nfts2.push(nft);
     }
 
+    //await sleep(1000 * 60 * 10); // 10 minutes
     console.log("Updating, iteration 2...");
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {

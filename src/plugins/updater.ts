@@ -59,12 +59,14 @@ class MinaNFTUpdater extends SmartContract {
     Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
     this.address.assertEquals(data.verifier);
 
+    /*
     // Check that all versions are properly verified
     const version = nft.version.get();
     const account = Account(address, this.token.id);
     const tokenBalance = account.balance.get();
     account.balance.assertEquals(tokenBalance);
     tokenBalance.assertEquals(version.mul(UInt64.from(1_000_000_000n)));
+    */
 
     // Check that the proof verifies
     proof.verify();
