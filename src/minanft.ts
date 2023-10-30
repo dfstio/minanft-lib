@@ -509,7 +509,10 @@ class MinaNFT extends BaseMinaNFT {
 ${MINAEXPLORER}/transaction/${hash}`
       );
       try {
+        //console.log("Waiting for transaction...");
+        console.time("Transaction time");
         await tx.wait({ maxAttempts: 120, interval: 60000 }); // wait 2 hours max
+        console.timeEnd("Transaction time");
       } catch (error) {
         console.log("Error waiting for transaction");
       }
