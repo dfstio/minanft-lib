@@ -39,7 +39,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">MinaNFTContract</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L43">src/contract/nft.ts:43</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L20">src/contract/nft.ts:20</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -53,6 +53,7 @@
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="MinaNFTContract.html#_private" class="tsd-index-link tsd-is-private tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>#private</span></a>
 <a href="MinaNFTContract.html#address" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>address</span></a>
+<a href="MinaNFTContract.html#escrow" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>escrow</span></a>
 <a href="MinaNFTContract.html#events" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>events</span></a>
 <a href="MinaNFTContract.html#metadata" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>metadata</span></a>
 <a href="MinaNFTContract.html#name" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>name</span></a>
@@ -131,41 +132,46 @@
 <p>Inherited from SmartContract.address</p>
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:46</li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="escrow" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>escrow</span><a href="#escrow" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">escrow</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L25">src/contract/nft.ts:25</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="events" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>events</span><a href="#events" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">events</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">mint</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">transfer</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">update</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><a href="Update.html" class="tsd-signature-type tsd-kind-class">Update</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = ...</span></div>
+<div class="tsd-signature"><span class="tsd-kind-property">events</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">mint</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">transfer</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">EscrowData</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">update</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><a href="Update.html" class="tsd-signature-type tsd-kind-class">Update</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = ...</span></div>
 <div class="tsd-type-declaration">
 <h4>Type declaration</h4>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">mint</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">)</span></h5></li>
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">transfer</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">)</span></h5></li>
+<h5><span class="tsd-kind-property">transfer</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type ">EscrowData</span></h5></li>
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">update</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">typeof </span><a href="Update.html" class="tsd-signature-type tsd-kind-class">Update</a></h5></li></ul></div><aside class="tsd-sources">
 <p>Overrides SmartContract.events</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L50">src/contract/nft.ts:50</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L28">src/contract/nft.ts:28</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="metadata" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>metadata</span><a href="#metadata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">metadata</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><a href="Metadata.html" class="tsd-signature-type tsd-kind-class">Metadata</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L45">src/contract/nft.ts:45</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L22">src/contract/nft.ts:22</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="name" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L44">src/contract/nft.ts:44</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L21">src/contract/nft.ts:21</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="owner" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>owner</span><a href="#owner" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">owner</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L47">src/contract/nft.ts:47</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L24">src/contract/nft.ts:24</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="storage" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>storage</span><a href="#storage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">storage</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><a href="Storage.html" class="tsd-signature-type tsd-kind-class">Storage</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<div class="tsd-signature"><span class="tsd-kind-property">storage</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Field</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L46">src/contract/nft.ts:46</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L23">src/contract/nft.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="tokenId" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>token<wbr/>Id</span><a href="#tokenId" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">token<wbr/>Id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Field</span></div><aside class="tsd-sources">
@@ -176,7 +182,7 @@
 <h3 class="tsd-anchor-link"><span>version</span><a href="#version" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">version</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">State</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L48">src/contract/nft.ts:48</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L26">src/contract/nft.ts:26</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="_maxProofsVerified" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>_max<wbr/>Proofs<wbr/>Verified</span><a href="#_maxProofsVerified" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_max<wbr/>Proofs<wbr/>Verified</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">0</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">2</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">1</span></div><aside class="tsd-sources">
@@ -357,10 +363,10 @@ A malicious prover could use any other public key without affecting the validity
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li>
+<h5><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li>
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4><aside class="tsd-sources">
@@ -375,10 +381,10 @@ A malicious prover could use any other public key without affecting the validity
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li>
+<h5><span class="tsd-kind-property">address</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li>
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4><aside class="tsd-sources">
@@ -393,14 +399,14 @@ A malicious prover could use any other public key without affecting the validity
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">from</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">from</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span></h5></li>
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">from</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li>
+<h5><span class="tsd-kind-property">from</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li>
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li></ul></li></ul></div>
+<h5><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4><aside class="tsd-sources">
 <ul>
 <li>Defined in .yarn/cache/o1js-npm-0.13.1-c58323a2b2-50d802acc5.zip/node_modules/o1js/dist/node/lib/zkapp.d.ts:254</li></ul></aside></li></ul></li></ul>
@@ -480,7 +486,7 @@ by specifying a certain expected layout of children. See AccountUpdate.Layout.</
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Overrides SmartContract.deploy</p>
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L56">src/contract/nft.ts:56</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L34">src/contract/nft.ts:34</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="emitEvent" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>emit<wbr/>Event</span><a href="#emitEvent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -591,12 +597,12 @@ with the only difference being that quick mock proofs are filled in instead of r
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<h5><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
 <h5><span class="tsd-kind-property">amount</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">UInt64</span></h5></li>
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li></ul></li></ul></div>
+<h5><span class="tsd-kind-property">to</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">PublicKey</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">SmartContract</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">AccountUpdate</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">AccountUpdate</span></h4><aside class="tsd-sources">
 <p>Inherited from SmartContract.send</p>
 <ul>
@@ -678,33 +684,29 @@ authorization flow.</p>
 <section class="tsd-panel tsd-member"><a id="transfer-1" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>transfer</span><a href="#transfer-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="transfer-1.transfer-2"><span class="tsd-kind-call-signature">transfer</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">secret</span>, <span class="tsd-kind-parameter">newOwner</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#transfer-1.transfer-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="transfer-1.transfer-2"><span class="tsd-kind-call-signature">transfer</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#transfer-1.transfer-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">secret</span>: <span class="tsd-signature-type ">Field</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">newOwner</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">proof</span>: <span class="tsd-signature-type ">EscrowProof</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L91">src/contract/nft.ts:91</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L83">src/contract/nft.ts:83</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="update-1" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>update</span><a href="#update-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="update-1.update-2"><span class="tsd-kind-call-signature">update</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span>, <span class="tsd-kind-parameter">secret</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#update-1.update-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="update-1.update-2"><span class="tsd-kind-call-signature">update</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">proof</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#update-1.update-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">data</span>: <a href="Update.html" class="tsd-signature-type tsd-kind-class">Update</a></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">secret</span>: <span class="tsd-signature-type ">Field</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">proof</span>: <span class="tsd-signature-type ">OwnerProof</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L72">src/contract/nft.ts:72</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/dfstio/minanft-lib/blob/master/src/contract/nft.ts#L50">src/contract/nft.ts:50</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="Proof" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>Proof</span><a href="#Proof" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -900,6 +902,7 @@ a cached verification key can be used.</p>
 <li><a href="#constructor" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-512"></use></svg><span>constructor</span></a></li>
 <li><a href="#_private" class="tsd-is-private tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>#private</span></a></li>
 <li><a href="#address" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>address</span></a></li>
+<li><a href="#escrow" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>escrow</span></a></li>
 <li><a href="#events" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>events</span></a></li>
 <li><a href="#metadata" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>metadata</span></a></li>
 <li><a href="#name" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>name</span></a></li>
@@ -968,8 +971,6 @@ a cached verification key can be used.</p>
 <div>MinaNFTUpdater<wbr/>Event</div></a></li>
 <li><a href="MinaNFTobject.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>MinaNFTobject</div></a></li>
-<li><a href="Storage.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
-<div>Storage</div></a></li>
 <li><a href="Update.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>Update</div></a></li>
 <li><a href="../interfaces/VeificationKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>

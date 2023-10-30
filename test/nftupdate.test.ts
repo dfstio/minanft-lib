@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import {
-  Field,
+  Signature,
   AccountUpdate,
   fetchAccount,
   PrivateKey,
@@ -10,16 +10,15 @@ import {
   Poseidon,
 } from "o1js";
 
-import { MinaNFTContract } from "../src/contract/nft";
-import { MinaNFTMetadataUpdate } from "../src/contract/metadata";
 import { MinaNFTUpdater } from "../src/plugins/updater";
+import { Escrow, EscrowData, EscrowProof } from "../src/contract/escrow";
 
 import { MINAURL, ARCHIVEURL } from "../src/config.json";
 import { MinaNFT } from "../src/minanft";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
 // use local blockchain or Berkeley
-const useLocal: boolean = false;
+const useLocal: boolean = true;
 
 const transactionFee = 150_000_000;
 const DEPLOYERS_NUMBER = 1;
@@ -116,18 +115,17 @@ describe("MinaNFT contract", () => {
     if (updater === undefined) return;
     const nfts: MinaNFT[] = [];
     const nfts2: MinaNFT[] = [];
-    const secrets: Field[] = [];
-    const owners: Field[] = [];
+    const nfts3: MinaNFT[] = [];
+    const owners: PrivateKey[] = [];
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
       const nft = new MinaNFT("@test");
       nft.update("description", "string", "my nft @test");
       nft.update("image", "string", "ipfs:Qm...");
-      const secret: Field = Field.random();
-      const owner: Field = Poseidon.hash([secret]);
+      const owner: PrivateKey = PrivateKey.random();
+      const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
 
-      await nft.mint(deployers[i], owner);
-      secrets.push(secret);
+      await nft.mint(deployers[i], ownerHash);
       owners.push(owner);
       nfts.push(nft);
     }
@@ -143,6 +141,17 @@ describe("MinaNFT contract", () => {
     expect(tokenSymbol).toEqual(tokenSymbol);
 
     console.log("Updating, iteration 1...");
+    const escrowPrivateKey1 = PrivateKey.random();
+    const escrowPublicKey1 = escrowPrivateKey1.toPublicKey();
+    const escrowPrivateKey2 = PrivateKey.random();
+    const escrowPublicKey2 = escrowPrivateKey2.toPublicKey();
+    const escrowPrivateKey3 = PrivateKey.random();
+    const escrowPublicKey3 = escrowPrivateKey3.toPublicKey();
+    const escrow = Poseidon.hash([
+      Poseidon.hash(escrowPublicKey1.toFields()),
+      Poseidon.hash(escrowPublicKey2.toFields()),
+      Poseidon.hash(escrowPublicKey3.toFields()),
+    ]);
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
       const nft: MinaNFT = nfts[i];
@@ -150,11 +159,12 @@ describe("MinaNFT contract", () => {
       nft.update("twitter", "string", "@mytwittername");
       nft.update("discord", "string", "@mydiscordname");
       nft.update("linkedin", "string", "@mylinkedinname");
-      await nft.commit(deployers[i], secrets[i], updater); // commit the update to blockchain
+      await nft.commit(deployers[i], owners[i], updater, escrow); // commit the update to blockchain
       nfts2.push(nft);
     }
 
     //await sleep(1000 * 60 * 10); // 10 minutes
+    /*
     console.log("Updating, iteration 2...");
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
@@ -163,7 +173,46 @@ describe("MinaNFT contract", () => {
       nft.update("twitter2", "string", "@mytwittername2");
       nft.update("discord2", "string", "@mydiscordname2");
       nft.update("linkedin2", "string", "@mylinkedinname2");
-      await nft.commit(deployers[i], secrets[i], updater); // commit the update to blockchain
+      await nft.commit(deployers[i], owners[i], updater); // commit the update to blockchain
+      nfts3.push(nft);
+    }
+    */
+    console.log("Transferring...");
+
+    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      const nft: MinaNFT = nfts2[i];
+      const ownerHash = Poseidon.hash(owners[i].toPublicKey().toFields());
+      const newOwnerPrivateKey = PrivateKey.random();
+      const newOwnerPublicKey = newOwnerPrivateKey.toPublicKey();
+      const newOwnerHash = Poseidon.hash(newOwnerPublicKey.toFields());
+      const escrowData = new EscrowData({
+        oldOwner: ownerHash,
+        newOwner: newOwnerHash,
+        name: MinaNFT.stringToField(nft.name),
+        escrow,
+      });
+      const signature1 = Signature.create(
+        escrowPrivateKey1,
+        escrowData.toFields()
+      );
+      const signature2 = Signature.create(
+        escrowPrivateKey2,
+        escrowData.toFields()
+      );
+      const signature3 = Signature.create(
+        escrowPrivateKey3,
+        escrowData.toFields()
+      );
+      const proofEscrow: EscrowProof = await Escrow.create(
+        escrowData,
+        signature1,
+        signature2,
+        signature3,
+        escrowPublicKey1,
+        escrowPublicKey2,
+        escrowPublicKey3
+      );
+      await nft.transfer(deployers[i], proofEscrow);
     }
   });
 });

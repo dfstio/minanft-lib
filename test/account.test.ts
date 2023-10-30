@@ -26,7 +26,7 @@ const transactionFee = 150_000_000;
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
-const useLocal: boolean = false;
+const useLocal: boolean = true;
 
 class KeyValueEvent extends Struct({
   name: Field,

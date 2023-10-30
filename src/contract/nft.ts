@@ -1,4 +1,4 @@
-export { MinaNFTContract, Metadata, Storage, Update };
+export { MinaNFTContract, Metadata, Update };
 
 import {
   Field,
@@ -7,34 +7,11 @@ import {
   method,
   DeployArgs,
   Permissions,
-  Poseidon,
   SmartContract,
-  PublicKey,
-  Struct,
   UInt64,
 } from "o1js";
-
-class Metadata extends Struct({
-  data: Field,
-  kind: Field,
-}) {
-  static assertEquals(state1: Metadata, state2: Metadata) {
-    state1.data.assertEquals(state2.data);
-    state1.kind.assertEquals(state2.kind);
-  }
-}
-
-class Storage extends Struct({
-  url: [Field, Field, Field], // IPFS or Arweave url
-}) {}
-
-class Update extends Struct({
-  oldRoot: Metadata,
-  newRoot: Metadata,
-  storage: Storage,
-  verifier: PublicKey,
-  version: UInt64,
-}) {}
+import { OwnerProof, Update, Metadata } from "./owner";
+import { EscrowProof, EscrowData } from "./escrow";
 
 /**
  * class MinaNFTContract
@@ -43,14 +20,15 @@ class Update extends Struct({
 class MinaNFTContract extends SmartContract {
   @state(Field) name = State<Field>();
   @state(Metadata) metadata = State<Metadata>();
-  @state(Storage) storage = State<Storage>();
+  @state(Field) storage = State<Field>();
   @state(Field) owner = State<Field>();
+  @state(Field) escrow = State<Field>();
   @state(UInt64) version = State<UInt64>();
 
   events = {
     mint: Field,
     update: Update,
-    transfer: Field,
+    transfer: EscrowData,
   };
 
   deploy(args: DeployArgs) {
@@ -69,30 +47,52 @@ class MinaNFTContract extends SmartContract {
     this.emitEvent("mint", Field(0));
   }
 
-  @method update(data: Update, secret: Field) {
-    this.owner.assertEquals(this.owner.get());
-    this.owner.assertEquals(Poseidon.hash([secret]));
+  @method update(proof: OwnerProof) {
+    this.owner.getAndAssertEquals();
+    this.owner.assertEquals(proof.publicInput.owner);
 
-    this.metadata.assertEquals(this.metadata.get());
-    this.metadata.assertEquals(data.oldRoot);
+    this.name.assertEquals(this.name.get());
+    this.name.assertEquals(proof.publicInput.name);
 
     const version = this.version.get();
     this.version.assertEquals(version);
     const newVersion: UInt64 = version.add(UInt64.from(1));
-    newVersion.assertEquals(data.version);
+    newVersion.assertEquals(proof.publicInput.version);
 
-    this.metadata.set(data.newRoot);
+    this.metadata.getAndAssertEquals();
+    this.metadata.assertEquals(proof.publicInput.oldRoot);
+
+    proof.verify();
+
+    this.metadata.set(proof.publicInput.newRoot);
     this.version.set(newVersion);
-    this.storage.set(data.storage);
+    this.storage.set(proof.publicInput.storage);
+    this.escrow.set(proof.publicInput.escrow);
 
-    this.emitEvent("update", data);
+    this.emitEvent("update", proof.publicInput);
   }
-
+  /*
   @method transfer(secret: Field, newOwner: Field) {
     this.owner.assertEquals(this.owner.get());
     this.owner.assertEquals(Poseidon.hash([secret]));
 
     this.owner.set(newOwner);
     this.emitEvent("transfer", newOwner);
+  }
+*/
+  @method transfer(proof: EscrowProof) {
+    this.owner.getAndAssertEquals();
+    this.owner.assertEquals(proof.publicInput.oldOwner);
+    this.escrow.getAndAssertEquals();
+    this.escrow.assertEquals(proof.publicInput.escrow);
+    // TODO: this.escrow.assertNotEquals(Field(0));
+    this.name.getAndAssertEquals();
+    this.name.assertEquals(proof.publicInput.name);
+
+    proof.verify();
+
+    this.owner.set(proof.publicInput.newOwner);
+
+    this.emitEvent("transfer", proof.publicInput);
   }
 }

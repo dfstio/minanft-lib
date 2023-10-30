@@ -1,5 +1,5 @@
 export { MinaNFT, MinaNFTobject, VeificationKey } from "./minanft";
-export { MinaNFTContract, Metadata, Storage, Update } from "./contract/nft";
+export { MinaNFTContract, Metadata, Update } from "./contract/nft";
 export {
   MetadataUpdate,
   MetadataTransition,

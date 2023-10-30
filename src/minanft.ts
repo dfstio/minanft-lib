@@ -7,17 +7,14 @@ import {
   Field,
   AccountUpdate,
   Encoding,
-  MerkleMap,
-  Proof,
   verify,
   fetchAccount,
   Poseidon,
-  fetchLastBlock,
+  Signature,
   UInt64,
-  Struct,
 } from "o1js";
 
-import { MinaNFTContract, Metadata, Update, Storage } from "./contract/nft";
+import { MinaNFTContract } from "./contract/nft";
 import {
   MinaNFTMetadataUpdate,
   MetadataTransition,
@@ -26,6 +23,8 @@ import {
   MetadataMap,
   MinaNFTMetadataUpdateProof,
 } from "./contract/metadata";
+import { Owner, Metadata, Update } from "./contract/owner";
+import { Escrow, EscrowProof, EscrowData } from "./contract/escrow";
 
 import { MinaNFTUpdater } from "./plugins/updater";
 /*
@@ -64,6 +63,7 @@ class BaseMinaNFT {
   static verificationKey: VeificationKey | undefined;
   static updaterVerificationKey: VeificationKey | undefined;
   static updateVerificationKey: string | undefined;
+  static escrowVerificationKey: string | undefined;
 
   constructor() {
     this.metadata = new Map<string, Metadata>();
@@ -200,6 +200,10 @@ class BaseMinaNFT {
     if (MinaNFT.verificationKey !== undefined) {
       return MinaNFT.verificationKey;
     }
+    console.log("Compiling Owner contract...");
+    await Owner.compile();
+    console.log("Compiling Escrow contract...");
+    await Escrow.compile();
     console.log("Compiling MinaNFT contract...");
     const { verificationKey } = await MinaNFTContract.compile();
     MinaNFT.verificationKey = verificationKey as VeificationKey;
@@ -308,7 +312,12 @@ class MinaNFT extends BaseMinaNFT {
    *
    * @param deployer Private key of the account that will commit the updates
    */
-  public async commit(deployer: PrivateKey, secret: Field, updater: PublicKey) {
+  public async commit(
+    deployer: PrivateKey,
+    ownerPrivateKey: PrivateKey,
+    updater: PublicKey,
+    escrow: Field | undefined = undefined
+  ) {
     if (this.zkAppPublicKey === undefined) {
       console.error("NFT contract is not deployed");
       return;
@@ -334,11 +343,12 @@ class MinaNFT extends BaseMinaNFT {
 
     await MinaNFT.compileUpdater();
 
-    const storage: Storage | undefined = await this.pinToStorage();
+    const storage = await this.pinToStorage();
     if (storage === undefined) {
       console.error("Storage error");
       return;
     }
+    const storageHash: Field = storage.hash;
 
     console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
@@ -346,26 +356,37 @@ class MinaNFT extends BaseMinaNFT {
     const zkApp = new MinaNFTContract(zkAppPublicKey);
     await fetchAccount({ publicKey: zkAppPublicKey });
     const version: UInt64 = zkApp.version.get();
+    const oldEscrow = zkApp.escrow.get();
     const newVersion: UInt64 = version.add(UInt64.from(1));
+    const ownerPublicKey = ownerPrivateKey.toPublicKey();
 
-    const update: Update = {
+    const update: Update = new Update({
       oldRoot: proof.publicInput.oldRoot,
       newRoot: proof.publicInput.newRoot,
-      storage,
+      storage: storageHash,
       verifier: updater,
       version: newVersion,
-    };
+      name: MinaNFT.stringToField(this.name),
+      escrow: escrow ?? oldEscrow,
+      owner: Poseidon.hash(ownerPublicKey.toFields()),
+    });
+    const signature = Signature.create(ownerPrivateKey, update.toFields());
+    const ownerProof = await Owner.create(update, signature, ownerPublicKey);
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: updater });
-    const needsOneMina: boolean = version.toBigInt() === BigInt(0);
-    console.log("version:", version.toString(), "needs 1 MINA:", needsOneMina);
-    if (needsOneMina) {
+    await fetchAccount({
+      publicKey: zkAppPublicKey,
+      tokenId: zkUpdater.token.id,
+    });
+
+    const hasAccount = Mina.hasAccount(zkAppPublicKey, zkUpdater.token.id);
+    if (hasAccount === false) {
       console.log("Sending update and 1 MINA for the verification badge...");
       const tx = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io" },
         () => {
           AccountUpdate.fundNewAccount(sender);
-          zkUpdater.update(update, zkAppPublicKey, secret, proof);
+          zkUpdater.update(zkAppPublicKey, ownerProof, proof);
         }
       );
       await tx.prove();
@@ -377,7 +398,7 @@ class MinaNFT extends BaseMinaNFT {
       const tx = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io" },
         () => {
-          zkUpdater.update(update, zkAppPublicKey, secret, proof);
+          zkUpdater.update(zkAppPublicKey, ownerProof, proof);
         }
       );
       await tx.prove();
@@ -435,13 +456,14 @@ class MinaNFT extends BaseMinaNFT {
     return proof;
   }
 
-  private async pinToStorage(): Promise<Storage | undefined> {
+  private async pinToStorage(): Promise<
+    { hash: Field; url: string } | undefined
+  > {
     //console.log("Pinning to IPFS...");
     // TODO: pin to IPFS
     const ipfs = `https://ipfs.io/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
     const ipfs_fields = Encoding.stringToFields(ipfs);
-    const storage: Storage = new Storage({ url: ipfs_fields });
-    return storage;
+    return { hash: Poseidon.hash(ipfs_fields), url: ipfs };
   }
 
   /*
@@ -569,11 +591,12 @@ ${MINAEXPLORER}/transaction/${hash}`
     const zkApp = new MinaNFTContract(this.zkAppPublicKey);
 
     const { root } = this.getMetadataRootAndMap();
-    const storage: Storage | undefined = await this.pinToStorage();
+    const storage = await this.pinToStorage();
     if (storage === undefined) {
       console.error("Storage error");
       return;
     }
+    const storageHash: Field = storage.hash;
 
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.zkAppPublicKey });
@@ -586,8 +609,9 @@ ${MINAEXPLORER}/transaction/${hash}`
         zkApp.name.set(MinaNFT.stringToField(this.name));
         zkApp.metadata.set(root);
         zkApp.owner.set(owner);
-        zkApp.storage.set(storage);
+        zkApp.storage.set(storageHash);
         zkApp.version.set(UInt64.from(0));
+        zkApp.escrow.set(Field(0));
         zkApp.account.tokenSymbol.set("NFT");
         zkApp.account.zkappUri.set("https://minanft.io/@test");
       }
@@ -615,11 +639,7 @@ ${MINAEXPLORER}/transaction/${hash}`
       throw new Error("Wrong metadata");
 
     const newStorage = zkApp.storage.get();
-    if (
-      newStorage.url[0].toJSON() !== storage.url[0].toJSON() ||
-      newStorage.url[1].toJSON() !== storage.url[1].toJSON() ||
-      newStorage.url[2].toJSON() !== storage.url[2].toJSON()
-    )
+    if (newStorage.toJSON() !== storageHash.toJSON())
       throw new Error("Wrong storage");
 
     const newOwner = zkApp.owner.get();
@@ -628,6 +648,10 @@ ${MINAEXPLORER}/transaction/${hash}`
     const newVersion = zkApp.version.get();
     if (newVersion.toJSON() !== UInt64.from(0).toJSON())
       throw new Error("Wrong version");
+
+    const newEscrow = zkApp.escrow.get();
+    if (newEscrow.toJSON() !== Field(0).toJSON())
+      throw new Error("Wrong escrow");
   }
 
   /**
@@ -637,7 +661,7 @@ ${MINAEXPLORER}/transaction/${hash}`
    * @param secret old owner secret
    * @param newOwner Hash of the new owner secret
    */
-  public async transfer(deployer: PrivateKey, secret: Field, newOwner: Field) {
+  public async transfer(deployer: PrivateKey, proof: EscrowProof) {
     if (this.zkAppPublicKey === undefined) {
       console.error("NFT contract is not deployed");
       return;
@@ -662,7 +686,7 @@ ${MINAEXPLORER}/transaction/${hash}`
     const tx = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
-        zkApp.transfer(secret, newOwner);
+        zkApp.transfer(proof);
       }
     );
     await tx.prove();
@@ -673,7 +697,7 @@ ${MINAEXPLORER}/transaction/${hash}`
     await sleep(10 * 1000);
     await fetchAccount({ publicKey: this.zkAppPublicKey });
     const newOwner_ = zkApp.owner.get();
-    if (newOwner_.toJSON() !== newOwner.toJSON())
+    if (newOwner_.toJSON() !== proof.publicInput.newOwner.toJSON())
       throw new Error("Transfer failed");
   }
 
