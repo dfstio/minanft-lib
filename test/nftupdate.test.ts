@@ -11,7 +11,7 @@ import {
 } from "o1js";
 
 import { MinaNFTUpdater } from "../src/plugins/updater";
-import { Escrow, EscrowData, EscrowProof } from "../src/contract/escrow";
+import { EscrowData } from "../src/contract/escrow";
 
 import { MINAURL, ARCHIVEURL } from "../src/config.json";
 import { MinaNFT } from "../src/minanft";
@@ -21,7 +21,8 @@ import { DEPLOYER, DEPLOYERS } from "../env.json";
 const useLocal: boolean = true;
 
 const transactionFee = 150_000_000;
-const DEPLOYERS_NUMBER = 1;
+const DEPLOYERS_NUMBER = 3;
+const ITERATIONS_NUMBER = 10;
 const tokenSymbol = "VBADGE";
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
@@ -75,9 +76,10 @@ beforeAll(async () => {
   if (balanceDeployer <= 2) return;
   console.time("compiled");
   await MinaNFT.compile();
-  await MinaNFT.compileUpdate();
-  await MinaNFT.compileUpdater();
   console.timeEnd("compiled");
+  console.time("Updater compiled");
+  await MinaNFT.compileUpdater();
+  console.timeEnd("Updater compiled");
 });
 
 describe("MinaNFT contract", () => {
@@ -113,10 +115,16 @@ describe("MinaNFT contract", () => {
   it("should deploy MinaNFT constracts and update their state", async () => {
     expect(updater).not.toBeUndefined();
     if (updater === undefined) return;
-    const nfts: MinaNFT[] = [];
-    const nfts2: MinaNFT[] = [];
-    const nfts3: MinaNFT[] = [];
+    expect(ITERATIONS_NUMBER).toBeGreaterThan(0);
+    interface iteration {
+      nfts: MinaNFT[];
+    }
+    const iterations: iteration[] = [];
+    for (let k = 0; k <= ITERATIONS_NUMBER + 1; k++)
+      iterations.push({ nfts: [] });
+    let iteration: number = 0;
     const owners: PrivateKey[] = [];
+    const newOwners: PrivateKey[] = [];
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
       const nft = new MinaNFT("@test");
@@ -127,7 +135,7 @@ describe("MinaNFT contract", () => {
 
       await nft.mint(deployers[i], ownerHash);
       owners.push(owner);
-      nfts.push(nft);
+      iterations[0].nfts.push(nft);
     }
 
     expect(updater).not.toBeUndefined();
@@ -154,33 +162,20 @@ describe("MinaNFT contract", () => {
     ]);
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft: MinaNFT = nfts[i];
+      const nft: MinaNFT = iterations[0].nfts[i];
       // update metadata
       nft.update("twitter", "string", "@mytwittername");
       nft.update("discord", "string", "@mydiscordname");
       nft.update("linkedin", "string", "@mylinkedinname");
       await nft.commit(deployers[i], owners[i], updater, escrow); // commit the update to blockchain
-      nfts2.push(nft);
+      iterations[1].nfts.push(nft);
     }
+    iteration++;
 
-    //await sleep(1000 * 60 * 10); // 10 minutes
-    /*
-    console.log("Updating, iteration 2...");
-
-    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft: MinaNFT = nfts2[i];
-      // update metadata
-      nft.update("twitter2", "string", "@mytwittername2");
-      nft.update("discord2", "string", "@mydiscordname2");
-      nft.update("linkedin2", "string", "@mylinkedinname2");
-      await nft.commit(deployers[i], owners[i], updater); // commit the update to blockchain
-      nfts3.push(nft);
-    }
-    */
     console.log("Transferring...");
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft: MinaNFT = nfts2[i];
+      const nft: MinaNFT = iterations[1].nfts[i];
       const ownerHash = Poseidon.hash(owners[i].toPublicKey().toFields());
       const newOwnerPrivateKey = PrivateKey.random();
       const newOwnerPublicKey = newOwnerPrivateKey.toPublicKey();
@@ -203,7 +198,8 @@ describe("MinaNFT contract", () => {
         escrowPrivateKey3,
         escrowData.toFields()
       );
-      const proofEscrow: EscrowProof = await Escrow.create(
+      await nft.transfer(
+        deployers[i],
         escrowData,
         signature1,
         signature2,
@@ -212,7 +208,22 @@ describe("MinaNFT contract", () => {
         escrowPublicKey2,
         escrowPublicKey3
       );
-      await nft.transfer(deployers[i], proofEscrow);
+      iterations[2].nfts.push(nft);
+      newOwners.push(newOwnerPrivateKey);
+    }
+
+    for (iteration = 2; iteration <= ITERATIONS_NUMBER; iteration++) {
+      console.log(`Updating, iteration ${iteration}...`);
+
+      for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+        const nft: MinaNFT = iterations[iteration].nfts[i];
+        // update metadata
+        nft.update(makeString(10), "string", makeString(15));
+        nft.update(makeString(10), "string", makeString(15));
+        nft.update(makeString(10), "string", makeString(15));
+        await nft.commit(deployers[i], newOwners[i], updater); // commit the update to blockchain
+        iterations[iteration + 1].nfts.push(nft);
+      }
     }
   });
 });
@@ -230,4 +241,15 @@ async function accountBalance(address: PublicKey): Promise<UInt64> {
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function makeString(length: number): string {
+  let outString: string = "";
+  const inOptions: string = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (let i = 0; i < length; i++) {
+    outString += inOptions.charAt(Math.floor(Math.random() * inOptions.length));
+  }
+
+  return outString;
 }

@@ -1,13 +1,5 @@
-export { Owner, OwnerProof, Update, Metadata };
-import {
-  Experimental,
-  Signature,
-  PublicKey,
-  Poseidon,
-  Struct,
-  Field,
-  UInt64,
-} from "o1js";
+export { Update, Metadata };
+import { PublicKey, Struct, Field, UInt64 } from "o1js";
 
 class Metadata extends Struct({
   data: Field,
@@ -51,6 +43,8 @@ class Update extends Struct({
   }
 }
 
+/*
+
 const Owner = Experimental.ZkProgram({
   publicInput: Update,
 
@@ -67,3 +61,4 @@ const Owner = Experimental.ZkProgram({
 });
 
 class OwnerProof extends Experimental.ZkProgram.Proof(Owner) {}
+*/
