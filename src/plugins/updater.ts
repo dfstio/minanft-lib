@@ -9,10 +9,12 @@ import {
   method,
   DeployArgs,
   Signature,
+  Account,
+  UInt64,
 } from "o1js";
 import { MinaNFTContract } from "../contract/nft";
-import { MinaNFTMetadataUpdateProof } from "../contract/metadata";
-import { Update, Metadata } from "../contract/owner";
+import { MinaNFTMetadataUpdateProof } from "./update";
+import { Update, Metadata } from "../contract/metadata";
 
 class MinaNFTUpdaterEvent extends Struct({
   address: PublicKey,
@@ -61,14 +63,11 @@ class MinaNFTUpdater extends SmartContract {
     Metadata.assertEquals(proof.publicInput.newRoot, update.newRoot);
     this.address.assertEquals(update.verifier);
 
-    /*
     // Check that all versions are properly verified
-    const version = nft.version.get();
+    const version = nft.version.getAndAssertEquals();
     const account = Account(address, this.token.id);
-    const tokenBalance = account.balance.get();
-    account.balance.assertEquals(tokenBalance);
+    const tokenBalance = account.balance.getAndAssertEquals();
     tokenBalance.assertEquals(version.mul(UInt64.from(1_000_000_000n)));
-    */
 
     // Check that the proof verifies
     proof.verify();

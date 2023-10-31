@@ -13,7 +13,7 @@ import {
   PublicKey,
   Poseidon,
 } from "o1js";
-import { Update, Metadata } from "./owner";
+import { Update, Metadata } from "./metadata";
 import { EscrowData } from "./escrow";
 
 /**
