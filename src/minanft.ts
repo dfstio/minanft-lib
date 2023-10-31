@@ -23,8 +23,8 @@ import {
   MetadataMap,
   MinaNFTMetadataUpdateProof,
 } from "./contract/metadata";
-import { Owner, Metadata, Update } from "./contract/owner";
-import { Escrow, EscrowProof, EscrowData } from "./contract/escrow";
+import { Metadata, Update } from "./contract/owner";
+import { EscrowData } from "./contract/escrow";
 
 import { MinaNFTUpdater } from "./plugins/updater";
 /*
@@ -200,10 +200,6 @@ class BaseMinaNFT {
     if (MinaNFT.verificationKey !== undefined) {
       return MinaNFT.verificationKey;
     }
-    console.log("Compiling Owner contract...");
-    await Owner.compile();
-    console.log("Compiling Escrow contract...");
-    await Escrow.compile();
     console.log("Compiling MinaNFT contract...");
     const { verificationKey } = await MinaNFTContract.compile();
     MinaNFT.verificationKey = verificationKey as VeificationKey;
@@ -215,12 +211,16 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileUpdater(): Promise<VeificationKey> {
-    if (MinaNFT.updaterVerificationKey !== undefined) {
-      return MinaNFT.updaterVerificationKey;
+    if (MinaNFT.updateVerificationKey === undefined) {
+      console.log("Compiling MinaNFTMetadataUpdate contract...");
+      const { verificationKey } = await MinaNFTMetadataUpdate.compile();
+      MinaNFT.updateVerificationKey = verificationKey;
     }
-    console.log("Compiling MinaNFTUpdater contract...");
-    const { verificationKey } = await MinaNFTUpdater.compile();
-    MinaNFT.updaterVerificationKey = verificationKey as VeificationKey;
+    if (MinaNFT.updaterVerificationKey === undefined) {
+      console.log("Compiling MinaNFTUpdater contract...");
+      const { verificationKey } = await MinaNFTUpdater.compile();
+      MinaNFT.updaterVerificationKey = verificationKey as VeificationKey;
+    }
     return MinaNFT.updaterVerificationKey;
   }
 
@@ -371,7 +371,6 @@ class MinaNFT extends BaseMinaNFT {
       owner: Poseidon.hash(ownerPublicKey.toFields()),
     });
     const signature = Signature.create(ownerPrivateKey, update.toFields());
-    const ownerProof = await Owner.create(update, signature, ownerPublicKey);
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: updater });
     await fetchAccount({
@@ -386,7 +385,13 @@ class MinaNFT extends BaseMinaNFT {
         { sender, fee: transactionFee, memo: "minanft.io" },
         () => {
           AccountUpdate.fundNewAccount(sender);
-          zkUpdater.update(zkAppPublicKey, ownerProof, proof);
+          zkUpdater.update(
+            zkAppPublicKey,
+            update,
+            signature,
+            ownerPublicKey,
+            proof
+          );
         }
       );
       await tx.prove();
@@ -398,7 +403,13 @@ class MinaNFT extends BaseMinaNFT {
       const tx = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io" },
         () => {
-          zkUpdater.update(zkAppPublicKey, ownerProof, proof);
+          zkUpdater.update(
+            zkAppPublicKey,
+            update,
+            signature,
+            ownerPublicKey,
+            proof
+          );
         }
       );
       await tx.prove();
@@ -661,7 +672,16 @@ ${MINAEXPLORER}/transaction/${hash}`
    * @param secret old owner secret
    * @param newOwner Hash of the new owner secret
    */
-  public async transfer(deployer: PrivateKey, proof: EscrowProof) {
+  public async transfer(
+    deployer: PrivateKey,
+    data: EscrowData,
+    signature1: Signature,
+    signature2: Signature,
+    signature3: Signature,
+    escrow1: PublicKey,
+    escrow2: PublicKey,
+    escrow3: PublicKey
+  ): Promise<void> {
     if (this.zkAppPublicKey === undefined) {
       console.error("NFT contract is not deployed");
       return;
@@ -686,7 +706,15 @@ ${MINAEXPLORER}/transaction/${hash}`
     const tx = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
-        zkApp.transfer(proof);
+        zkApp.transfer(
+          data,
+          signature1,
+          signature2,
+          signature3,
+          escrow1,
+          escrow2,
+          escrow3
+        );
       }
     );
     await tx.prove();
@@ -697,7 +725,7 @@ ${MINAEXPLORER}/transaction/${hash}`
     await sleep(10 * 1000);
     await fetchAccount({ publicKey: this.zkAppPublicKey });
     const newOwner_ = zkApp.owner.get();
-    if (newOwner_.toJSON() !== proof.publicInput.newOwner.toJSON())
+    if (newOwner_.toJSON() !== data.newOwner.toJSON())
       throw new Error("Transfer failed");
   }
 

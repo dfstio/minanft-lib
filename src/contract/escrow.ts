@@ -1,12 +1,5 @@
-export { Escrow, EscrowProof, EscrowData };
-import {
-  Experimental,
-  Signature,
-  PublicKey,
-  Poseidon,
-  Field,
-  Struct,
-} from "o1js";
+export { EscrowData };
+import { Field, Struct } from "o1js";
 
 class EscrowData extends Struct({
   oldOwner: Field,
@@ -23,6 +16,7 @@ class EscrowData extends Struct({
   }
 }
 
+/*
 const Escrow = Experimental.ZkProgram({
   publicInput: EscrowData,
 
@@ -62,3 +56,4 @@ const Escrow = Experimental.ZkProgram({
 });
 
 class EscrowProof extends Experimental.ZkProgram.Proof(Escrow) {}
+*/
