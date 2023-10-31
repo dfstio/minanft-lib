@@ -3,32 +3,35 @@ import os from "os";
 import fs from "fs/promises";
 import {
   Field,
-  state,
-  State,
-  method,
-  DeployArgs,
-  Permissions,
-  SmartContract,
-  AccountUpdate,
   fetchAccount,
   PrivateKey,
   Mina,
   PublicKey,
   UInt64,
   Poseidon,
-  Struct,
+  SmartContract,
+  state,
+  State,
+  method,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
 import { MinaNFT, RedactedMinaNFT } from "../src/minanft";
+import { RedactedMinaNFTMapCalculation } from "../src/plugins/redactedmap";
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
 const useLocal: boolean = false;
 
-let testnft: MinaNFT | undefined = undefined;
-let badgeHash: Field | undefined = undefined;
+class Key extends SmartContract {
+  @state(Field) key = State<Field>();
+
+  @method mint(key: Field) {
+    this.key.assertEquals(Field(0));
+    this.key.set(key);
+  }
+}
 
 beforeAll(async () => {
   if (useLocal) {
@@ -49,65 +52,49 @@ beforeAll(async () => {
   );
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
-  //await KeyValue.compile();
-  //await MinaNFT.compile();
+  console.log(
+    "Compiling the contracts, free memory: ",
+    os.freemem() / 1024 / 1024 / 1024
+  );
+  await Key.compile();
+  console.time("compiled");
+  console.log("Compiling RedactedMinaNFTMapCalculation");
+  await MinaNFT.compileRedactedMap();
+  //await RedactedMinaNFTMapCalculation.compile();
+  console.timeEnd("compiled");
 });
 
 describe("Create a proof of a redacted MinNFT", () => {
-  it("should deploy MinaNFT", async () => {
+  it("should generate a proof", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
 
     const builderName = "@builder";
-    const grantorSecret: Field = Field.random();
-    const builderSecret: Field = Field.random();
-    const pwdHash: Field = Poseidon.hash([builderSecret]);
-    badgeHash = Poseidon.hash([
+    const grantorSecret: Field = Field(123);
+    const badgeHash = Poseidon.hash([
       grantorSecret,
       MinaNFT.stringToField(builderName),
     ]);
 
     const nft = new MinaNFT(builderName);
-    nft.updatePublicAttribute(
-      "description",
-      MinaNFT.stringToField("Mina Navigators Builder")
-    );
-    nft.updatePublicAttribute("image", MinaNFT.stringToField("ipfs:Qm..."));
-    nft.updatePublicAttribute(
-      "project",
-      MinaNFT.stringToField("Mina zk toolkit")
-    );
-    nft.updatePublicAttribute(
-      "hasMinaNavigatorsBadge",
-      MinaNFT.stringToField("true")
-    );
-    nft.updatePublicAttribute("numberOfCommits", Field(12));
-    nft.updatePrivateAttribute("MinaNavigatorsBadgeHash", badgeHash);
+    nft.update("description", "string", "Mina Navigators Builder");
+    nft.update("project", "string", "Mina zk toolkit");
+    nft.update("hasMinaNavigatorsBadge", "string", "true");
+    nft.updateField("numberOfCommits", "number", Field(12));
+    nft.updateField("MinaNavigatorsBadgeHash", "number", badgeHash);
+
+    const disclosure = new RedactedMinaNFT(nft);
+    disclosure.copyMetadata("hasMinaNavigatorsBadge");
+    disclosure.copyMetadata("numberOfCommits");
+    disclosure.copyMetadata("MinaNavigatorsBadgeHash");
     console.log(
-      "Minting NFT, free memory: ",
+      "Generating the proof, free memory: ",
       os.freemem() / 1024 / 1024 / 1024
     );
-    await nft.mint(deployer, pwdHash);
-    console.log("Minted NFT, free memory: ", os.freemem() / 1024 / 1024 / 1024);
-    testnft = nft;
-  });
-
-  it("should generate a proof", async () => {
-    expect(deployer).not.toBeUndefined();
-    if (deployer === undefined) return;
-    expect(testnft).not.toBeUndefined();
-    if (testnft === undefined) return;
-
-    const disclosure = new RedactedMinaNFT(testnft);
-    disclosure.copyPublicAttribute("hasMinaNavigatorsBadge");
-    disclosure.copyPublicAttribute("numberOfCommits");
-    disclosure.copyPrivateAttribute("MinaNavigatorsBadgeHash");
-    console.log(
-      "Generating proof, free memory: ",
-      os.freemem() / 1024 / 1024 / 1024
-    );
-    const { publicAttributesProof, privateAttributesProof } =
-      await disclosure.proof();
+    console.time("proof");
+    const proof = await disclosure.proof();
+    console.timeEnd("proof");
+    console.log("Free memory: ", os.freemem() / 1024 / 1024 / 1024);
     /*
     console.log(
       "Disclosure proof",
@@ -117,52 +104,29 @@ describe("Create a proof of a redacted MinNFT", () => {
       disclosureProof.publicInput.redactedRoot.toJSON()
     );
     */
-    expect(publicAttributesProof.publicInput.count.toJSON()).toBe(
-      Field(2).toJSON()
-    );
-    expect(privateAttributesProof.publicInput.count.toJSON()).toBe(
-      Field(1).toJSON()
-    );
+    expect(proof.publicInput.count.toJSON()).toBe(Field(3).toJSON());
+
     const hash1 = Poseidon.hash([
       MinaNFT.stringToField("hasMinaNavigatorsBadge"),
       MinaNFT.stringToField("true"),
+      MinaNFT.stringToField("string"),
     ]);
     const hash2 = Poseidon.hash([
       MinaNFT.stringToField("numberOfCommits"),
       Field(12),
+      MinaNFT.stringToField("number"),
     ]);
-    const hash3 = Poseidon.hash([hash1, hash2]);
     expect(badgeHash).not.toBeUndefined();
     if (badgeHash === undefined) return;
-    const hash4 = Poseidon.hash([
+    const hash3 = Poseidon.hash([
       MinaNFT.stringToField("MinaNavigatorsBadgeHash"),
       badgeHash,
+      MinaNFT.stringToField("number"),
     ]);
-    /*
-    console.log("hash1", hash1.toJSON());
-    console.log("hash2", hash2.toJSON());
-    console.log("hash3", hash3.toJSON());
-    */
-    expect(publicAttributesProof.publicInput.hash.toJSON()).toBe(
-      hash3.toJSON()
-    );
-    expect(privateAttributesProof.publicInput.hash.toJSON()).toBe(
-      hash4.toJSON()
-    );
-    const data = {
-      nft: testnft.zkAppPublicKey?.toJSON(),
-      publicAttributesProof: publicAttributesProof.toJSON(),
-      privateAttributesProof: privateAttributesProof.toJSON(),
-    };
-    const writeData = JSON.stringify(data, (_, v) =>
-      typeof v === "bigint" ? v.toString() : v
-    )
-      .replaceAll("},", "},\n")
-      .replaceAll("[", "[\n")
-      .replaceAll("]", "\n]");
-    //console.log(writeData);
-    const proofFilename = "proof.json";
-    await fs.writeFile(proofFilename, writeData);
+    const hash = Poseidon.hash([Poseidon.hash([hash1, hash2]), hash3]);
+    expect(proof.publicInput.hash.toJSON()).toBe(hash.toJSON());
+
+    await fs.writeFile("proof.json", JSON.stringify({ proof: proof.toJSON() }));
   });
 });
 

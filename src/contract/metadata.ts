@@ -1,21 +1,15 @@
-export {
-  MetadataUpdate,
-  MetadataTransition,
-  MetadataWitness,
-  MetadataMap,
-  MinaNFTMetadataUpdate,
-  MinaNFTMetadataUpdateProof,
-};
+export { Update, Metadata, MetadataWitness };
+import { PublicKey, Struct, Field, UInt64, MerkleMapWitness } from "o1js";
 
-import {
-  Field,
-  SelfProof,
-  Experimental,
-  Struct,
-  MerkleMapWitness,
-  MerkleMap,
-} from "o1js";
-import { Metadata } from "./nft";
+class Metadata extends Struct({
+  data: Field,
+  kind: Field,
+}) {
+  static assertEquals(state1: Metadata, state2: Metadata) {
+    state1.data.assertEquals(state2.data);
+    state1.kind.assertEquals(state2.kind);
+  }
+}
 
 class MetadataWitness extends Struct({
   data: MerkleMapWitness,
@@ -27,134 +21,34 @@ class MetadataWitness extends Struct({
   }
 }
 
-class MetadataMap {
-  data: MerkleMap;
-  kind: MerkleMap;
-
-  constructor() {
-    this.data = new MerkleMap();
-    this.kind = new MerkleMap();
-  }
-
-  getRoot(): Metadata {
-    return new Metadata({
-      data: this.data.getRoot(),
-      kind: this.kind.getRoot(),
-    });
-  }
-
-  get(key: Field): Metadata {
-    return new Metadata({
-      data: this.data.get(key),
-      kind: this.kind.get(key),
-    });
-  }
-
-  set(key: Field, value: Metadata): void {
-    this.data.set(key, value.data);
-    this.kind.set(key, value.kind);
-  }
-
-  getWitness(key: Field): MetadataWitness {
-    return new MetadataWitness({
-      data: this.data.getWitness(key),
-      kind: this.kind.getWitness(key),
-    });
-  }
-}
-
-class MetadataUpdate extends Struct({
+class Update extends Struct({
   oldRoot: Metadata,
   newRoot: Metadata,
-  key: Field,
-  oldValue: Metadata,
-  newValue: Metadata,
-  witness: MetadataWitness,
-}) {}
-
-class MetadataTransition extends Struct({
-  oldRoot: Metadata,
-  newRoot: Metadata,
+  storage: Field,
+  escrow: Field,
+  name: Field,
+  owner: Field,
+  version: UInt64,
+  verifier: PublicKey,
 }) {
-  static create(update: MetadataUpdate) {
-    const [dataWitnessRootBefore, dataWitnessKey] =
-      update.witness.data.computeRootAndKey(update.oldValue.data);
-    update.oldRoot.data.assertEquals(dataWitnessRootBefore);
-    dataWitnessKey.assertEquals(update.key);
-    const [kindWitnessRootBefore, kindWitnessKey] =
-      update.witness.kind.computeRootAndKey(update.oldValue.kind);
-    update.oldRoot.kind.assertEquals(kindWitnessRootBefore);
-    kindWitnessKey.assertEquals(update.key);
-
-    const [dataWitnessRootAfter, _] = update.witness.data.computeRootAndKey(
-      update.newValue.data
-    );
-    update.newRoot.data.assertEquals(dataWitnessRootAfter);
-    const [kindWitnessRootAfter, __] = update.witness.kind.computeRootAndKey(
-      update.newValue.kind
-    );
-    update.newRoot.kind.assertEquals(kindWitnessRootAfter);
-
-    return new MetadataTransition({
-      oldRoot: update.oldRoot,
-      newRoot: update.newRoot,
-    });
+  constructor(args: any) {
+    super(args);
   }
 
-  static merge(
-    transition1: MetadataTransition,
-    transition2: MetadataTransition
-  ) {
-    return new MetadataTransition({
-      oldRoot: transition1.oldRoot,
-      newRoot: transition2.newRoot,
-    });
-  }
-
-  static assertEquals(
-    transition1: MetadataTransition,
-    transition2: MetadataTransition
-  ) {
-    Metadata.assertEquals(transition1.oldRoot, transition2.oldRoot);
-    Metadata.assertEquals(transition1.newRoot, transition2.newRoot);
+  toFields(): Field[] {
+    const verifier = this.verifier.toFields();
+    return [
+      this.oldRoot.data,
+      this.oldRoot.kind,
+      this.newRoot.data,
+      this.newRoot.kind,
+      this.storage,
+      this.escrow,
+      this.name,
+      this.owner,
+      this.version.toFields()[0],
+      verifier[0],
+      verifier[1],
+    ];
   }
 }
-
-const MinaNFTMetadataUpdate = Experimental.ZkProgram({
-  publicInput: MetadataTransition,
-
-  methods: {
-    update: {
-      privateInputs: [MetadataUpdate],
-
-      method(state: MetadataTransition, update: MetadataUpdate) {
-        const computedState = MetadataTransition.create(update);
-        MetadataTransition.assertEquals(computedState, state);
-      },
-    },
-
-    merge: {
-      privateInputs: [SelfProof, SelfProof],
-
-      method(
-        newState: MetadataTransition,
-        proof1: SelfProof<MetadataTransition, void>,
-        proof2: SelfProof<MetadataTransition, void>
-      ) {
-        proof1.verify();
-        proof2.verify();
-
-        Metadata.assertEquals(
-          proof1.publicInput.newRoot,
-          proof2.publicInput.oldRoot
-        );
-        Metadata.assertEquals(proof1.publicInput.oldRoot, newState.oldRoot);
-        Metadata.assertEquals(proof2.publicInput.newRoot, newState.newRoot);
-      },
-    },
-  },
-});
-
-class MinaNFTMetadataUpdateProof extends Experimental.ZkProgram.Proof(
-  MinaNFTMetadataUpdate
-) {}

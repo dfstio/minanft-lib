@@ -21,8 +21,8 @@ import { DEPLOYER, DEPLOYERS } from "../env.json";
 const useLocal: boolean = true;
 
 const transactionFee = 150_000_000;
-const DEPLOYERS_NUMBER = 3;
-const ITERATIONS_NUMBER = 10;
+const DEPLOYERS_NUMBER = 1;
+const ITERATIONS_NUMBER = 15;
 const tokenSymbol = "VBADGE";
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
@@ -77,9 +77,7 @@ beforeAll(async () => {
   console.time("compiled");
   await MinaNFT.compile();
   console.timeEnd("compiled");
-  console.time("Updater compiled");
   await MinaNFT.compileUpdater();
-  console.timeEnd("Updater compiled");
 });
 
 describe("MinaNFT contract", () => {

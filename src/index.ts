@@ -7,6 +7,6 @@ export {
   MetadataMap,
   MinaNFTMetadataUpdate,
   MinaNFTMetadataUpdateProof,
-} from "./contract/metadata";
+} from "./contract/update";
 export { MinaNFTUpdater, MinaNFTUpdaterEvent } from "./plugins/updater";
 export { IPFS } from "./storage/ipfs";
