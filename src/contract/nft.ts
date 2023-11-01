@@ -14,6 +14,7 @@ import {
   Poseidon,
 } from "o1js";
 import { Update, Metadata } from "./metadata";
+import { MinaNFTMetadataUpdateProof } from "../plugins/update";
 import { EscrowData } from "./escrow";
 
 /**
@@ -50,7 +51,21 @@ class MinaNFTContract extends SmartContract {
     this.emitEvent("mint", Field(0));
   }
 
-  @method update(update: Update, signature: Signature, owner: PublicKey) {
+  @method update(
+    update: Update,
+    signature: Signature,
+    owner: PublicKey,
+    proof: MinaNFTMetadataUpdateProof
+  ) {
+    // Check that the metadata is correct
+    const metadata = this.metadata.getAndAssertEquals();
+    Metadata.assertEquals(metadata, update.oldRoot);
+    Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
+    Metadata.assertEquals(proof.publicInput.newRoot, update.newRoot);
+
+    // Check that the proof verifies
+    proof.verify();
+
     signature.verify(owner, update.toFields());
     update.owner.assertEquals(Poseidon.hash(owner.toFields()));
 
@@ -60,9 +75,6 @@ class MinaNFTContract extends SmartContract {
     const version = this.version.getAndAssertEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(update.version);
-
-    this.metadata.getAndAssertEquals();
-    this.metadata.assertEquals(update.oldRoot);
 
     this.metadata.set(update.newRoot);
     this.version.set(newVersion);

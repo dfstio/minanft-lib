@@ -24,8 +24,11 @@ import { MinaNFTVerifier } from "../src/plugins/verifier";
 import { proof } from "../proof.json";
 import { nft } from "../address.json";
 import { VERIFIER } from "../verifier.json";
-//const VERIFIER = undefined;
-//const proof = undefined;
+/*
+const VERIFIER = undefined;
+const proof = undefined;
+const nft = undefined;
+*/
 const transactionFee = 150_000_000;
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
@@ -151,6 +154,7 @@ describe("Verify proof of a redacted MinNFT", () => {
     expect(verifier).not.toBeUndefined();
     if (verifier === undefined) return;
   });
+
   it("should verify proof", async () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;

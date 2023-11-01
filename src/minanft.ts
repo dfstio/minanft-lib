@@ -195,6 +195,12 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compile(): Promise<VeificationKey> {
+    if (MinaNFT.updateVerificationKey === undefined) {
+      console.log("Compiling MinaNFTMetadataUpdate contract...");
+      const { verificationKey } = await MinaNFTMetadataUpdate.compile();
+      MinaNFT.updateVerificationKey = verificationKey;
+    }
+
     if (MinaNFT.verificationKey !== undefined) {
       return MinaNFT.verificationKey;
     }
@@ -347,7 +353,6 @@ class MinaNFT extends BaseMinaNFT {
   public async commit(
     deployer: PrivateKey,
     ownerPrivateKey: PrivateKey,
-    updater: PublicKey,
     escrow: Field | undefined = undefined
   ) {
     if (this.zkAppPublicKey === undefined) {
@@ -373,8 +378,6 @@ class MinaNFT extends BaseMinaNFT {
       return;
     }
 
-    await MinaNFT.compileUpdater();
-
     const storage = await this.pinToStorage();
     if (storage === undefined) {
       console.error("Storage error");
@@ -384,7 +387,6 @@ class MinaNFT extends BaseMinaNFT {
 
     console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
-    const zkUpdater = new MinaNFTUpdater(updater);
     const zkApp = new MinaNFTContract(zkAppPublicKey);
     await fetchAccount({ publicKey: zkAppPublicKey });
     const version: UInt64 = zkApp.version.get();
@@ -396,7 +398,7 @@ class MinaNFT extends BaseMinaNFT {
       oldRoot: proof.publicInput.oldRoot,
       newRoot: proof.publicInput.newRoot,
       storage: storageHash,
-      verifier: updater,
+      verifier: PrivateKey.random().toPublicKey(),
       version: newVersion,
       name: MinaNFT.stringToField(this.name),
       escrow: escrow ?? oldEscrow,
@@ -404,12 +406,21 @@ class MinaNFT extends BaseMinaNFT {
     });
     const signature = Signature.create(ownerPrivateKey, update.toFields());
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: updater });
-    await fetchAccount({
-      publicKey: zkAppPublicKey,
-      tokenId: zkUpdater.token.id,
-    });
+    await fetchAccount({ publicKey: zkAppPublicKey });
 
+    console.log("Sending update...");
+    const tx = await Mina.transaction(
+      { sender, fee: transactionFee, memo: "minanft.io" },
+      () => {
+        zkApp.update(update, signature, ownerPublicKey, proof);
+      }
+    );
+    await tx.prove();
+    tx.sign([deployer]);
+    const res = await tx.send();
+    await MinaNFT.transactionInfo(res, "update");
+
+    /*
     const hasAccount = Mina.hasAccount(zkAppPublicKey, zkUpdater.token.id);
     if (hasAccount === false) {
       console.log("Sending update and 1 MINA for the verification badge...");
@@ -449,13 +460,13 @@ class MinaNFT extends BaseMinaNFT {
       const res = await tx.send();
       await MinaNFT.transactionInfo(res, "update");
     }
+    */
     this.metadataRoot = proof.publicInput.newRoot;
   }
 
   private async generateProof(): Promise<
     MinaNFTMetadataUpdateProof | undefined
   > {
-    await MinaNFT.compileUpdater();
     if (MinaNFT.updateVerificationKey === undefined) {
       console.error("Update verification key is undefined");
       return undefined;
