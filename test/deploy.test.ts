@@ -9,6 +9,10 @@ import {
   PublicKey,
   UInt64,
   Poseidon,
+  SmartContract,
+  state,
+  State,
+  method,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
@@ -18,6 +22,15 @@ jest.setTimeout(1000 * 60 * 60); // 1 hour
 
 let deployer: PrivateKey | undefined = undefined;
 const useLocal: boolean = false;
+
+class Key extends SmartContract {
+  @state(Field) key = State<Field>();
+
+  @method mint(key: Field) {
+    this.key.assertEquals(Field(0));
+    this.key.set(key);
+  }
+}
 
 beforeAll(async () => {
   if (useLocal) {
@@ -42,6 +55,7 @@ beforeAll(async () => {
     "Compiling the contracts, free memory: ",
     os.freemem() / 1024 / 1024 / 1024
   );
+  await Key.compile();
   console.time("compiled");
   await MinaNFT.compile();
   console.timeEnd("compiled");

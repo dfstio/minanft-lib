@@ -73,7 +73,7 @@ class MinaNFTUpdater extends SmartContract {
     proof.verify();
 
     // Update metadata
-    nft.update(update, signature, owner);
+    nft.update(update, signature, owner, proof);
 
     // Issue verification badge
     this.token.mint({ address, amount: 1_000_000_000n });

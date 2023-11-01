@@ -1,7 +1,11 @@
 import { describe, expect, it } from "@jest/globals";
 import {
   Signature,
-  AccountUpdate,
+  SmartContract,
+  method,
+  Field,
+  state,
+  State,
   fetchAccount,
   PrivateKey,
   Mina,
@@ -10,31 +14,33 @@ import {
   Poseidon,
 } from "o1js";
 
-import { MinaNFTUpdater } from "../src/plugins/updater";
 import { EscrowData } from "../src/contract/escrow";
-
 import { MINAURL, ARCHIVEURL } from "../src/config.json";
 import { MinaNFT } from "../src/minanft";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
 // use local blockchain or Berkeley
-const useLocal: boolean = false;
+const useLocal: boolean = true;
 
-const transactionFee = 150_000_000;
 const DEPLOYERS_NUMBER = 1;
 const ITERATIONS_NUMBER = 1000;
-const tokenSymbol = "VBADGE";
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
 
 let deployer: PrivateKey | undefined = undefined;
 const deployers: PrivateKey[] = [];
 
-let updater: PublicKey | undefined = undefined;
-//let updaterPrivateKey: PrivateKey | undefined = undefined;
-let updaterTx: Mina.TransactionId | undefined = undefined;
+class Key extends SmartContract {
+  @state(Field) key = State<Field>();
+
+  @method mint(key: Field) {
+    this.key.assertEquals(Field(0));
+    this.key.set(key);
+  }
+}
 
 beforeAll(async () => {
+  memory();
   if (useLocal) {
     const Local = Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
@@ -74,77 +80,31 @@ beforeAll(async () => {
   );
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
+  await Key.compile();
   console.time("compiled");
   await MinaNFT.compile();
   console.timeEnd("compiled");
-  await MinaNFT.compileUpdater();
+  //await MinaNFT.compileUpdater();
 });
 
 describe("MinaNFT contract", () => {
-  it("should deploy MinaNFTUpdater contract", async () => {
-    expect(deployer).not.toBeUndefined();
-    if (deployer === undefined) return;
-
-    const sender = deployer.toPublicKey();
-    const zkAppPrivateKey = PrivateKey.random();
-    const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
-    console.log(
-      `deploying the MinaNFTUpdater contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
-    );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
-
-    const zkApp = new MinaNFTUpdater(zkAppPublicKey);
-    const transaction = await Mina.transaction(
-      { sender, fee: transactionFee },
-      () => {
-        AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
-        zkApp.account.tokenSymbol.set(tokenSymbol);
-      }
-    );
-    await transaction.prove();
-    transaction.sign([deployer, zkAppPrivateKey]);
-    const tx = await transaction.send();
-    updater = zkAppPublicKey;
-    updaterTx = tx;
-  });
-
   it("should deploy MinaNFT constracts and update their state", async () => {
-    expect(updater).not.toBeUndefined();
-    if (updater === undefined) return;
+    memory();
     expect(ITERATIONS_NUMBER).toBeGreaterThan(0);
-    interface iteration {
-      nfts: MinaNFT[];
-    }
-    const iterations: iteration[] = [];
-    for (let k = 0; k <= ITERATIONS_NUMBER + 1; k++)
-      iterations.push({ nfts: [] });
-    let iteration: number = 0;
     const owners: PrivateKey[] = [];
     const newOwners: PrivateKey[] = [];
+    const nft: MinaNFT[] = [];
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft = new MinaNFT("@test");
-      nft.update("description", "string", "my nft @test");
-      nft.update("image", "string", "ipfs:Qm...");
+      nft.push(new MinaNFT("@test"));
+      nft[i].update("description", "string", "my nft @test");
+      nft[i].update("image", "string", "ipfs:Qm...");
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
 
-      await nft.mint(deployers[i], ownerHash);
+      await nft[i].mint(deployers[i], ownerHash);
       owners.push(owner);
-      iterations[0].nfts.push(nft);
     }
-
-    expect(updater).not.toBeUndefined();
-    if (updater === undefined) return;
-    expect(updaterTx).not.toBeUndefined();
-    if (updaterTx === undefined) return;
-    if (!useLocal) await MinaNFT.transactionInfo(updaterTx, "deploy updater");
-    await fetchAccount({ publicKey: updater });
-    const tokenSymbol = Mina.getAccount(updater).tokenSymbol;
-    expect(tokenSymbol).toBeDefined();
-    expect(tokenSymbol).toEqual(tokenSymbol);
 
     console.log("Updating, iteration 1...");
     const escrowPrivateKey1 = PrivateKey.random();
@@ -160,20 +120,16 @@ describe("MinaNFT contract", () => {
     ]);
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft: MinaNFT = iterations[0].nfts[i];
       // update metadata
-      nft.update("twitter", "string", "@mytwittername");
-      nft.update("discord", "string", "@mydiscordname");
-      nft.update("linkedin", "string", "@mylinkedinname");
-      await nft.commit(deployers[i], owners[i], updater, escrow); // commit the update to blockchain
-      iterations[1].nfts.push(nft);
+      nft[i].update("twitter", "string", "@mytwittername");
+      nft[i].update("discord", "string", "@mydiscordname");
+      nft[i].update("linkedin", "string", "@mylinkedinname");
+      await nft[i].commit(deployers[i], owners[i], escrow); // commit the update to blockchain
     }
-    iteration++;
 
     console.log("Transferring...");
 
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      const nft: MinaNFT = iterations[1].nfts[i];
       const ownerHash = Poseidon.hash(owners[i].toPublicKey().toFields());
       const newOwnerPrivateKey = PrivateKey.random();
       const newOwnerPublicKey = newOwnerPrivateKey.toPublicKey();
@@ -181,7 +137,7 @@ describe("MinaNFT contract", () => {
       const escrowData = new EscrowData({
         oldOwner: ownerHash,
         newOwner: newOwnerHash,
-        name: MinaNFT.stringToField(nft.name),
+        name: MinaNFT.stringToField(nft[i].name),
         escrow,
       });
       const signature1 = Signature.create(
@@ -196,7 +152,7 @@ describe("MinaNFT contract", () => {
         escrowPrivateKey3,
         escrowData.toFields()
       );
-      await nft.transfer(
+      await nft[i].transfer(
         deployers[i],
         escrowData,
         signature1,
@@ -206,21 +162,24 @@ describe("MinaNFT contract", () => {
         escrowPublicKey2,
         escrowPublicKey3
       );
-      iterations[2].nfts.push(nft);
       newOwners.push(newOwnerPrivateKey);
     }
-
-    for (iteration = 2; iteration <= ITERATIONS_NUMBER; iteration++) {
+    memory();
+    for (let iteration = 2; iteration <= ITERATIONS_NUMBER; iteration++) {
       console.log(`Updating, iteration ${iteration}...`);
 
       for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-        const nft: MinaNFT = iterations[iteration].nfts[i];
         // update metadata
-        nft.update(makeString(10), "string", makeString(15));
-        nft.update(makeString(10), "string", makeString(15));
-        nft.update(makeString(10), "string", makeString(15));
-        await nft.commit(deployers[i], newOwners[i], updater); // commit the update to blockchain
-        iterations[iteration + 1].nfts.push(nft);
+        nft[i].update(makeString(10), "string", makeString(15));
+        nft[i].update(makeString(10), "string", makeString(15));
+        nft[i].update(makeString(10), "string", makeString(15));
+        try {
+          await nft[i].commit(deployers[i], newOwners[i]); // commit the update to blockchain
+        } catch (e) {
+          console.log("Commit failed", e);
+          memory();
+        }
+        memory();
       }
     }
   });
@@ -250,4 +209,25 @@ function makeString(length: number): string {
   }
 
   return outString;
+}
+
+function memory() {
+  const memoryData = process.memoryUsage();
+  const formatMemoryUsage = (data: any) =>
+    `${Math.round((data / 1024 / 1024) * 100) / 100} MB`;
+
+  const memoryUsage = {
+    rss: `${formatMemoryUsage(
+      memoryData.rss
+    )} -> Resident Set Size - total memory allocated for the process execution`,
+    heapTotal: `${formatMemoryUsage(
+      memoryData.heapTotal
+    )} -> total size of the allocated heap`,
+    heapUsed: `${formatMemoryUsage(
+      memoryData.heapUsed
+    )} -> actual memory used during the execution`,
+    external: `${formatMemoryUsage(memoryData.external)} -> V8 external memory`,
+  };
+
+  console.log(memoryUsage);
 }
