@@ -24,8 +24,7 @@ import {
   MetadataUpdate,
   MetadataMap,
   MinaNFTMetadataUpdateProof,
-} from "./plugins/update";
-import { MinaNFTUpdater } from "./plugins/updater";
+} from "./contract/update";
 import { EscrowData } from "./contract/escrow";
 
 import {
@@ -210,24 +209,6 @@ class BaseMinaNFT {
     const { verificationKey } = await MinaNFTContract.compile({ cache });
     MinaNFT.verificationKey = verificationKey as VeificationKey;
     return MinaNFT.verificationKey;
-  }
-
-  /**
-   * Compiles MinaNFT contract (takes a long time)
-   * @returns verification key
-   */
-  public static async compileUpdater(): Promise<VeificationKey> {
-    if (MinaNFT.updateVerificationKey === undefined) {
-      console.log("Compiling MinaNFTMetadataUpdate contract...");
-      const { verificationKey } = await MinaNFTMetadataUpdate.compile();
-      MinaNFT.updateVerificationKey = verificationKey;
-    }
-    if (MinaNFT.updaterVerificationKey === undefined) {
-      console.log("Compiling MinaNFTUpdater contract...");
-      const { verificationKey } = await MinaNFTUpdater.compile();
-      MinaNFT.updaterVerificationKey = verificationKey as VeificationKey;
-    }
-    return MinaNFT.updaterVerificationKey;
   }
 
   /**

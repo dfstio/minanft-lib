@@ -14,7 +14,7 @@ import {
   Poseidon,
 } from "o1js";
 import { Update, Metadata } from "./metadata";
-import { MinaNFTMetadataUpdateProof } from "../plugins/update";
+import { MinaNFTMetadataUpdateProof } from "./update";
 import { EscrowData } from "./escrow";
 
 /**
@@ -109,7 +109,12 @@ class MinaNFTContract extends SmartContract {
       ])
     );
 
+    const version = this.version.getAndAssertEquals();
+    const newVersion: UInt64 = version.add(UInt64.from(1));
+
     this.owner.set(data.newOwner);
+    this.version.set(newVersion);
+
     this.emitEvent("transfer", data);
   }
 }
