@@ -80,6 +80,7 @@ describe("MinaNFT deployment", () => {
     const nft = new MinaNFT(builderName);
     nft.update("description", "string", "Mina Navigators Builder");
     nft.update("project", "string", "Mina zk toolkit");
+    nft.update("twitter", "string", "@builder");
     nft.update("hasMinaNavigatorsBadge", "string", "true");
     nft.updateField("numberOfCommits", "number", Field(12));
     nft.updateField("MinaNavigatorsBadgeHash", "number", badgeHash);
@@ -91,9 +92,10 @@ describe("MinaNFT deployment", () => {
     console.log("Minted NFT, free memory: ", os.freemem() / 1024 / 1024 / 1024);
 
     await fs.writeFile(
-      "address.json",
+      "nft.json",
       JSON.stringify({
         nft: nft.zkAppPublicKey?.toJSON(),
+        key: builderSecret.toBase58(),
       })
     );
   });

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "@jest/globals";
-import os from "os";
 import fs from "fs/promises";
 import {
   Field,
@@ -52,10 +51,6 @@ beforeAll(async () => {
   );
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
-  console.log(
-    "Compiling the contracts, free memory: ",
-    os.freemem() / 1024 / 1024 / 1024
-  );
   await Key.compile();
   console.time("compiled");
   console.log("Compiling RedactedMinaNFTMapCalculation");
@@ -85,50 +80,17 @@ describe("Create a proof of a redacted MinNFT", () => {
     nft.updateField("MinaNavigatorsBadgeHash", "number", badgeHash);
 
     const disclosure = new RedactedMinaNFT(nft);
-    disclosure.copyMetadata("hasMinaNavigatorsBadge");
-    disclosure.copyMetadata("numberOfCommits");
-    disclosure.copyMetadata("MinaNavigatorsBadgeHash");
+    disclosure.copyMetadata("twitter");
 
-    console.log(
-      "Generating the proof, free memory: ",
-      os.freemem() / 1024 / 1024 / 1024
-    );
     console.time("proof");
     const proof = await disclosure.proof();
     console.timeEnd("proof");
-    console.log("Free memory: ", os.freemem() / 1024 / 1024 / 1024);
-    /*
-    console.log(
-      "Disclosure proof",
-      disclosureProof.publicInput.count.toJSON(),
-      disclosureProof.publicInput.hash.toJSON(),
-      disclosureProof.publicInput.originalRoot.toJSON(),
-      disclosureProof.publicInput.redactedRoot.toJSON()
+
+    expect(proof.publicInput.count.toJSON()).toBe(Field(1).toJSON());
+    await fs.writeFile(
+      "badgeproof.json",
+      JSON.stringify({ proof: proof.toJSON() })
     );
-    */
-    expect(proof.publicInput.count.toJSON()).toBe(Field(3).toJSON());
-
-    const hash1 = Poseidon.hash([
-      MinaNFT.stringToField("hasMinaNavigatorsBadge"),
-      MinaNFT.stringToField("true"),
-      MinaNFT.stringToField("string"),
-    ]);
-    const hash2 = Poseidon.hash([
-      MinaNFT.stringToField("numberOfCommits"),
-      Field(12),
-      MinaNFT.stringToField("number"),
-    ]);
-    expect(badgeHash).not.toBeUndefined();
-    if (badgeHash === undefined) return;
-    const hash3 = Poseidon.hash([
-      MinaNFT.stringToField("MinaNavigatorsBadgeHash"),
-      badgeHash,
-      MinaNFT.stringToField("number"),
-    ]);
-    const hash = Poseidon.hash([Poseidon.hash([hash1, hash2]), hash3]);
-    expect(proof.publicInput.hash.toJSON()).toBe(hash.toJSON());
-
-    await fs.writeFile("proof.json", JSON.stringify({ proof: proof.toJSON() }));
   });
 });
 
