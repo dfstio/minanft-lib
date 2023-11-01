@@ -5,7 +5,7 @@ import {
   state,
   State,
   method,
-  Experimental,
+  ZkProgram,
   Struct,
   MerkleMapWitness,
 } from "o1js";
@@ -47,7 +47,8 @@ class MapState extends Struct({
   }
 }
 
-const MapCalculation = Experimental.ZkProgram({
+const MapCalculation = ZkProgram({
+  name: "MapCalculation",
   publicInput: MapState,
 
   methods: {
