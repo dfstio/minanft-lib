@@ -18,11 +18,11 @@ import { MinaNFT } from "../src/minanft";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
 // use local blockchain or Berkeley
-const useLocal: boolean = true;
+const useLocal: boolean = false;
 
 const transactionFee = 150_000_000;
 const DEPLOYERS_NUMBER = 1;
-const ITERATIONS_NUMBER = 15;
+const ITERATIONS_NUMBER = 1000;
 const tokenSymbol = "VBADGE";
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours

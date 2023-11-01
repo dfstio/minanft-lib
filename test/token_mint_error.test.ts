@@ -158,6 +158,7 @@ using the deployer with public key ${sender.toBase58()}:
       if (!useLocalBlockchain) {
         await tx.wait({ maxAttempts: 120, interval: 60000 });
       }
+      console.log(`Fetching accounts...`);
       await fetchAccount({ publicKey: sender });
       await fetchAccount({ publicKey: token });
       await fetchAccount({ publicKey: counterPublicKey });
