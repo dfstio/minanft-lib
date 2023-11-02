@@ -1,4 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
+import fs from "fs/promises";
 import {
   Field,
   AccountUpdate,
@@ -72,10 +73,16 @@ beforeAll(async () => {
   if (balanceDeployer <= 2) return;
   console.time("compiled");
   await Key.compile(); // If this is not compiled, the next compilation will fail. Contaract Key is not used in this test.
-  console.log("Compiling RedactedMinaNFTMapCalculation");
-  await MinaNFT.compileRedactedMap(); // Succeed only if compiled after any other contract
+  //console.log("Compiling RedactedMinaNFTMapCalculation");
+  //await MinaNFT.compileRedactedMap(); // Succeed only if compiled after any other contract
   console.log("Compiling MinaNFTVBadge");
-  await MinaNFTBadge.compile();
+  /*
+  const { verificationKey } = await MinaNFTBadge.compile();
+  await fs.writeFile(
+    "verificationkey.json",
+    JSON.stringify({ verificationKey })
+  );
+  */
   console.log("Compiling MinaNFTVerifierBadge");
   await MinaNFTVerifierBadge.compile();
   console.timeEnd("compiled");
