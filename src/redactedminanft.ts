@@ -35,7 +35,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
   public async proof(): Promise<RedactedMinaNFTMapStateProof> {
     await MinaNFT.compileRedactedMap();
 
-    console.log("Creating proof for redacted maps...");
+    //console.log("Creating proof for redacted maps...");
 
     const { root, map } = this.getMetadataRootAndMap();
     const { root: originalRoot, map: originalMap } =

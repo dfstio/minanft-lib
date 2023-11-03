@@ -1,4 +1,5 @@
 export { MinaNFT, MinaNFTobject } from "./minanft";
+export { MinaNFTBadge, MinaNFTBadgeConstructor } from "./minanftbadge";
 export { RedactedMinaNFT } from "./redactedminanft";
 export { BaseMinaNFT } from "./baseminanft";
 export { MinaNFTContract } from "./contract/nft";
@@ -18,7 +19,7 @@ export {
 export {
   BadgeData,
   BadgeDataWitness,
-  MinaNFTBadge,
+  MinaNFTBadgeCalculation,
   MinaNFTBadgeProof,
 } from "./plugins/badgeproof";
 export {

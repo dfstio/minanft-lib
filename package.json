@@ -88,7 +88,11 @@
     "slowTestThreshold": 1500,
     "verbose": true,
     "roots": [
-      "test"
+      "tests",
+      "experimental"
+    ],
+    "setupFilesAfterEnv": [
+      "./jest-config.ts"
     ]
   },
   "packageManager": "yarn@3.6.4"

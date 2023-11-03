@@ -55,6 +55,7 @@ class MinaNFTContract extends SmartContract {
     signature: Signature,
     owner: PublicKey,
     proof: MinaNFTMetadataUpdateProof
+    //uri: Types.ZkappUri
   ) {
     // Check that the metadata is correct
     const metadata = this.metadata.getAndAssertEquals();
@@ -79,6 +80,7 @@ class MinaNFTContract extends SmartContract {
     this.version.set(newVersion);
     this.storage.set(update.storage);
     this.escrow.set(update.escrow);
+    //this.account.zkappUri.set(uri.data);
 
     this.emitEvent("update", update);
   }
@@ -113,6 +115,7 @@ class MinaNFTContract extends SmartContract {
 
     this.owner.set(data.newOwner);
     this.version.set(newVersion);
+    this.escrow.set(Field(0));
 
     this.emitEvent("transfer", data);
   }
