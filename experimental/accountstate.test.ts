@@ -133,6 +133,7 @@ beforeAll(async () => {
   );
   expect(balanceDeployer).toBeGreaterThan(2);
   if (balanceDeployer <= 2) return;
+  console.log("Mina", Mina.getProofsEnabled());
   await KeyValue.compile();
   await Reader.compile();
   console.log("Compiled");

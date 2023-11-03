@@ -1,4 +1,9 @@
-export { BadgeData, BadgeDataWitness, MinaNFTBadge, MinaNFTBadgeProof };
+export {
+  BadgeData,
+  BadgeDataWitness,
+  MinaNFTBadgeCalculation,
+  MinaNFTBadgeProof,
+};
 
 import { Field, ZkProgram, Struct } from "o1js";
 import { Metadata, MetadataWitness } from "../contract/metadata";
@@ -44,8 +49,8 @@ class BadgeData extends Struct({
   }
 }
 
-const MinaNFTBadge = ZkProgram({
-  name: "MinaNFTBadge",
+const MinaNFTBadgeCalculation = ZkProgram({
+  name: "MinaNFTBadgeCalculation",
   publicInput: BadgeData,
 
   methods: {
@@ -60,4 +65,4 @@ const MinaNFTBadge = ZkProgram({
   },
 });
 
-class MinaNFTBadgeProof extends ZkProgram.Proof(MinaNFTBadge) {}
+class MinaNFTBadgeProof extends ZkProgram.Proof(MinaNFTBadgeCalculation) {}

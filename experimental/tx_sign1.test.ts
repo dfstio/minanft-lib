@@ -23,6 +23,8 @@ beforeAll(async () => {
   senderPublicKey = senderPrivateKey.toPublicKey();
   expect(senderPublicKey).not.toBeUndefined();
   expect(senderPrivateKey).not.toBeUndefined();
+  const fee: UInt64 = UInt64.from(transactionFee);
+  console.log("fee:", fee.toJSON());
 });
 
 describe("Sign, export, and import transaction", () => {

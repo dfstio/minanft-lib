@@ -10,6 +10,8 @@ import {
 } from "./contract/update";
 import { RedactedMinaNFTMapCalculation } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
+import { MinaNFTVerifierBadge } from "./plugins/badge";
+import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 
 class BaseMinaNFT {
   protected metadata: Map<string, Metadata>;
@@ -18,6 +20,8 @@ class BaseMinaNFT {
   static updateVerificationKey: string | undefined;
   static verifierVerificationKey: VerificationKey | undefined;
   static redactedMapVerificationKey: string | undefined;
+  static badgeVerifierVerificationKey: VerificationKey | undefined;
+  static badgeVerificationKey: string | undefined;
 
   constructor() {
     this.metadata = new Map<string, Metadata>();
@@ -127,6 +131,15 @@ class BaseMinaNFT {
   }
 
   /**
+   * Converts a Field to a string
+   * @param item Field to convert
+   * @returns string
+   */
+  public static stringFromField(item: Field): string {
+    return Encoding.stringFromFields([item]);
+  }
+
+  /**
    * Creates a Map from JSON
    * @param map map to convert
    * @returns map as JSON object
@@ -147,53 +160,83 @@ class BaseMinaNFT {
   }
 
   /**
-   * Compiles MinaNFT contract (takes a long time)
+   * Compiles MinaNFT contract
    * @returns verification key
    */
   public static async compile(): Promise<VerificationKey> {
     if (MinaNFT.updateVerificationKey === undefined) {
-      console.log("Compiling MinaNFTMetadataUpdate contract...");
+      console.time("MinaNFTMetadataUpdate compiled");
       const { verificationKey } = await MinaNFTMetadataUpdate.compile();
+      console.timeEnd("MinaNFTMetadataUpdate compiled");
       MinaNFT.updateVerificationKey = verificationKey;
     }
 
     if (MinaNFT.verificationKey !== undefined) {
       return MinaNFT.verificationKey;
     }
-    console.log("Compiling MinaNFT contract...");
-
     const cache: Cache = Cache.FileSystem("./nftcache");
+    console.time("MinaNFT compiled");
     const { verificationKey } = await MinaNFTContract.compile({ cache });
+    console.timeEnd("MinaNFT compiled");
     MinaNFT.verificationKey = verificationKey as VerificationKey;
     return MinaNFT.verificationKey;
   }
 
   /**
-   * Compiles MinaNFT contract (takes a long time)
+   * Compiles MinaNFTVerifier contract
    * @returns verification key
    */
   public static async compileVerifier(): Promise<VerificationKey> {
     if (MinaNFT.redactedMapVerificationKey === undefined) {
-      console.log("Compiling RedactedMinaNFTMapCalculation contract...");
+      console.time("RedactedMinaNFTMapCalculation compiled");
       const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }
     if (MinaNFT.verifierVerificationKey === undefined) {
-      console.log("Compiling MinaNFTVerifier contract...");
+      console.time("MinaNFTVerifier compiled");
       const { verificationKey } = await MinaNFTVerifier.compile();
+      console.timeEnd("MinaNFTVerifier compiled");
       MinaNFT.verifierVerificationKey = verificationKey as VerificationKey;
     }
     return MinaNFT.verifierVerificationKey;
   }
 
   /**
-   * Compiles MinaNFT contract (takes a long time)
+   * Compiles MinaNFTVerifierBadge contract
+   * @returns verification key
+   */
+  public static async compileBadge(): Promise<VerificationKey> {
+    if (MinaNFT.redactedMapVerificationKey === undefined) {
+      console.time("RedactedMinaNFTMapCalculation compiled");
+      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      console.timeEnd("RedactedMinaNFTMapCalculation compiled");
+      MinaNFT.redactedMapVerificationKey = verificationKey;
+    }
+    if (MinaNFT.badgeVerificationKey === undefined) {
+      console.time("MinaNFTBadgeCalculation compiled");
+      const { verificationKey } = await MinaNFTBadgeCalculation.compile();
+      console.timeEnd("MinaNFTBadgeCalculation compiled");
+      MinaNFT.badgeVerificationKey = verificationKey;
+    }
+    if (MinaNFT.badgeVerifierVerificationKey === undefined) {
+      console.time("MinaNFTVerifierBadge compiled");
+      const { verificationKey } = await MinaNFTVerifierBadge.compile();
+      console.timeEnd("MinaNFTVerifierBadge compiled");
+      MinaNFT.badgeVerifierVerificationKey = verificationKey as VerificationKey;
+    }
+    return MinaNFT.badgeVerifierVerificationKey;
+  }
+
+  /**
+   * Compiles RedactedMinaNFTMapCalculation contract
    * @returns verification key
    */
   public static async compileRedactedMap(): Promise<string> {
     if (MinaNFT.redactedMapVerificationKey === undefined) {
-      console.log("Compiling RedactedMinaNFTMapCalculation contract...");
+      console.time("RedactedMinaNFTMapCalculation compiled");
       const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }
     return MinaNFT.redactedMapVerificationKey;
