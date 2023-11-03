@@ -3,9 +3,7 @@ export {
   RedactedMinaNFTMapState,
   RedactedMinaNFTMapStateProof,
   MapElement,
-  MetadataWitness,
 };
-
 import { Field, SelfProof, ZkProgram, Struct, Poseidon } from "o1js";
 import { Metadata, MetadataWitness } from "../contract/metadata";
 

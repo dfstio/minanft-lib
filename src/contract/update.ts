@@ -5,7 +5,6 @@ export {
   MinaNFTMetadataUpdate,
   MinaNFTMetadataUpdateProof,
 };
-
 import { Field, SelfProof, ZkProgram, Struct, MerkleMap } from "o1js";
 import { Metadata, MetadataWitness } from "../contract/metadata";
 
