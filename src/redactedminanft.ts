@@ -41,8 +41,8 @@ class RedactedMinaNFT extends BaseMinaNFT {
     const { root: originalRoot, map: originalMap } =
       this.nft.getMetadataRootAndMap();
     const elements: MapElement[] = [];
-    const originalWitnesses: MetadataWitness[] = [];
-    const redactedWitnesses: MetadataWitness[] = [];
+    let originalWitnesses: MetadataWitness[] = [];
+    let redactedWitnesses: MetadataWitness[] = [];
     this.metadata.forEach((value: Metadata, key: string) => {
       const keyField = MinaNFT.stringToField(key);
       const redactedWitness = map.getWitness(keyField);
@@ -58,7 +58,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
       redactedWitnesses.push(redactedWitness);
     });
 
-    const proofs: Proof<RedactedMinaNFTMapState, void>[] = [];
+    let proofs: Proof<RedactedMinaNFTMapState, void>[] = [];
     for (let i = 0; i < elements.length; i++) {
       const state = RedactedMinaNFTMapState.create(
         elements[i],
@@ -73,6 +73,8 @@ class RedactedMinaNFT extends BaseMinaNFT {
       );
       proofs.push(proof);
     }
+    originalWitnesses = [];
+    redactedWitnesses = [];
 
     //console.log("Merging redacted proofs...");
     let proof: RedactedMinaNFTMapStateProof = proofs[0];
@@ -81,13 +83,12 @@ class RedactedMinaNFT extends BaseMinaNFT {
         proof.publicInput,
         proofs[i].publicInput
       );
-      const mergedProof = await RedactedMinaNFTMapCalculation.merge(
-        state,
-        proof,
-        proofs[i]
-      );
+      let mergedProof: RedactedMinaNFTMapStateProof | null =
+        await RedactedMinaNFTMapCalculation.merge(state, proof, proofs[i]);
       proof = mergedProof;
+      mergedProof = null;
     }
+    proofs = [];
 
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       throw new Error("Redacted map verification key is missing");
