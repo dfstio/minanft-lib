@@ -17,7 +17,7 @@ import {
 } from "o1js";
 
 import { MinaNFTContract } from "./contract/nft";
-import { Metadata, Update } from "./contract/metadata";
+import { Metadata, Update, MetadataWitness } from "./contract/metadata";
 import {
   MinaNFTMetadataUpdate,
   MetadataTransition,
@@ -32,7 +32,6 @@ import {
   RedactedMinaNFTMapState,
   RedactedMinaNFTMapStateProof,
   MapElement,
-  MetadataWitness,
 } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 

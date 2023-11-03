@@ -1,3 +1,5 @@
+export { MinaNFTVerifier };
+
 import {
   method,
   DeployArgs,
@@ -10,7 +12,7 @@ import { RedactedMinaNFTMapStateProof } from "./redactedmap";
 import { MinaNFTContract } from "../contract/nft";
 import { Metadata } from "../contract/metadata";
 
-export class MinaNFTVerifier extends SmartContract {
+class MinaNFTVerifier extends SmartContract {
   deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({

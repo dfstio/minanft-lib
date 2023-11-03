@@ -1,3 +1,5 @@
+export { MinaNFTVerifierBadgeEvent, MinaNFTVerifierBadge };
+
 import {
   method,
   DeployArgs,
@@ -18,10 +20,11 @@ import { MinaNFTContract } from "../contract/nft";
 import { Metadata } from "../contract/metadata";
 import { MinaNFTBadgeProof } from "./badgeproof";
 
-export class MinaNFTVerifierBadgeEvent extends Struct({
+class MinaNFTVerifierBadgeEvent extends Struct({
   address: PublicKey,
   owner: Field,
   name: Field,
+  version: UInt64,
   data: Metadata,
   key: Field,
 }) {
@@ -41,7 +44,7 @@ export class MinaNFTVerifierBadgeEvent extends Struct({
   }
 }
 
-export class MinaNFTVerifierBadge extends SmartContract {
+class MinaNFTVerifierBadge extends SmartContract {
   @state(Field) name = State<Field>();
   @state(Field) owner = State<Field>();
   @state(Field) verifiedKey = State<Field>();
@@ -80,6 +83,7 @@ export class MinaNFTVerifierBadge extends SmartContract {
     badgeEvent.owner.assertEquals(minanft.owner.getAndAssertEquals());
     badgeEvent.address.assertEquals(nft);
     badgeEvent.name.assertEquals(minanft.name.getAndAssertEquals());
+    badgeEvent.version.assertEquals(minanft.version.getAndAssertEquals());
     badgeProof.publicInput.data.kind.assertEquals(
       this.verifiedKind.getAndAssertEquals()
     );
@@ -102,8 +106,12 @@ export class MinaNFTVerifierBadge extends SmartContract {
     badgeProof.verify();
 
     // Issue verification badge
-    //TODO: change amount to version - balance
-    this.token.mint({ address: nft, amount: UInt64.from(1) });
+    const account = Account(nft, this.token.id);
+    const tokenBalance = account.balance.getAndAssertEquals();
+    this.token.mint({
+      address: nft,
+      amount: badgeEvent.version.sub(tokenBalance),
+    });
 
     // Emit event
     this.emitEvent("issue", badgeEvent);

@@ -1,5 +1,4 @@
-export { MinaNFTContract, Metadata, Update };
-
+export { MinaNFTContract };
 import {
   Field,
   state,

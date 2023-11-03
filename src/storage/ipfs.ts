@@ -1,6 +1,7 @@
+export { IPFS };
 import axios from "axios";
 
-export class IPFS {
+class IPFS {
   private auth: string;
 
   constructor(token: string) {

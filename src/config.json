@@ -1,7 +1,6 @@
 {
   "MINAURL": "https://proxy.berkeley.minaexplorer.com/graphql",
   "ARCHIVEURL": "https://archive.berkeley.minaexplorer.com",
-  "ARCHIVEURL2": "https://api.minascan.io/archive/berkeley/v1/graphql",
   "MINAFEE": "0.1",
   "MINAEXPLORER": "https://berkeley.minaexplorer.com",
   "MINNFTAPIAUTH": "***********************************************",
