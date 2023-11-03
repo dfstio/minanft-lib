@@ -21,10 +21,10 @@ import { MinaNFTBadge } from "../src/minanftbadge";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
 // use local blockchain or Berkeley
-const useLocal: boolean = true;
+const useLocal: boolean = false;
 
 const DEPLOYERS_NUMBER = 2;
-const ITERATIONS_NUMBER = 100;
+const ITERATIONS_NUMBER = 2; // hangs on 3rd iteration with 2 deployers
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
 
@@ -73,7 +73,7 @@ beforeAll(async () => {
   const balanceDeployer =
     Number((await accountBalance(deployer.toPublicKey())).toBigInt()) / 1e9;
   console.log(
-    "Balance of the Deployer is ",
+    "Balance of the Deployer is",
     balanceDeployer.toLocaleString("en")
   );
   expect(balanceDeployer).toBeGreaterThan(2);

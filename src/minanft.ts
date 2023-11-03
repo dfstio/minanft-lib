@@ -203,17 +203,59 @@ class MinaNFT extends BaseMinaNFT {
       return undefined;
     }
 
+    /*
     const proof: MinaNFTMetadataUpdateProof | undefined =
       await this.generateProof();
     if (proof === undefined) {
       console.error("Proof generation error");
       return undefined;
     }
+    */
+    if (MinaNFT.updateVerificationKey === undefined) {
+      console.error("Update verification key is undefined");
+      return undefined;
+    }
+
+    //console.log("Creating proofs...");
+    console.time("Update proofs created");
+    let proofs: MinaNFTMetadataUpdateProof[] = [];
+    for (const update of this.updates) {
+      let state: MetadataTransition | null = MetadataTransition.create(update);
+      let proof: MinaNFTMetadataUpdateProof | null =
+        await MinaNFTMetadataUpdate.update(state, update);
+      proofs.push(proof);
+      state = null;
+      proof = null;
+    }
+
+    //console.log("Merging proofs...");
+    let proof: MinaNFTMetadataUpdateProof | null = proofs[0];
+    for (let i = 1; i < proofs.length; i++) {
+      let state: MetadataTransition | null = MetadataTransition.merge(
+        proof.publicInput,
+        proofs[i].publicInput
+      );
+      let mergedProof: MinaNFTMetadataUpdateProof | null =
+        await MinaNFTMetadataUpdate.merge(state, proof, proofs[i]);
+      proof = mergedProof;
+      state = null;
+      mergedProof = null;
+    }
+    proofs = [];
+
+    const verificationResult: boolean = await verify(
+      proof.toJSON(),
+      MinaNFT.updateVerificationKey
+    );
+    console.timeEnd("Update proofs created");
+    //console.log("Proof verification result:", verificationResult);
+    if (verificationResult === false) {
+      throw new Error("Proof verification error");
+    }
 
     const storage = await this.pinToStorage();
     if (storage === undefined) {
-      console.error("Storage error");
-      return undefined;
+      throw new Error("Storage error");
     }
     const storageHash: Field = storage.hash;
 
@@ -246,15 +288,17 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io" },
       () => {
-        zkApp.update(update, signature, ownerPublicKey, proof);
+        zkApp.update(update, signature, ownerPublicKey, proof!);
       }
     );
     await tx.prove();
     tx.sign([deployer]);
     const sentTx = await tx.send();
     await MinaNFT.transactionInfo(sentTx, "update", false);
+    const newRoot = proof!.publicInput.newRoot;
+    proof = null;
     if (sentTx.isSuccess) {
-      this.metadataRoot = proof.publicInput.newRoot;
+      this.metadataRoot = newRoot;
       this.updates = [];
       this.version = newVersion;
       this.storage = storage.url;
@@ -263,6 +307,7 @@ class MinaNFT extends BaseMinaNFT {
     } else return undefined;
   }
 
+  /*
   private async generateProof(): Promise<
     MinaNFTMetadataUpdateProof | undefined
   > {
@@ -307,7 +352,7 @@ class MinaNFT extends BaseMinaNFT {
     }
     return proof;
   }
-
+*/
   private async pinToStorage(): Promise<
     { hash: Field; url: string } | undefined
   > {
