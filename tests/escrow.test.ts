@@ -150,6 +150,13 @@ describe(`MinaNFT contract`, () => {
     if (escrowTx === undefined) return;
     expect(await MinaNFT.wait(escrowTx)).toBe(true);
   });
+  let isKYCpassed = false;
+
+  it(`should wait for KYC to be passed`, async () => {
+    // Here escrow agent should check the KYC status of the buyer and the seller
+    isKYCpassed = true;
+    expect(isKYCpassed).toBe(true);
+  });
 
   it(`should wait for mint transaction to be included into the block`, async () => {
     expect(mintTx).toBeDefined();
@@ -236,7 +243,8 @@ describe(`MinaNFT contract`, () => {
       buyerDeposited,
       nft.zkAppPublicKey,
       sellerPublicKey!,
-      buyerPublicKey!
+      buyerPublicKey!,
+      isKYCpassed
     );
     expect(transferTx).toBeDefined();
   });
