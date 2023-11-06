@@ -3,7 +3,7 @@ export { MinaNFTBadge, MinaNFTBadgeConstructor } from "./minanftbadge";
 export { RedactedMinaNFT } from "./redactedminanft";
 export { BaseMinaNFT } from "./baseminanft";
 export { MinaNFTContract } from "./contract/nft";
-export { EscrowData } from "./contract/escrow";
+export { EscrowTransfer, EscrowApproval } from "./contract/escrow";
 export { Update, Metadata, MetadataWitness } from "./contract/metadata";
 export {
   MetadataUpdate,

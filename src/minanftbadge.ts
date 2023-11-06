@@ -20,6 +20,7 @@ import {
   MinaNFTVerifierBadge,
 } from "./plugins/badge";
 import { RedactedMinaNFT } from "./redactedminanft";
+import { MinaNFTContract } from "./contract/nft";
 
 /**
  * interface for MinaNFTBadge constructor
@@ -90,14 +91,14 @@ class MinaNFTBadge {
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     await MinaNFT.compileBadge();
     console.log(
-      `deploying the verifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      `deploying the MinaNFTVerifierBadge contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
 
     const zkApp = new MinaNFTVerifierBadge(zkAppPublicKey);
     const transaction = await Mina.transaction(
-      { sender, fee: await MinaNFT.fee() },
+      { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
         AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
@@ -120,7 +121,6 @@ class MinaNFTBadge {
   public async issue(
     deployer: PrivateKey,
     nft: MinaNFT,
-    verifiedKey: string,
     oraclePrivateKey: PrivateKey
   ): Promise<Mina.TransactionId | undefined> {
     if (this.address === undefined) {
@@ -136,7 +136,7 @@ class MinaNFTBadge {
     //console.log("Creating proofs for", verifiedKey);
     console.time("Badge proofs created");
     const disclosure = new RedactedMinaNFT(nft);
-    disclosure.copyMetadata(verifiedKey);
+    disclosure.copyMetadata(this.verifiedKey);
     const redactedProof = await disclosure.proof();
     /*
         class MinaNFTVerifierBadgeEvent extends Struct({
@@ -154,8 +154,8 @@ class MinaNFTBadge {
         owner: nft.owner,
         name: MinaNFT.stringToField(nft.name),
         version: nft.version,
-        data: nft.getMetadata(verifiedKey),
-        key: MinaNFT.stringToField(verifiedKey),
+        data: nft.getMetadata(this.verifiedKey),
+        key: MinaNFT.stringToField(this.verifiedKey),
       }
     );
     /*
@@ -215,7 +215,7 @@ class MinaNFTBadge {
     const hasAccount = Mina.hasAccount(nftAddress, tokenId);
 
     const transaction = await Mina.transaction(
-      { sender, fee: await MinaNFT.fee() },
+      { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
         issuer.issueBadge(
@@ -234,5 +234,25 @@ class MinaNFTBadge {
     if (tx.isSuccess) {
       return tx;
     } else return undefined;
+  }
+
+  public async verify(nft: MinaNFT): Promise<boolean> {
+    if (this.address === undefined) {
+      throw new Error("Badge not deployed");
+    }
+    if (nft.zkAppPublicKey === undefined) {
+      throw new Error("NFT not deployed");
+    }
+    const nftAddress: PublicKey = nft.zkAppPublicKey;
+    const issuer = new MinaNFTVerifierBadge(this.address);
+    const tokenId = issuer.token.id;
+    const zkNFT = new MinaNFTContract(nftAddress);
+    await fetchAccount({ publicKey: nftAddress, tokenId });
+    const hasAccount = Mina.hasAccount(nftAddress, tokenId);
+    if (!hasAccount) return false;
+    await fetchAccount({ publicKey: nftAddress });
+    const version = zkNFT.version.get();
+    const balance = Mina.getBalance(nftAddress, tokenId);
+    return version.equals(balance).toBoolean();
   }
 }
