@@ -1,18 +1,40 @@
-export { EscrowData };
-import { Field, Struct } from "o1js";
+export { EscrowApproval, EscrowTransfer };
+import { Field, Struct, UInt64 } from "o1js";
 
-class EscrowData extends Struct({
+class EscrowTransfer extends Struct({
   oldOwner: Field,
   newOwner: Field,
   name: Field,
   escrow: Field,
+  version: UInt64,
 }) {
   constructor(args: any) {
     super(args);
   }
 
   toFields() {
-    return [this.oldOwner, this.newOwner, this.name, this.escrow];
+    return [
+      this.oldOwner,
+      this.newOwner,
+      this.name,
+      this.escrow,
+      this.version.toFields()[0],
+    ];
+  }
+}
+
+class EscrowApproval extends Struct({
+  name: Field,
+  escrow: Field,
+  owner: Field,
+  version: UInt64,
+}) {
+  constructor(args: any) {
+    super(args);
+  }
+
+  toFields() {
+    return [this.name, this.escrow, this.owner, this.version.toFields()[0]];
   }
 }
 

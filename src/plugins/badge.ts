@@ -85,10 +85,12 @@ class MinaNFTVerifierBadge extends SmartContract {
     badgeEvent.name.assertEquals(minanft.name.getAndAssertEquals());
     badgeEvent.version.assertEquals(minanft.version.getAndAssertEquals());
     badgeProof.publicInput.data.kind.assertEquals(
-      this.verifiedKind.getAndAssertEquals()
+      this.verifiedKind.getAndAssertEquals(),
+      "Kind mismatch"
     );
     badgeProof.publicInput.key.assertEquals(
-      this.verifiedKey.getAndAssertEquals()
+      this.verifiedKey.getAndAssertEquals(),
+      "Key mismatch"
     );
 
     Metadata.assertEquals(

@@ -24,7 +24,7 @@
     "lint": "eslint src/*.ts",
     "testold": "ts-node tests/test.ts",
     "test": "jest",
-    "deploytest": "ts-node test/deploy.ts",
+    "deployers": "ts-node experimental/deployers.ts",
     "coverage": "jest --coverage",
     "style": "prettier --tab-width 4 --write {,!(node_modules)/**/}*.ts",
     "push": "git status && git push -u originminanftlib recursive",
