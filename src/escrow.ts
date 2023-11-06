@@ -137,10 +137,16 @@ class MinaNFTEscrow {
     buyerDeposited: EscrowDeposit,
     nft: PublicKey,
     seller: PublicKey,
-    buyer: PublicKey
+    buyer: PublicKey,
+    isKYCpassed: boolean
   ): Promise<Mina.TransactionId | undefined> {
     if (this.address === undefined) {
       throw new Error("Escrow not deployed");
+    }
+    if (isKYCpassed === false) {
+      throw new Error(
+        "KYC not passed. It is obligation of the escrow agent to check the KYC status of the buyer and the seller."
+      );
     }
 
     await MinaNFT.compileEscrow();

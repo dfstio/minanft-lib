@@ -146,28 +146,4 @@ class MinaNFTContract extends SmartContract {
 
     this.emitEvent("approveEscrow", data);
   }
-  /*
-  @method buy(data: EscrowTransfer, signature: Signature, owner: PublicKey, buyer: PublicKey) {
-    this.owner
-      .getAndAssertEquals()
-      .assertEquals(data.oldOwner, "Owner mismatch");
-    this.owner.assertEquals(Poseidon.hash(owner.toFields()));
-    this.name.getAndAssertEquals().assertEquals(data.name, "Name mismatch");
-    const dataFields = data.toFields();
-    const escrow = Poseidon.hash(dataFields);
-    this.escrow.getAndAssertEquals().assertEquals(escrow, "Escrow mismatch");
-
-    const version = this.version.getAndAssertEquals();
-    const newVersion: UInt64 = version.add(UInt64.from(1));
-    newVersion.assertEquals(data.version);
-
-    signature.verify(owner, dataFields);
-
-    this.owner.set(data.newOwner);
-    this.version.set(newVersion);
-    this.escrow.set(Field(0));
-
-    this.emitEvent("transfer", data);
-  }
-  */
 }
