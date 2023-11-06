@@ -7,18 +7,22 @@ class EscrowTransfer extends Struct({
   name: Field,
   escrow: Field,
   version: UInt64,
+  price: UInt64,
+  tokenId: Field, // Field(0) for MINA payments
 }) {
   constructor(args: any) {
     super(args);
   }
 
-  toFields() {
+  toFields(): Field[] {
     return [
       this.oldOwner,
       this.newOwner,
       this.name,
       this.escrow,
-      this.version.toFields()[0],
+      ...this.version.toFields(),
+      ...this.price.toFields(),
+      this.tokenId,
     ];
   }
 }
@@ -34,7 +38,7 @@ class EscrowApproval extends Struct({
   }
 
   toFields() {
-    return [this.name, this.escrow, this.owner, this.version.toFields()[0]];
+    return [this.name, this.escrow, this.owner, ...this.version.toFields()];
   }
 }
 

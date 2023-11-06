@@ -125,11 +125,9 @@ class MinaNFTBadge {
   ): Promise<Mina.TransactionId | undefined> {
     if (this.address === undefined) {
       throw new Error("Badge not deployed");
-      return undefined;
     }
     if (nft.zkAppPublicKey === undefined) {
       throw new Error("NFT not deployed");
-      return undefined;
     }
     const nftAddress: PublicKey = nft.zkAppPublicKey;
     await MinaNFT.compileBadge();

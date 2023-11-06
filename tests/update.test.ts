@@ -26,7 +26,7 @@ const DEPLOYERS_NUMBER = 2;
 // hangs on 3rd iteration with 2 deployers or 6th iteration with 1 deployer
 const ITERATIONS_NUMBER = 2;
 
-jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
+//jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
 
 class Key extends SmartContract {
   @state(Field) key = State<Field>();
@@ -66,17 +66,6 @@ describe(`MinaNFT contract`, () => {
   const nft: MinaNFT[] = [];
   const txs: Mina.TransactionId[] = [];
   let badgeTx: Mina.TransactionId | undefined = undefined;
-  const escrowPrivateKey1 = PrivateKey.random();
-  const escrowPublicKey1 = escrowPrivateKey1.toPublicKey();
-  const escrowPrivateKey2 = PrivateKey.random();
-  const escrowPublicKey2 = escrowPrivateKey2.toPublicKey();
-  const escrowPrivateKey3 = PrivateKey.random();
-  const escrowPublicKey3 = escrowPrivateKey3.toPublicKey();
-  const escrow = Poseidon.hash([
-    Poseidon.hash(escrowPublicKey1.toFields()),
-    Poseidon.hash(escrowPublicKey2.toFields()),
-    Poseidon.hash(escrowPublicKey3.toFields()),
-  ]);
   const oraclePrivateKey = PrivateKey.random();
   const badge = new MinaNFTBadge({
     name: `badgetest`,
@@ -106,7 +95,7 @@ describe(`MinaNFT contract`, () => {
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
 
-      const tx = await nft[i].mint(deployers[i], ownerHash, escrow);
+      const tx = await nft[i].mint(deployers[i], ownerHash);
       expect(tx).toBeDefined();
       if (tx === undefined) return;
       txs.push(tx);

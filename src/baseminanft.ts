@@ -12,6 +12,7 @@ import { RedactedMinaNFTMapCalculation } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 import { MinaNFTVerifierBadge } from "./plugins/badge";
 import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
+import { Escrow } from "./plugins/escrow";
 
 class BaseMinaNFT {
   protected metadata: Map<string, Metadata>;
@@ -22,6 +23,7 @@ class BaseMinaNFT {
   static redactedMapVerificationKey: string | undefined;
   static badgeVerifierVerificationKey: VerificationKey | undefined;
   static badgeVerificationKey: string | undefined;
+  static escrowVerificationKey: VerificationKey | undefined;
 
   constructor() {
     this.metadata = new Map<string, Metadata>();
@@ -226,6 +228,20 @@ class BaseMinaNFT {
       MinaNFT.badgeVerifierVerificationKey = verificationKey as VerificationKey;
     }
     return MinaNFT.badgeVerifierVerificationKey;
+  }
+
+  /**
+   * Compiles Escrow contract
+   * @returns verification key
+   */
+  public static async compileEscrow(): Promise<VerificationKey> {
+    if (MinaNFT.escrowVerificationKey === undefined) {
+      console.time("Escrow compiled");
+      const { verificationKey } = await Escrow.compile();
+      console.timeEnd("Escrow compiled");
+      MinaNFT.escrowVerificationKey = verificationKey as VerificationKey;
+    }
+    return MinaNFT.escrowVerificationKey;
   }
 
   /**

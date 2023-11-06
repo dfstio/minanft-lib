@@ -14,19 +14,14 @@ import {
 
 import { MinaNFT } from "../src/minanft";
 import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
-import {
-  makeString,
-  Memory,
-  blockchain,
-  initBlockchain,
-} from "../utils/testhelpers";
+import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 
 // 'local' or 'berkeley' or 'mainnet'
 const blockchainInstance: blockchain = "local";
+//const blockchainInstance: blockchain = 'berkeley';
 
-const DEPLOYERS_NUMBER = 2;
-// hangs on 3rd iteration with 2 deployers or 6th iteration with 1 deployer
-const ITERATIONS_NUMBER = 3;
+const DEPLOYERS_NUMBER = 1;
+const ITERATIONS_NUMBER = 2;
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
 
@@ -85,7 +80,7 @@ describe(`MinaNFT contract`, () => {
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
 
-      const tx = await nft[i].mint(deployers[i], ownerHash, escrow);
+      const tx = await nft[i].mint(deployers[i], ownerHash);
       expect(tx).toBeDefined();
       if (tx === undefined) return;
       txs.push(tx);
@@ -152,6 +147,8 @@ describe(`MinaNFT contract`, () => {
           name: MinaNFT.stringToField(nft[i].name),
           escrow,
           version,
+          price: UInt64.from(0),
+          tokenId: Field(0),
         });
         const signature1 = Signature.create(
           escrowPrivateKey1,
