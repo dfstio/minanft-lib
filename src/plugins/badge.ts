@@ -132,4 +132,14 @@ class MinaNFTVerifierBadge extends SmartContract {
     // Emit event
     this.emitEvent("revoke", nft);
   }
+
+  @method verifyBadge(nft: PublicKey) {
+    const account = Account(nft, this.token.id);
+    const tokenBalance = account.balance.getAndAssertEquals();
+
+    const minanft = new MinaNFTContract(nft);
+    const version = minanft.version.getAndAssertEquals();
+
+    version.assertEquals(tokenBalance);
+  }
 }
