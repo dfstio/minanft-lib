@@ -19,8 +19,8 @@ import {
   initBlockchain,
 } from "../utils/testhelpers";
 
-// 'local' or 'berkeley' or 'mainnet'
-const blockchainInstance: blockchain = "local";
+// 'local' or 'berkeley' or 'mainnet' or 'testworld2'
+const blockchainInstance: blockchain = "testworld2";
 
 const DEPLOYERS_NUMBER = 2;
 // hangs on 3rd iteration with 2 deployers or 6th iteration with 1 deployer
@@ -79,14 +79,14 @@ describe(`MinaNFT contract`, () => {
     expect(ITERATIONS_NUMBER).toBeGreaterThan(0);
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
-    //console.log(`Deploying MinaNFTBadge...`);
+    console.log(`Deploying MinaNFTBadge...`);
     badgeTx = await badge.deploy(deployer);
     expect(badgeTx).toBeDefined();
     if (badgeTx === undefined) return;
   });
 
   it(`should mint NFTs`, async () => {
-    //console.log(`Minting...`);
+    console.log(`Minting...`);
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
       nft.push(new MinaNFT(`@test`));
       nft[i].update(`description`, `string`, `my nft @test`);
@@ -120,7 +120,7 @@ describe(`MinaNFT contract`, () => {
 
   for (let iteration = 1; iteration <= ITERATIONS_NUMBER; iteration++) {
     it(`should update NFTs, iteration ${iteration}`, async () => {
-      //console.log(`Updating and issuing badges, iteration ${iteration}...`);
+      console.log(`Updating and issuing badges, iteration ${iteration}...`);
 
       for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
         // update metadata

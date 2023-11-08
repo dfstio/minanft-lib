@@ -12,21 +12,33 @@ import {
   PublicKey,
   Poseidon,
 } from "o1js";
-import { Update, Metadata } from "./metadata";
+import { Update, Metadata, Storage } from "./metadata";
 import { MinaNFTMetadataUpdateProof } from "./update";
 import { EscrowTransfer, EscrowApproval } from "./escrow";
 
 /**
- * class MinaNFTContract
- *
+ * MinaNFTContract is a smart contract that implements the Mina NFT standard.
+ * @property name The name of the NFT.
+ * @property metadata The metadata of the NFT.
+ * @property storage The storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
+ * @property owner The owner of the NFT - Poseidon hash of owner's public key
+ * @property escrow The escrow of the NFT - Poseidon hash of three escrow's public keys
+ * @property version The version of the NFT, increases by one with the chaing of the metadata or owner
  */
 class MinaNFTContract extends SmartContract {
   @state(Field) name = State<Field>();
   @state(Metadata) metadata = State<Metadata>();
-  @state(Field) storage = State<Field>();
+  @state(Storage) storage = State<Storage>();
   @state(Field) owner = State<Field>();
   @state(Field) escrow = State<Field>();
   @state(UInt64) version = State<UInt64>();
+
+  /**
+   * @event mint NFT minted
+   * @event update NFT metadata updated
+   * @event transfer NFT transferred
+   * @event approveEscrow NFT escrow approved
+   */
 
   events = {
     mint: Field,
@@ -51,6 +63,13 @@ class MinaNFTContract extends SmartContract {
     this.emitEvent("mint", Field(0));
   }
 
+  /**
+   * Update metadata of the NFT
+   * @param update {@link Update} - data for the update
+   * @param signature signature of the owner
+   * @param owner owner's public key
+   * @param proof {@link MinaNFTMetadataUpdateProof} - proof of the update of the metadata to be correctly inserted into the Merkle Map
+   */
   @method update(
     update: Update,
     signature: Signature,
@@ -86,7 +105,16 @@ class MinaNFTContract extends SmartContract {
 
     this.emitEvent("update", update);
   }
-
+  /**
+   * Transfer the NFT to new owner
+   * @param data {@link EscrowTransfer} - data for the transfer
+   * @param signature1 signature of the first escrow
+   * @param signature2 signature of the second escrow
+   * @param signature3 signature of the third escrow
+   * @param escrow1 public key of the first escrow
+   * @param escrow2 public key of the second escrow
+   * @param escrow3 public key of the third escrow
+   */
   @method transfer(
     data: EscrowTransfer,
     signature1: Signature,
@@ -125,7 +153,12 @@ class MinaNFTContract extends SmartContract {
 
     this.emitEvent("transfer", data);
   }
-
+  /**
+   * Approve setting of the new escrow
+   * @param data {@link EscrowApproval} - data for the approval
+   * @param signature signature of the owner
+   * @param owner owner's public key
+   */
   @method approveEscrow(
     data: EscrowApproval,
     signature: Signature,

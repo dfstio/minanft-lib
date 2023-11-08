@@ -8,6 +8,11 @@ export {
 import { Field, SelfProof, ZkProgram, Struct, MerkleMap } from "o1js";
 import { Metadata, MetadataWitness } from "../contract/metadata";
 
+/**
+ * MetadataMap is a wrapper around MerkleMap that stores Metadata
+ * @property data The MerkleMap of the data
+ * @property kind The MerkleMap of the kind
+ */
 class MetadataMap {
   data: MerkleMap;
   kind: MerkleMap;
@@ -17,6 +22,10 @@ class MetadataMap {
     this.kind = new MerkleMap();
   }
 
+  /**
+   * Calculates the root of the MerkleMap
+   * @returns {@link Metadata} root of the MerkleMap
+   */
   getRoot(): Metadata {
     return new Metadata({
       data: this.data.getRoot(),
@@ -24,6 +33,11 @@ class MetadataMap {
     });
   }
 
+  /**
+   * Get value at key
+   * @param key key of the data and kind requested
+   * @returns {@link Metadata} value of the data and kind at key
+   */
   get(key: Field): Metadata {
     return new Metadata({
       data: this.data.get(key),
@@ -31,11 +45,21 @@ class MetadataMap {
     });
   }
 
+  /**
+   * Sets the data and kind at key
+   * @param key key of the data and kind to set
+   * @param value {@link Metadata} data and kind to set
+   */
   set(key: Field, value: Metadata): void {
     this.data.set(key, value.data);
     this.kind.set(key, value.kind);
   }
 
+  /**
+   * Calculates the witness of the data and kind at key
+   * @param key key of the data and kind, for which witness is requested
+   * @returns {@link MetadataWitness} witness of the data and kind at key
+   */
   getWitness(key: Field): MetadataWitness {
     return new MetadataWitness({
       data: this.data.getWitness(key),

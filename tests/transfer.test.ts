@@ -17,11 +17,12 @@ import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 
 // 'local' or 'berkeley' or 'mainnet'
-const blockchainInstance: blockchain = "local";
+//const blockchainInstance: blockchain = "local";
 //const blockchainInstance: blockchain = 'berkeley';
+const blockchainInstance: blockchain = "testworld2";
 
-const DEPLOYERS_NUMBER = 1;
-const ITERATIONS_NUMBER = 2;
+const DEPLOYERS_NUMBER = 3;
+const ITERATIONS_NUMBER = 5;
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
 

@@ -5,7 +5,12 @@ export { RedactedMinaNFT } from "./redactedminanft";
 export { BaseMinaNFT } from "./baseminanft";
 export { MinaNFTContract } from "./contract/nft";
 export { EscrowTransfer, EscrowApproval } from "./contract/escrow";
-export { Update, Metadata, MetadataWitness } from "./contract/metadata";
+export {
+  Update,
+  Metadata,
+  MetadataWitness,
+  Storage,
+} from "./contract/metadata";
 export {
   MetadataUpdate,
   MetadataTransition,
@@ -32,3 +37,4 @@ export {
 export { MinaNFTVerifier } from "./plugins/verifier";
 export { Escrow, EscrowDeposit } from "./plugins/escrow";
 export { IPFS } from "./storage/ipfs";
+export { stringToFields, stringFromFields } from "./strings";
