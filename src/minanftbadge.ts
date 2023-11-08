@@ -126,10 +126,10 @@ class MinaNFTBadge {
     if (this.address === undefined) {
       throw new Error("Badge not deployed");
     }
-    if (nft.zkAppPublicKey === undefined) {
+    if (nft.address === undefined) {
       throw new Error("NFT not deployed");
     }
-    const nftAddress: PublicKey = nft.zkAppPublicKey;
+    const nftAddress: PublicKey = nft.address;
     await MinaNFT.compileBadge();
     //console.log("Creating proofs for", verifiedKey);
     console.time("Badge proofs created");
@@ -238,10 +238,10 @@ class MinaNFTBadge {
     if (this.address === undefined) {
       throw new Error("Badge not deployed");
     }
-    if (nft.zkAppPublicKey === undefined) {
+    if (nft.address === undefined) {
       throw new Error("NFT not deployed");
     }
-    const nftAddress: PublicKey = nft.zkAppPublicKey;
+    const nftAddress: PublicKey = nft.address;
     const issuer = new MinaNFTVerifierBadge(this.address);
     const tokenId = issuer.token.id;
     const zkNFT = new MinaNFTContract(nftAddress);

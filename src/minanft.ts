@@ -6,18 +6,16 @@ import {
   PublicKey,
   Field,
   AccountUpdate,
-  Encoding,
   verify,
   fetchAccount,
   Poseidon,
   Signature,
   UInt64,
-  Types,
 } from "o1js";
 
 import { BaseMinaNFT } from "./baseminanft";
 import { MinaNFTContract } from "./contract/nft";
-import { Metadata, Update } from "./contract/metadata";
+import { Metadata, Update, Storage } from "./contract/metadata";
 import {
   MinaNFTMetadataUpdate,
   MetadataTransition,
@@ -30,7 +28,7 @@ import { EscrowTransfer, EscrowApproval } from "./contract/escrow";
 import { RedactedMinaNFTMapStateProof } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 
-import { MINAURL, ARCHIVEURL, MINAEXPLORER, MINAFEE } from "../src/config.json";
+import { MINAURL, ARCHIVEURL, MINAFEE } from "../src/config.json";
 
 class MinaNFTobject {
   metadata: Map<string, string>; // metadata of file
@@ -41,6 +39,18 @@ class MinaNFTobject {
   }
 }
 
+/**
+ * MinaNFT is the class for the NFT, wrapper around the MinaNFTContract
+ * @property name Name of the NFT
+ * @property storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
+ * @property owner Owner of the NFT - Poseidon hash of owner's public key
+ * @property escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
+ * @property version Version of the NFT, increases by one with the changing of the metadata or owner
+ * @property isMinted True if the NFT is minted
+ * @property address Public key of the deployed NFT zkApp
+ * @property updates Array of the metadata updates
+ * @property metadataRoot Root of the Merkle Map of the metadata
+ */
 class MinaNFT extends BaseMinaNFT {
   /*
   @state(Field) name = State<Field>();
@@ -57,7 +67,7 @@ class MinaNFT extends BaseMinaNFT {
   escrow: Field;
   version: UInt64;
   isMinted: boolean;
-  zkAppPublicKey: PublicKey | undefined;
+  address: PublicKey | undefined;
 
   private updates: MetadataUpdate[];
   private metadataRoot: Metadata;
@@ -65,17 +75,17 @@ class MinaNFT extends BaseMinaNFT {
   /**
    * Create MinaNFT object
    * @param name Name of NFT
-   * @param zkAppPublicKey Public key of the deployed NFT zkApp
+   * @param address Public key of the deployed NFT zkApp
    */
-  constructor(name: string, zkAppPublicKey: PublicKey | undefined = undefined) {
+  constructor(name: string, address: PublicKey | undefined = undefined) {
     super();
     this.name = name;
     this.storage = "";
     this.owner = Field(0);
     this.escrow = Field(0);
     this.version = UInt64.from(0);
-    this.isMinted = zkAppPublicKey === undefined ? false : true;
-    this.zkAppPublicKey = zkAppPublicKey;
+    this.isMinted = address === undefined ? false : true;
+    this.address = address;
     this.updates = [];
     const metadataMap = new MetadataMap();
     this.metadataRoot = metadataMap.getRoot();
@@ -85,14 +95,14 @@ class MinaNFT extends BaseMinaNFT {
    * Load metadata from blockchain and IPFS/Arweave
    */
   public async loadMetadata(): Promise<void> {
-    if (this.zkAppPublicKey === undefined) {
-      throw new Error("zkAppPublicKey is undefined");
+    if (this.address === undefined) {
+      throw new Error("address is undefined");
       return;
     }
-    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
-    const account = await fetchAccount({ publicKey: this.zkAppPublicKey });
+    const zkApp = new MinaNFTContract(this.address);
+    const account = await fetchAccount({ publicKey: this.address });
     if (
-      !Mina.hasAccount(this.zkAppPublicKey) ||
+      !Mina.hasAccount(this.address) ||
       account.account === undefined ||
       account.account.zkapp?.zkappUri === undefined
     ) {
@@ -179,18 +189,18 @@ class MinaNFT extends BaseMinaNFT {
    * @returns true if on-chain state is equal to off-chain state
    */
   public async checkState(): Promise<boolean> {
-    if (this.zkAppPublicKey === undefined) {
+    if (this.address === undefined) {
       console.error("NFT contract is not deployed");
       return false;
     }
 
-    const zkAppPublicKey: PublicKey = this.zkAppPublicKey;
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    if (!Mina.hasAccount(zkAppPublicKey)) {
+    const address: PublicKey = this.address;
+    await fetchAccount({ publicKey: address });
+    if (!Mina.hasAccount(address)) {
       console.error("NFT contract is not deployed");
       return false;
     }
-    const zkApp = new MinaNFTContract(zkAppPublicKey);
+    const zkApp = new MinaNFTContract(address);
     let result = true;
 
     const version: UInt64 = zkApp.version.get();
@@ -242,11 +252,11 @@ class MinaNFT extends BaseMinaNFT {
     deployer: PrivateKey,
     ownerPrivateKey: PrivateKey
   ): Promise<Mina.TransactionId | undefined> {
-    if (this.zkAppPublicKey === undefined) {
+    if (this.address === undefined) {
       console.error("NFT contract is not deployed");
       return undefined;
     }
-    const zkAppPublicKey: PublicKey = this.zkAppPublicKey;
+    const address: PublicKey = this.address;
 
     if (this.updates.length === 0) {
       console.error("No updates to commit");
@@ -312,15 +322,15 @@ class MinaNFT extends BaseMinaNFT {
     if (storage === undefined) {
       throw new Error("Storage error");
     }
-    const storageHash: Field = storage.hash;
+    const storageHash: Storage = storage.hash;
     if (false === (await this.checkState())) {
       throw new Error("State verification error");
     }
     //console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
-    const zkApp = new MinaNFTContract(zkAppPublicKey);
+    const zkApp = new MinaNFTContract(address);
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchAccount({ publicKey: address });
     const version: UInt64 = zkApp.version.get();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     const oldOwner = zkApp.owner.get();
@@ -418,13 +428,17 @@ class MinaNFT extends BaseMinaNFT {
   }
 */
   private async pinToStorage(): Promise<
-    { hash: Field; url: string } | undefined
+    { hash: Storage; url: string } | undefined
   > {
     //console.log("Pinning to IPFS...");
     // TODO: pin to IPFS
-    const ipfs = `https://ipfs.io/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
-    const ipfs_fields = Encoding.stringToFields(ipfs);
-    return { hash: Poseidon.hash(ipfs_fields), url: ipfs };
+    const ipfs = `i:bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
+    const ipfs_fields = MinaNFT.stringToFields(ipfs);
+    if (ipfs_fields.length !== 2) throw new Error("IPFS hash encoding error");
+    return {
+      hash: new Storage({ hashString: ipfs_fields as [Field, Field] }),
+      url: ipfs,
+    };
   }
 
   /*
@@ -492,9 +506,7 @@ class MinaNFT extends BaseMinaNFT {
         return;
       }
 
-      console.log(
-        `MinaNFT ${description} transaction sent: ${MINAEXPLORER}/transaction/${hash}`
-      );
+      console.log(`MinaNFT ${description} transaction sent: ${hash}`);
       if (wait) {
         try {
           //console.log("Waiting for transaction...");
@@ -541,8 +553,8 @@ class MinaNFT extends BaseMinaNFT {
     //console.log("Minting NFT...");
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = PrivateKey.random();
-    this.zkAppPublicKey = zkAppPrivateKey.toPublicKey();
-    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    this.address = zkAppPrivateKey.toPublicKey();
+    const zkApp = new MinaNFTContract(this.address);
 
     const { root } = this.getMetadataRootAndMap();
     const storage = await this.pinToStorage();
@@ -550,10 +562,10 @@ class MinaNFT extends BaseMinaNFT {
       console.error("Storage error");
       return undefined;
     }
-    const storageHash: Field = storage.hash;
+    const storageHash: Storage = storage.hash;
 
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: this.zkAppPublicKey });
+    await fetchAccount({ publicKey: this.address });
 
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
@@ -588,7 +600,7 @@ class MinaNFT extends BaseMinaNFT {
     await sleep(10 * 1000);
 
     // Check that the contract is deployed correctly
-    await fetchAccount({ publicKey: this.zkAppPublicKey });
+    await fetchAccount({ publicKey: this.address });
 
     const newName = zkApp.name.get();
     if (newName.toJSON() !== MinaNFT.stringToField(this.name).toJSON())
@@ -640,7 +652,7 @@ class MinaNFT extends BaseMinaNFT {
     escrow2: PublicKey,
     escrow3: PublicKey
   ): Promise<Mina.TransactionId | undefined> {
-    if (this.zkAppPublicKey === undefined) {
+    if (this.address === undefined) {
       throw new Error("NFT contract is not deployed");
       return;
     }
@@ -662,8 +674,8 @@ class MinaNFT extends BaseMinaNFT {
     }
     const sender = deployer.toPublicKey();
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: this.zkAppPublicKey });
-    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    await fetchAccount({ publicKey: this.address });
+    const zkApp = new MinaNFTContract(this.address);
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
@@ -703,7 +715,7 @@ class MinaNFT extends BaseMinaNFT {
     signature: Signature,
     ownerPublicKey: PublicKey
   ): Promise<Mina.TransactionId | undefined> {
-    if (this.zkAppPublicKey === undefined) {
+    if (this.address === undefined) {
       throw new Error("NFT contract is not deployed");
       return;
     }
@@ -724,8 +736,8 @@ class MinaNFT extends BaseMinaNFT {
     }
     const sender = deployer.toPublicKey();
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: this.zkAppPublicKey });
-    const zkApp = new MinaNFTContract(this.zkAppPublicKey);
+    await fetchAccount({ publicKey: this.address });
+    const zkApp = new MinaNFTContract(this.address);
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
@@ -755,19 +767,19 @@ class MinaNFT extends BaseMinaNFT {
     nft: PublicKey,
     proof: RedactedMinaNFTMapStateProof
   ) {
-    const zkAppPublicKey = nft;
+    const address = nft;
     await MinaNFT.compileVerifier();
 
     console.log("Verifying the proof...");
     const sender = deployer.toPublicKey();
     await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchAccount({ publicKey: address });
     const zkApp = new MinaNFTVerifier(verifier);
 
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
-        zkApp.verifyRedactedMetadata(zkAppPublicKey, proof);
+        zkApp.verifyRedactedMetadata(address, proof);
       }
     );
     await tx.prove();

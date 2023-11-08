@@ -25,6 +25,7 @@
     "testold": "ts-node tests/test.ts",
     "test": "jest",
     "deployers": "ts-node experimental/deployers.ts",
+    "testworld2": "ts-node experimental/testworld2.ts",
     "coverage": "jest --coverage",
     "style": "prettier --tab-width 4 --write {,!(node_modules)/**/}*.ts",
     "push": "git status && git push -u originminanftlib recursive",

@@ -9,10 +9,10 @@ export {
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
 
-import { MINAURL, ARCHIVEURL } from "../src/config.json";
+import { MINAURL, ARCHIVEURL, TESTWORLD2 } from "../src/config.json";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
-type blockchain = "local" | "berkeley" | "mainnet";
+type blockchain = "local" | "berkeley" | "testworld2" | "mainnet";
 
 async function initBlockchain(
   instance: blockchain,
@@ -30,11 +30,17 @@ async function initBlockchain(
       const { privateKey } = Local.testAccounts[i];
       deployers.push(privateKey);
     }
-  } else if (instance === "berkeley") {
-    const network = Mina.Network({
-      mina: MINAURL,
-      archive: ARCHIVEURL,
-    });
+  } else if (instance === "berkeley" || instance === "testworld2") {
+    const network = Mina.Network(
+      instance === "berkeley"
+        ? {
+            mina: MINAURL,
+            archive: ARCHIVEURL,
+          }
+        : {
+            mina: TESTWORLD2,
+          }
+    );
     Mina.setActiveInstance(network);
     deployer = PrivateKey.fromBase58(DEPLOYER);
     for (let i = 0; i < deployersNumber; i++) {
@@ -71,14 +77,9 @@ async function initBlockchain(
 }
 
 async function accountBalance(address: PublicKey): Promise<UInt64> {
-  let check = Mina.hasAccount(address);
-  if (!check) {
-    await fetchAccount({ publicKey: address });
-    check = Mina.hasAccount(address);
-    if (!check) return UInt64.from(0);
-  }
-  const balance = Mina.getBalance(address);
-  return balance;
+  await fetchAccount({ publicKey: address });
+  if (Mina.hasAccount(address)) return Mina.getBalance(address);
+  else return UInt64.from(0);
 }
 
 function sleep(ms: number) {

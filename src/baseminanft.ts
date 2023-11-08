@@ -1,5 +1,5 @@
 export { BaseMinaNFT };
-import { Field, Encoding, Cache, VerificationKey } from "o1js";
+import { Field, Cache, VerificationKey } from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTContract } from "./contract/nft";
 import { Metadata, MetadataWitness } from "./contract/metadata";
@@ -13,6 +13,7 @@ import { MinaNFTVerifier } from "./plugins/verifier";
 import { MinaNFTVerifierBadge } from "./plugins/badge";
 import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
+import { stringToFields, stringFromFields } from "./strings";
 
 class BaseMinaNFT {
   protected metadata: Map<string, Metadata>;
@@ -124,21 +125,49 @@ class BaseMinaNFT {
    * @returns string as a Field
    */
   public static stringToField(item: string): Field {
-    const fields: Field[] = Encoding.stringToFields(item);
-    if (fields.length === 1) return fields[0];
-    else
+    // Encoding.stringToFields is not working properly in o1js 0.14.0, use internal implementation
+    //const fields: Field[] = Encoding.stringToFields(item);
+    const fields: Field[] = stringToFields(item);
+    if (fields.length === 1) {
+      if (stringFromFields(fields) === item) return fields[0];
+      else throw Error(`stringToField error: encoding error`);
+    } else
       throw new Error(
         `stringToField error: string ${item} is too long, requires ${fields.length} Fields`
       );
   }
 
   /**
+   * Converts a string to a Fields
+   * @param item string to convert
+   * @returns string as a Field[]
+   */
+  public static stringToFields(item: string): Field[] {
+    // Encoding.stringToFields is not working properly in o1js 0.14.0, use internal implementation
+    //const fields: Field[] = Encoding.stringToFields(item);
+    const fields: Field[] = stringToFields(item);
+    if (stringFromFields(fields) === item) return fields;
+    else throw Error(`stringToField error: encoding error`);
+  }
+
+  /**
    * Converts a Field to a string
-   * @param item Field to convert
+   * @param field Field to convert
    * @returns string
    */
-  public static stringFromField(item: Field): string {
-    return Encoding.stringFromFields([item]);
+  public static stringFromField(field: Field): string {
+    // Encoding.stringFromFields is not working properly in o1js 0.14.0, use internal implementation
+    return stringFromFields([field]);
+  }
+
+  /**
+   * Converts a Field[] to a string
+   * @param fields Fields to convert
+   * @returns string
+   */
+  public static stringFromFields(fields: Field[]): string {
+    // Encoding.stringFromFields is not working properly in o1js 0.14.0, use internal implementation
+    return stringFromFields(fields);
   }
 
   /**
