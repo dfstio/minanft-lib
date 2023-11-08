@@ -1,4 +1,4 @@
-export { BaseMinaNFT };
+export { BaseMinaNFT, PrivateMetadata, BaseMinaNFTObject };
 import { Field, Cache, VerificationKey } from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTContract } from "./contract/nft";
@@ -13,10 +13,24 @@ import { MinaNFTVerifier } from "./plugins/verifier";
 import { MinaNFTVerifierBadge } from "./plugins/badge";
 import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
-import { stringToFields, stringFromFields } from "./strings";
+import { stringToFields, stringFromFields } from "./conversions";
 
+class BaseMinaNFTObject {
+  root: Field;
+}
+
+interface PrivateMetadata {
+  data: Field;
+  kind: Field;
+  isPrivate: boolean;
+  linkedObject?: BaseMinaNFTObject;
+}
+
+/**
+ * Base class for MinaNFT
+ */
 class BaseMinaNFT {
-  protected metadata: Map<string, Metadata>;
+  protected metadata: Map<string, PrivateMetadata>;
   static verificationKey: VerificationKey | undefined;
   static updaterVerificationKey: VerificationKey | undefined;
   static updateVerificationKey: string | undefined;
@@ -27,7 +41,7 @@ class BaseMinaNFT {
   static escrowVerificationKey: VerificationKey | undefined;
 
   constructor() {
-    this.metadata = new Map<string, Metadata>();
+    this.metadata = new Map<string, PrivateMetadata>();
   }
 
   /**
@@ -35,7 +49,7 @@ class BaseMinaNFT {
    * @param key key of the attribute
    * @returns value of the attribute
    */
-  public getMetadata(key: string): Metadata | undefined {
+  public getMetadata(key: string): PrivateMetadata | undefined {
     return this.metadata.get(key);
   }
 
@@ -48,14 +62,14 @@ class BaseMinaNFT {
    */
   protected updateMetadataMap(
     keyToUpdate: string,
-    newValue: Metadata
+    newValue: PrivateMetadata
   ): MetadataUpdate {
     const { root, map } = this.getMetadataRootAndMap();
     const key = MinaNFT.stringToField(keyToUpdate);
     const witness: MetadataWitness = map.getWitness(key);
     const oldValue: Metadata = map.get(key);
     this.metadata.set(keyToUpdate, newValue);
-    map.set(key, newValue);
+    map.set(key, new Metadata({ data: newValue.data, kind: newValue.kind }));
     const newRoot: Metadata = map.getRoot();
 
     return {

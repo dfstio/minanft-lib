@@ -1,6 +1,6 @@
 export { RedactedMinaNFT };
 import { verify, Proof } from "o1js";
-import { BaseMinaNFT } from "./baseminanft";
+import { BaseMinaNFT, PrivateMetadata } from "./baseminanft";
 import { MinaNFT } from "./minanft";
 import { Metadata, MetadataWitness } from "./contract/metadata";
 import {
@@ -23,7 +23,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
    * @param key key of the attribute
    */
   public copyMetadata(key: string) {
-    const value: Metadata | undefined = this.nft.getMetadata(key);
+    const value: PrivateMetadata | undefined = this.nft.getMetadata(key);
     if (value) this.metadata.set(key, value);
     else throw new Error("Map error");
   }

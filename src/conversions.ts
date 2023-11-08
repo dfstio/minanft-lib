@@ -1,4 +1,4 @@
-export { stringToFields, stringFromFields };
+export { stringToFields, stringFromFields, bytesToFields };
 import { Field } from "o1js";
 
 /**
@@ -44,6 +44,28 @@ function stringFromFields(fields: Field[]): string {
   });
 
   return str;
+}
+
+/**
+ * Convert Buffer to Fields
+ * @param buf Buffer to convert
+ * @returns Buffer converted to Field[]
+ */
+function bytesToFields(bytes: Uint8Array): Field[] {
+  const fields: Field[] = [];
+
+  for (let i = 0; i < bytes.length; i += 31) {
+    const chunkSize = Math.min(31, bytes.length - i);
+    const chunk = new Uint8Array(32);
+    chunk[0] = chunkSize; // The first byte is the length of the actual string chunk
+    chunk.set(bytes.slice(i, i + chunkSize), 32 - chunkSize);
+    const value = uint8ArrayToBigInt(chunk);
+    if (value >= Field.ORDER)
+      throw new Error("bytesToFields: value too large to fit into Field");
+    fields.push(Field.from(value));
+  }
+
+  return fields;
 }
 
 // Helper function to convert BigInt to Uint8Array

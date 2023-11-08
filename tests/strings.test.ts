@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import { Field } from "o1js";
-import { stringToFields, stringFromFields } from "../src/strings";
+import { stringToFields, stringFromFields } from "../src/conversions";
 import { makeString } from "../utils/testhelpers";
 
 describe("Convert string to Fields and back", () => {

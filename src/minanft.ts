@@ -1,4 +1,11 @@
-export { MinaNFT, MinaNFTobject };
+export {
+  MinaNFT,
+  MinaNFTobject,
+  MinaNFTStringUpdate,
+  MinaNFTFieldUpdate,
+  MinaNFTImageUpdate,
+  MinaNFTTextUpdate,
+};
 
 import {
   Mina,
@@ -13,7 +20,7 @@ import {
   UInt64,
 } from "o1js";
 
-import { BaseMinaNFT } from "./baseminanft";
+import { BaseMinaNFT, PrivateMetadata } from "./baseminanft";
 import { MinaNFTContract } from "./contract/nft";
 import { Metadata, Update, Storage } from "./contract/metadata";
 import {
@@ -27,6 +34,7 @@ import { EscrowTransfer, EscrowApproval } from "./contract/escrow";
 
 import { RedactedMinaNFTMapStateProof } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
+import { TextData } from "./storage/text";
 
 import { MINAURL, ARCHIVEURL, MINAFEE } from "../src/config.json";
 
@@ -37,6 +45,62 @@ class MinaNFTobject {
   constructor() {
     this.metadata = new Map<string, string>();
   }
+}
+
+/**
+ * MinaNFTStringUpdate is the data for the update of the metadata to be written to the NFT state
+ * with string value
+ * String can be maximum 31 characters long
+ * @property key The key of the metadata
+ * @property value The value of the metadata
+ * @property kind The kind of the metadata, default is "string"
+ * @property isPrivate True if the metadata is private, default is false
+ */
+interface MinaNFTStringUpdate {
+  key: string;
+  value: string;
+  kind?: string;
+  isPrivate?: boolean;
+}
+
+/**
+ * MinaNFTTextUpdate is the data for the update of the metadata to be written to the NFT state
+ * with text value
+ * Text can be of any length
+ * @property key The key of the metadata
+ * @property text The text
+ * @property isPrivate True if the text is private, default is false
+ */
+interface MinaNFTTextUpdate {
+  key: string;
+  text: string;
+  isPrivate?: boolean;
+}
+
+/**
+ * MinaNFTImageUpdate is the data for the update of the image to be written to the NFT state
+ * Image is always public and has the key "image"
+ * @property filename The filename of the image
+ * @property pinataJWT Pinata JWT token for uploading to the IPFS
+ */
+interface MinaNFTImageUpdate {
+  filename: string;
+  pinataJWT: string;
+}
+
+/**
+ * MinaNFTFieldUpdate is the data for the update of the metadata to be written to the NFT state
+ * with Field value
+ * @property key The key of the metadata
+ * @property value The value of the metadata
+ * @property kind The kind of the metadata, default is "string"
+ * @property isPrivate True if the metadata is private, default is false
+ */
+interface MinaNFTFieldUpdate {
+  key: string;
+  value: Field;
+  kind?: string;
+  isPrivate?: boolean;
 }
 
 /**
@@ -146,7 +210,7 @@ class MinaNFT extends BaseMinaNFT {
    * @param key key to update
    * @param value value to update
    */
-  public updateMetadata(key: string, value: Metadata): void {
+  public updateMetadata(key: string, value: PrivateMetadata): void {
     if (this.isMinted) {
       const update: MetadataUpdate = this.updateMetadataMap(key, value);
       this.updates.push(update);
@@ -154,33 +218,41 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
-   * updates Metadata
-   * @param key key to update
-   * @param value value to update
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTStringUpdate} update data
    */
-  public update(key: string, kind: string, value: string): void {
-    this.updateMetadata(
-      key,
-      new Metadata({
-        data: MinaNFT.stringToField(value),
-        kind: MinaNFT.stringToField(kind),
-      })
-    );
+  public update(data: MinaNFTStringUpdate): void {
+    this.updateMetadata(data.key, {
+      data: MinaNFT.stringToField(data.value),
+      kind: MinaNFT.stringToField(data.kind ?? "string"),
+      isPrivate: data.isPrivate ?? false,
+    } as PrivateMetadata);
   }
 
   /**
-   * updates Metadata
-   * @param key key to update
-   * @param value value to update
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTTextUpdate} update data
    */
-  public updateField(key: string, kind: string, value: Field): void {
-    this.updateMetadata(
-      key,
-      new Metadata({
-        data: value,
-        kind: MinaNFT.stringToField(kind),
-      })
-    );
+  public updateText(data: MinaNFTTextUpdate): void {
+    const text = new TextData(data.text);
+    this.updateMetadata(data.key, {
+      data: text.root,
+      kind: MinaNFT.stringToField("text"),
+      isPrivate: data.isPrivate ?? false,
+      linkedObject: text,
+    } as PrivateMetadata);
+  }
+
+  /**
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTFieldUpdate} update data
+   */
+  public updateField(data: MinaNFTFieldUpdate): void {
+    this.updateMetadata(data.key, {
+      data: data.value,
+      kind: MinaNFT.stringToField(data.kind ?? "string"),
+      isPrivate: data.isPrivate ?? false,
+    } as PrivateMetadata);
   }
 
   /**

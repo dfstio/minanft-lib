@@ -17,9 +17,9 @@ import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 
 // 'local' or 'berkeley' or 'mainnet'
-//const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "local";
 //const blockchainInstance: blockchain = 'berkeley';
-const blockchainInstance: blockchain = "testworld2";
+//const blockchainInstance: blockchain = "testworld2";
 
 const DEPLOYERS_NUMBER = 3;
 const ITERATIONS_NUMBER = 5;
@@ -75,9 +75,8 @@ describe(`MinaNFT contract`, () => {
     //console.log(`Minting...`);
     for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
       nft.push(new MinaNFT(`@test`));
-      nft[i].update(`description`, `string`, `my nft @test`);
-      nft[i].update(`image`, `string`, `ipfs:Qm...`);
-      nft[i].update(`twitter`, `string`, `@builder`);
+      nft[i].update({ key: `description`, value: `my nft @test` });
+      nft[i].update({ key: `twitter`, value: `@builder` });
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
 
