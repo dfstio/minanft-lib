@@ -34,10 +34,7 @@ class MinaNFTContract extends SmartContract {
   @state(UInt64) version = State<UInt64>();
 
   /**
-   * @event mint NFT minted
-   * @event update NFT metadata updated
-   * @event transfer NFT transferred
-   * @event approveEscrow NFT escrow approved
+   * @event
    */
   events = {
     mint: Field,
