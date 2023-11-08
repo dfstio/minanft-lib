@@ -23,7 +23,7 @@ import { EscrowTransfer, EscrowApproval } from "./escrow";
  * @property storage The storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
  * @property owner The owner of the NFT - Poseidon hash of owner's public key
  * @property escrow The escrow of the NFT - Poseidon hash of three escrow's public keys
- * @property version The version of the NFT, increases by one with the chaing of the metadata or owner
+ * @property version The version of the NFT, increases by one with the changing of the metadata or the owner
  */
 class MinaNFTContract extends SmartContract {
   @state(Field) name = State<Field>();
@@ -39,7 +39,6 @@ class MinaNFTContract extends SmartContract {
    * @event transfer NFT transferred
    * @event approveEscrow NFT escrow approved
    */
-
   events = {
     mint: Field,
     update: Update,
