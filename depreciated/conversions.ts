@@ -1,4 +1,5 @@
-export { stringToFields, stringFromFields, bytesToFields };
+// Depreciated with o1js 0.14.1 fixes
+//export { stringToFields, stringFromFields, bytesToFields };
 import { Field } from "o1js";
 
 /**

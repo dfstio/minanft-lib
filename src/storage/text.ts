@@ -1,6 +1,6 @@
 export { TextData };
 import { MerkleTree, Field } from "o1js";
-import { BaseMinaNFTObject } from "../baseminanft";
+import { BaseMinaNFTObject } from "../baseminanftobject";
 
 class TextData extends BaseMinaNFTObject {
   height: number;
@@ -8,7 +8,7 @@ class TextData extends BaseMinaNFTObject {
   text: string;
 
   constructor(text: string) {
-    super();
+    super("text");
     this.text = text;
     this.size = text.length;
     this.height = Math.ceil(Math.log2(this.size + 2)) + 1;
@@ -22,4 +22,14 @@ class TextData extends BaseMinaNFTObject {
     }
     this.root = tree.getRoot();
   }
+
+  public toJSON(): object {
+    return {
+      type: this.type,
+      MerkleTreeHeight: this.height,
+      size: this.size,
+      text: this.text,
+    };
+  }
+  public fromJSON(json: object): void {}
 }

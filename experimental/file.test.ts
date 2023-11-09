@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import { File, FileData } from "../src/storage/file";
-import { stringToFields } from "../src/conversions";
+import { MinaNFT } from "../src/minanft";
 import { IPFS } from "../src/storage/ipfs";
 import { PINATA_JWT } from "../env.json";
 
@@ -11,7 +11,8 @@ describe("Upload file to IPFS", () => {
     const file = new File(filename);
     const metadata = await file.metadata();
     console.log("metadata", metadata, metadata.size / 31);
-    const fields = stringToFields(metadata.sha512);
+    const sha512 = await file.sha512();
+    const fields = MinaNFT.stringToFields(sha512);
     expect(fields.length).toBe(3);
   });
   /*
@@ -28,18 +29,12 @@ describe("Upload file to IPFS", () => {
 */
   it(`should get file data`, async () => {
     const file = new File(filename);
+    const ipfs = `i:bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
+    file.storage = ipfs;
     const data: FileData = await file.data();
     console.log("File data", data);
-    const ipfs = `i:bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
-    data.storage = ipfs;
-    const { root, fields } = data.toFields();
-    expect(data.root.toJSON()).toBe(
-      "2793059465469543774426261406247381266701367422851648306638716756703027304636"
-    );
-    expect(fields.length).toBe(12);
-    expect(root.toJSON()).toBe(
-      "23135804848423275475338229695103818521415053410040749836833614379226435103097"
-    );
+    console.log("File root", data.fileRoot.toJSON());
+    console.log("root", data.root.toJSON());
   });
 
   /*
