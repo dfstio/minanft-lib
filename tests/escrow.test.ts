@@ -25,6 +25,7 @@ import {
 
 // 'local' or 'berkeley' or 'mainnet'
 const blockchainInstance: blockchain = "local";
+//const blockchainInstance: blockchain = "testworld2";
 //const blockchainInstance: blockchain = 'berkeley';
 
 class Key extends SmartContract {
@@ -135,9 +136,8 @@ describe(`MinaNFT contract`, () => {
   it(`should mint NFT`, async () => {
     expect(sellerPrivateKey).toBeDefined();
     if (sellerPrivateKey === undefined) return;
-    nft.update(`description`, `string`, `my nft @test`);
-    nft.update(`image`, `string`, `ipfs:Qm...`);
-    nft.update(`twitter`, `string`, `@builder`);
+    nft.update({ key: `description`, value: `my nft @test` });
+    nft.update({ key: `twitter`, value: `@builder` });
     const sellerHash = Poseidon.hash(sellerPublicKey!.toFields());
 
     mintTx = await nft.mint(sellerPrivateKey, sellerHash, escrowHash);
@@ -230,18 +230,18 @@ describe(`MinaNFT contract`, () => {
         buyer: PublicKey
   )
     */
-    expect(nft.zkAppPublicKey).toBeDefined();
+    expect(nft.address).toBeDefined();
     expect(sellerDeposited).toBeDefined();
     if (sellerDeposited === undefined) return;
     expect(buyerDeposited).toBeDefined();
     if (buyerDeposited === undefined) return;
-    if (nft.zkAppPublicKey === undefined) return;
+    if (nft.address === undefined) return;
     transferTx = await escrow.transfer(
       escrowData!,
       escrowPrivateKey!,
       sellerDeposited,
       buyerDeposited,
-      nft.zkAppPublicKey,
+      nft.address,
       sellerPublicKey!,
       buyerPublicKey!,
       isKYCpassed

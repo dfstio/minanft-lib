@@ -51,7 +51,7 @@ describe("Compile a contract", () => {
     const cache: Cache = Cache.FileSystem("./mycache");
     memory();
     console.time("compiled MyZkProgram");
-    await MyZkProgram.compile(); // { cache } argument is not supported
+    await MyZkProgram.compile({ cache }); // { cache } argument is not supported
     console.timeEnd("compiled MyZkProgram");
     memory();
     console.time("compiled MySmartContract");

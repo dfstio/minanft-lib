@@ -1,7 +1,8 @@
-export { BaseMinaNFT };
-import { Field, Cache, VerificationKey } from "o1js";
+export { BaseMinaNFT, PrivateMetadata };
+import { Field, Cache, VerificationKey, Encoding } from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTContract } from "./contract/nft";
+import { BaseMinaNFTObject } from "./baseminanftobject";
 import { Metadata, MetadataWitness } from "./contract/metadata";
 import {
   MinaNFTMetadataUpdate,
@@ -13,10 +14,45 @@ import { MinaNFTVerifier } from "./plugins/verifier";
 import { MinaNFTVerifierBadge } from "./plugins/badge";
 import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
-import { stringToFields, stringFromFields } from "./strings";
 
+class PrivateMetadata {
+  data: Field;
+  kind: Field;
+  isPrivate: boolean;
+  linkedObject?: BaseMinaNFTObject;
+
+  constructor(value: {
+    data: Field;
+    kind: Field;
+    isPrivate?: boolean;
+    linkedObject?: BaseMinaNFTObject;
+  }) {
+    this.data = value.data;
+    this.kind = value.kind;
+    this.isPrivate = value.isPrivate ?? false;
+    this.linkedObject = value.linkedObject;
+  }
+  public toJSON(): object {
+    const kind = MinaNFT.stringFromField(this.kind);
+    let data: string;
+    if (kind === "string") data = MinaNFT.stringFromField(this.data);
+    else data = this.data.toJSON();
+    const isPrivate: boolean | undefined =
+      this.isPrivate === true ? true : undefined;
+    return {
+      data,
+      kind,
+      isPrivate,
+      linkedObject: this.linkedObject?.toJSON(),
+    };
+  }
+}
+
+/**
+ * Base class for MinaNFT
+ */
 class BaseMinaNFT {
-  protected metadata: Map<string, Metadata>;
+  metadata: Map<string, PrivateMetadata>;
   static verificationKey: VerificationKey | undefined;
   static updaterVerificationKey: VerificationKey | undefined;
   static updateVerificationKey: string | undefined;
@@ -27,7 +63,7 @@ class BaseMinaNFT {
   static escrowVerificationKey: VerificationKey | undefined;
 
   constructor() {
-    this.metadata = new Map<string, Metadata>();
+    this.metadata = new Map<string, PrivateMetadata>();
   }
 
   /**
@@ -35,7 +71,7 @@ class BaseMinaNFT {
    * @param key key of the attribute
    * @returns value of the attribute
    */
-  public getMetadata(key: string): Metadata | undefined {
+  public getMetadata(key: string): PrivateMetadata | undefined {
     return this.metadata.get(key);
   }
 
@@ -48,14 +84,14 @@ class BaseMinaNFT {
    */
   protected updateMetadataMap(
     keyToUpdate: string,
-    newValue: Metadata
+    newValue: PrivateMetadata
   ): MetadataUpdate {
     const { root, map } = this.getMetadataRootAndMap();
     const key = MinaNFT.stringToField(keyToUpdate);
     const witness: MetadataWitness = map.getWitness(key);
     const oldValue: Metadata = map.get(key);
     this.metadata.set(keyToUpdate, newValue);
-    map.set(key, newValue);
+    map.set(key, new Metadata({ data: newValue.data, kind: newValue.kind }));
     const newRoot: Metadata = map.getRoot();
 
     return {
@@ -125,11 +161,10 @@ class BaseMinaNFT {
    * @returns string as a Field
    */
   public static stringToField(item: string): Field {
-    // Encoding.stringToFields is not working properly in o1js 0.14.0, use internal implementation
-    //const fields: Field[] = Encoding.stringToFields(item);
-    const fields: Field[] = stringToFields(item);
+    const fields: Field[] = Encoding.stringToFields(item);
+    //const fields: Field[] = stringToFields(item);
     if (fields.length === 1) {
-      if (stringFromFields(fields) === item) return fields[0];
+      if (MinaNFT.stringFromFields(fields) === item) return fields[0];
       else throw Error(`stringToField error: encoding error`);
     } else
       throw new Error(
@@ -143,10 +178,9 @@ class BaseMinaNFT {
    * @returns string as a Field[]
    */
   public static stringToFields(item: string): Field[] {
-    // Encoding.stringToFields is not working properly in o1js 0.14.0, use internal implementation
-    //const fields: Field[] = Encoding.stringToFields(item);
-    const fields: Field[] = stringToFields(item);
-    if (stringFromFields(fields) === item) return fields;
+    const fields: Field[] = Encoding.stringToFields(item);
+    //const fields: Field[] = stringToFields(item);
+    if (MinaNFT.stringFromFields(fields) === item) return fields;
     else throw Error(`stringToField error: encoding error`);
   }
 
@@ -156,8 +190,7 @@ class BaseMinaNFT {
    * @returns string
    */
   public static stringFromField(field: Field): string {
-    // Encoding.stringFromFields is not working properly in o1js 0.14.0, use internal implementation
-    return stringFromFields([field]);
+    return MinaNFT.stringFromFields([field]);
   }
 
   /**
@@ -167,27 +200,8 @@ class BaseMinaNFT {
    */
   public static stringFromFields(fields: Field[]): string {
     // Encoding.stringFromFields is not working properly in o1js 0.14.0, use internal implementation
-    return stringFromFields(fields);
-  }
-
-  /**
-   * Creates a Map from JSON
-   * @param map map to convert
-   * @returns map as JSON object
-   */
-  public static mapFromJSON(json: Object): Map<string, string> {
-    const map: Map<string, string> = new Map<string, string>();
-    Object.entries(json).forEach(([key, value]) => map.set(key, value));
-    return map;
-  }
-
-  /**
-   * Converts a Map to JSON
-   * @param map map to convert
-   * @returns map as JSON object
-   */
-  public static mapToJSON(map: Map<string, Field>): object {
-    return Object.fromEntries(map);
+    // It is working again in o1js 0.14.1
+    return Encoding.stringFromFields(fields);
   }
 
   /**

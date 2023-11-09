@@ -1,4 +1,11 @@
-export { MinaNFT, MinaNFTobject };
+export {
+  MinaNFT,
+  MinaNFTobject,
+  MinaNFTStringUpdate,
+  MinaNFTFieldUpdate,
+  MinaNFTImageUpdate,
+  MinaNFTTextUpdate,
+};
 
 import {
   Mina,
@@ -13,7 +20,7 @@ import {
   UInt64,
 } from "o1js";
 
-import { BaseMinaNFT } from "./baseminanft";
+import { BaseMinaNFT, PrivateMetadata } from "./baseminanft";
 import { MinaNFTContract } from "./contract/nft";
 import { Metadata, Update, Storage } from "./contract/metadata";
 import {
@@ -27,6 +34,9 @@ import { EscrowTransfer, EscrowApproval } from "./contract/escrow";
 
 import { RedactedMinaNFTMapStateProof } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
+import { TextData } from "./storage/text";
+import { File, FileData } from "./storage/file";
+import { IPFS } from "./storage/ipfs";
 
 import { MINAURL, ARCHIVEURL, MINAFEE } from "../src/config.json";
 
@@ -37,6 +47,62 @@ class MinaNFTobject {
   constructor() {
     this.metadata = new Map<string, string>();
   }
+}
+
+/**
+ * MinaNFTStringUpdate is the data for the update of the metadata to be written to the NFT state
+ * with string value
+ * String can be maximum 31 characters long
+ * @property key The key of the metadata
+ * @property value The value of the metadata
+ * @property kind The kind of the metadata, default is "string"
+ * @property isPrivate True if the metadata is private, default is false
+ */
+interface MinaNFTStringUpdate {
+  key: string;
+  value: string;
+  kind?: string;
+  isPrivate?: boolean;
+}
+
+/**
+ * MinaNFTTextUpdate is the data for the update of the metadata to be written to the NFT state
+ * with text value
+ * Text can be of any length
+ * @property key The key of the metadata
+ * @property text The text
+ * @property isPrivate True if the text is private, default is false
+ */
+interface MinaNFTTextUpdate {
+  key: string;
+  text: string;
+  isPrivate?: boolean;
+}
+
+/**
+ * MinaNFTImageUpdate is the data for the update of the image to be written to the NFT state
+ * Image is always public and has the key "image"
+ * @property filename The filename of the image
+ * @property pinataJWT Pinata JWT token for uploading to the IPFS
+ */
+interface MinaNFTImageUpdate {
+  filename: string;
+  pinataJWT: string;
+}
+
+/**
+ * MinaNFTFieldUpdate is the data for the update of the metadata to be written to the NFT state
+ * with Field value
+ * @property key The key of the metadata
+ * @property value The value of the metadata
+ * @property kind The kind of the metadata, default is "string"
+ * @property isPrivate True if the metadata is private, default is false
+ */
+interface MinaNFTFieldUpdate {
+  key: string;
+  value: Field;
+  kind?: string;
+  isPrivate?: boolean;
 }
 
 /**
@@ -117,6 +183,50 @@ class MinaNFT extends BaseMinaNFT {
     this.version = zkApp.version.get();
     //TODO: load metadata from IPFS/Arweave
   }
+
+  /**
+   * Creates a Map from JSON
+   * @param map map to convert
+   * @returns map as JSON object
+   */
+  public static mapFromJSON(json: object): Map<string, string> {
+    const map: Map<string, string> = new Map<string, string>();
+    Object.entries(json).forEach(([key, value]) => map.set(key, value));
+    return map;
+  }
+
+  /**
+   * Converts a Map to JSON
+   * @param map map to convert
+   * @returns map as JSON object
+   */
+  public toJSON(): object {
+    let description: string | undefined = undefined;
+    const descriptionObject = this.getMetadata("description");
+    if (
+      descriptionObject !== undefined &&
+      descriptionObject.linkedObject !== undefined &&
+      descriptionObject.linkedObject instanceof TextData
+    )
+      description = descriptionObject.linkedObject.text;
+    let image: string | undefined = undefined;
+    const imageObject = this.getMetadata("image");
+    if (
+      imageObject !== undefined &&
+      imageObject.linkedObject !== undefined &&
+      imageObject.linkedObject instanceof FileData
+    )
+      image =
+        "https://ipfs.io/ipfs/" + imageObject.linkedObject.storage.slice(2);
+
+    return {
+      name: this.name,
+      description,
+      image,
+      metadata: Object.fromEntries(this.metadata),
+    };
+  }
+
   /**
    * Initialize Mina o1js library
    * @param local Choose Mina network to use. Default is local network
@@ -146,7 +256,7 @@ class MinaNFT extends BaseMinaNFT {
    * @param key key to update
    * @param value value to update
    */
-  public updateMetadata(key: string, value: Metadata): void {
+  public updateMetadata(key: string, value: PrivateMetadata): void {
     if (this.isMinted) {
       const update: MetadataUpdate = this.updateMetadataMap(key, value);
       this.updates.push(update);
@@ -154,33 +264,67 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
-   * updates Metadata
-   * @param key key to update
-   * @param value value to update
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTStringUpdate} update data
    */
-  public update(key: string, kind: string, value: string): void {
+  public update(data: MinaNFTStringUpdate): void {
     this.updateMetadata(
-      key,
-      new Metadata({
-        data: MinaNFT.stringToField(value),
-        kind: MinaNFT.stringToField(kind),
+      data.key,
+      new PrivateMetadata({
+        data: MinaNFT.stringToField(data.value),
+        kind: MinaNFT.stringToField(data.kind ?? "string"),
+        isPrivate: data.isPrivate ?? false,
       })
     );
   }
 
   /**
-   * updates Metadata
-   * @param key key to update
-   * @param value value to update
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTTextUpdate} update data
    */
-  public updateField(key: string, kind: string, value: Field): void {
+  public updateText(data: MinaNFTTextUpdate): void {
+    const text = new TextData(data.text);
     this.updateMetadata(
-      key,
-      new Metadata({
-        data: value,
-        kind: MinaNFT.stringToField(kind),
+      data.key,
+      new PrivateMetadata({
+        data: text.root,
+        kind: MinaNFT.stringToField("text"),
+        isPrivate: data.isPrivate ?? false,
+        linkedObject: text,
       })
     );
+  }
+
+  /**
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTImageUpdate} update data
+   */
+  public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
+    const file = new File(data.filename);
+    await file.pin(data.pinataJWT);
+    const fileData: FileData = await file.data();
+
+    this.updateMetadata(
+      "image",
+      new PrivateMetadata({
+        data: fileData.root,
+        kind: MinaNFT.stringToField("image"),
+        isPrivate: false,
+        linkedObject: fileData,
+      })
+    );
+  }
+
+  /**
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTFieldUpdate} update data
+   */
+  public updateField(data: MinaNFTFieldUpdate): void {
+    this.updateMetadata(data.key, {
+      data: data.value,
+      kind: MinaNFT.stringToField(data.kind ?? "string"),
+      isPrivate: data.isPrivate ?? false,
+    } as PrivateMetadata);
   }
 
   /**
@@ -250,7 +394,8 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async commit(
     deployer: PrivateKey,
-    ownerPrivateKey: PrivateKey
+    ownerPrivateKey: PrivateKey,
+    pinataJWT: string
   ): Promise<Mina.TransactionId | undefined> {
     if (this.address === undefined) {
       console.error("NFT contract is not deployed");
@@ -318,9 +463,9 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("Proof verification error");
     }
 
-    const storage = await this.pinToStorage();
+    const storage = await this.pinToStorage(pinataJWT);
     if (storage === undefined) {
-      throw new Error("Storage error");
+      throw new Error("IPFS Storage error");
     }
     const storageHash: Storage = storage.hash;
     if (false === (await this.checkState())) {
@@ -427,17 +572,18 @@ class MinaNFT extends BaseMinaNFT {
     return proof;
   }
 */
-  private async pinToStorage(): Promise<
-    { hash: Storage; url: string } | undefined
-  > {
-    //console.log("Pinning to IPFS...");
-    // TODO: pin to IPFS
-    const ipfs = `i:bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi`;
-    const ipfs_fields = MinaNFT.stringToFields(ipfs);
+  private async pinToStorage(
+    pinataJWT: string
+  ): Promise<{ hash: Storage; url: string } | undefined> {
+    console.log("Pinning to IPFS...");
+    const ipfs = new IPFS(pinataJWT);
+    const hash = await ipfs.pinJSON(this.toJSON());
+    if (hash === undefined) return undefined;
+    const ipfs_fields = MinaNFT.stringToFields("i:" + hash);
     if (ipfs_fields.length !== 2) throw new Error("IPFS hash encoding error");
     return {
       hash: new Storage({ hashString: ipfs_fields as [Field, Field] }),
-      url: ipfs,
+      url: "https://ipfs.io/ipfs/" + hash,
     };
   }
 
@@ -547,6 +693,7 @@ class MinaNFT extends BaseMinaNFT {
   public async mint(
     deployer: PrivateKey,
     owner: Field,
+    pinataJWT: string,
     escrow: Field = Field(0)
   ): Promise<Mina.TransactionId | undefined> {
     await MinaNFT.compile();
@@ -557,12 +704,13 @@ class MinaNFT extends BaseMinaNFT {
     const zkApp = new MinaNFTContract(this.address);
 
     const { root } = this.getMetadataRootAndMap();
-    const storage = await this.pinToStorage();
+    const storage = await this.pinToStorage(pinataJWT);
     if (storage === undefined) {
-      console.error("Storage error");
+      console.error("IPFS Storage error");
       return undefined;
     }
     const storageHash: Storage = storage.hash;
+    const url = "https://minanft.io/" + this.name;
 
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.address });
@@ -579,7 +727,7 @@ class MinaNFT extends BaseMinaNFT {
         zkApp.version.set(UInt64.from(1));
         zkApp.escrow.set(escrow);
         zkApp.account.tokenSymbol.set("NFT");
-        zkApp.account.zkappUri.set(storage.url);
+        zkApp.account.zkappUri.set(url);
       }
     );
     await transaction.prove();
