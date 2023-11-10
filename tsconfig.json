@@ -23,5 +23,16 @@
   },
   "files": ["src/config.json"],
   "include": ["src/**/*"],
-  "exclude": ["dist/**", "tests/**", "node_modules", "deprecated/**"]
+  "exclude": [
+    "dist/**", 
+    "tests/**", 
+    "docs/**", 
+    "experimental/**", 
+    "mycache/**", 
+    "nftcache/**", 
+    "experimental/**", 
+    "node_modules", 
+    "deprecated/**",
+    "images/**"
+  ]
 }

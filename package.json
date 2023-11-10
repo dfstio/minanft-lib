@@ -13,13 +13,14 @@
     "web3",
     "zero knowledge"
   ],
-  "version": "1.1.0",
+  "version": "1.1.1",
   "repository": "git@dfstio.github.com:dfstio/minanft-lib.git",
   "main": "src/index.ts",
   "author": "dfst.io",
   "license": "Apache-2.0",
   "scripts": {
     "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.js.json",
+    "compilets": "rm -rf dist/lib && tsc",
     "test": "jest",
     "deployers": "ts-node experimental/deployers.ts",
     "testworld2": "ts-node experimental/testworld2.ts",
@@ -27,7 +28,7 @@
     "githubcleartoken": "git config --global --unset credential.helper",
     "upgradeinteractive": "yarn upgrade-interactive",
     "login": "yarn npm login",
-    "publish": "yarn npm publish --access public",
+    "publish": "cd dist && yarn npm publish --access public",
     "docs": "yarn typedoc",
     "vscode": "yarn dlx @yarnpkg/sdks vscode"
   },
