@@ -1,99 +1,154 @@
 # Mina NFT nodejs library for TypeScript and Javascript
 
-This library is designed for the easy integration for third-party developers and 
+This library is designed for the easy integration for third-party developers and
 corporations with MinaNFT, allowing to start minting NFTs, adding public and private keys
 and verifying data off-chain and on-chain within one hour with easy and intiutive API
 
 ## Installation
-
-	yarn add minanft
-	
-## Example:
-	yarn test
-	/**
-	publicJson {
-		publicMapRoot: '22731122946631793544306773678309960639073656601863129978322145324846701682624',
-		publicData: {
-			name: '@test',
-			description: 'my nft @test',
-			image: 'https/ipfs.io/ipfs/Qm...'
-		}
-	}
-	privateJson {
-		publicMapRoot: '22731122946631793544306773678309960639073656601863129978322145324846701682624',
-		privateMapRoot: '22731122946631793544306773678309960639073656601863129978322145324846701682624',
-		secret: '27316507744649576315264793589997090976505003005329138038060744248453624828573',
-		salt: '28415388566484028622541902066833196068283745836710945290933054341632001313105',
-		publicData: {
-			name: '@test',
-			description: 'my nft @test',
-			image: 'https/ipfs.io/ipfs/Qm...'
-		},
-		privateData: { name: 'cohort2' }
-	}
-	**/
-	
-## Usage:
-```	
-	import { MinaNFT } from "minanft"; // const { MinaNFT } = require("minanft") for JavaScript
-	import fs from "fs/promises";
-	
-	await MinaNFT.minaInit(); // init Mina network connection
-	
-	//Create NFT from image link
-	const nft1 = MinaNFT.fromImageUrl("@mynftname1", "https://.../myimage.jpg");
-	
-	//Create NFT from text description of image using AI models ChatGPT and DALL-E
-	const nft2 = MinaNFT.fromImageDescription("@mynftname2", "Description of the image");
-	
-	//Create NFT from voice description of image using AI models ChatGPT and DALL-E
-	const nft3 = MinaNFT.fromVoiceUrl("@mynftname2", "https://.../voicemessage.ogg");
-	
-	// Add public visible and verifiable on-chain keys
-	await nft1.addPublicKeys({country: "France", city: "Paris"});
-	
-	// Add private invisible, but verifiable on-chain keys
-	await nft1.addPrivateKeys({author: "John Blockchain", date: "16-Aug-2023"});
-	
-	// Generate proof
-	const proof = await nft1.getPrivateProof("date");
-	
-	// verify proof off-chain
-	const isValid = await nft1.verifyPrivateProof(proof, "16-Aug-2023");
-	
-	// Get jwtToken at https://t.me/minanft_bot?start=auth
-	// and then deploy NFT to MINA blockchain
-	await nft1.deploy(jwtToken);
-	
-	await nft1.wait(); // Wait for deployment, can be up to 15 minutes
-	
-	console.log("See your new Mina NFT at minnaft.io\@mynftname1");
-	
-	// get all private data and keys
-	const privateData = await nft1.getPrivateJson(); 
-	
-	// Write private keys to local disk
-	await fs.writeFile("@nynftname1-private-v1.json", JSON.stringify(privateData));
-	
-	const tx = await nft1.getVerifyPrivateProofTransaction(proof, "16-Aug-2023");
-	// then send tx to Mina Network to get verification on-chain
-	
-	// Restore NFT from JSON 
-	const nft = MinaNFT.formPrivateJson(privateData);
-
+```
+yarn add minanft
 ```
 
+## Documentation
+
+https://lib.minanft.io
+
 ## Website
+
 https://minanft.io
 
+## Library on NPM
+
+https://www.npmjs.com/package/minanft
+
 ## Example
+
 https://github.com/dfstio/minanft-lib-example
 
-## Faucet 
+## Faucet
+
 https://faucet.minaprotocol.com
 
 
+## Example:
 
+```typescript
+const nft = new MinaNFT(`@test`);
+nft.updateText({
+  key: `description`,
+  text: "This is my long description of the NFT. Can be of any length, supports markdown.",
+});
+nft.update({ key: `twitter`, value: `@builder` });
+nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
+await nft.updateImage({
+  filename: "./images/navigator.jpg",
+  pinataJWT,
+});
+const map = new MapData();
+map.update({ key: `level2-1`, value: `value21` });
+map.update({ key: `level2-2`, value: `value22` });
+map.updateText({
+  key: `level2-3`,
+  text: `This is text on level 2. Can be very long`,
+});
+await map.updateFile({
+  key: "woman",
+  filename: "./images/woman.png",
+  pinataJWT,
+});
+const mapLevel3 = new MapData();
+mapLevel3.update({ key: `level3-1`, value: `value31` });
+mapLevel3.update({ key: `level3-2`, value: `value32`, isPrivate: true });
+mapLevel3.update({ key: `level3-3`, value: `value33` });
+map.updateMap({ key: `level2-4`, map: mapLevel3 });
+nft.updateMap({ key: `level 2 and 3 data`, map });
 
+console.log(`metadata json:`, JSON.stringify(nft.toJSON(), null, 2));
+const tx = await nft.mint(deployer, owner, pinataJWT);
+```
 
+console.log() output:
+```
+{
+  "name": "@test",
+  "description": "This is my long description of the NFT. Can be of any length, supports markdown.",
+  "image": "https://ipfs.io/ipfs/QmaRZUgm2GYCCjsDCa5eJk4rjRogTgY6dCyXRQmnhvFmjj",
+  "external_url": "https://minanft.io/@test",
+  "version": "1",
+  "properties": {
+    "description": {
+      "data": "18517207261845548419976623877380749961354033201106730554029419367822129049904",
+      "kind": "text",
+      "linkedObject": {
+        "type": "text",
+        "MerkleTreeHeight": 8,
+        "size": 80,
+        "text": "This is my long description of the NFT. Can be of any length, supports markdown."
+      }
+    },
+    "twitter": { "data": "@builder", "kind": "string" },
+    "image": {
+      "data": "10933230901147616890011856723104406636132207767661104022200152886713008012214",
+      "kind": "image",
+      "linkedObject": {
+        "type": "file",
+        "fileMerkleTreeRoot": "12270219107974990626194443794620557463255219768178943904127152237423102258649",
+        "MerkleTreeHeight": 15,
+        "size": 447504,
+        "mimeType": "image/jpeg",
+        "SHA3_512": "Xi6MogV1W1lxB+kS/lx4QlZoNIbMLjK/x0Re8k5Ldmd/1oLdFysw45dULcNVpWSKaJ7HGiJb5gV8cC63mHrCCw==",
+        "filename": "navigator.jpg",
+        "storage": "i:QmaRZUgm2GYCCjsDCa5eJk4rjRogTgY6dCyXRQmnhvFmjj"
+      }
+    },
+    "level 2 and 3 data": {
+      "data": "11885314413346415507686033256426043319433077311130413960112944947713555004108",
+      "kind": "map",
+      "linkedObject": {
+        "type": "map",
+        "properties": {
+          "level2-1": { "data": "value21", "kind": "string" },
+          "level2-2": { "data": "value22", "kind": "string" },
+          "level2-3": {
+            "data": "17918742563826681862408641965129071963958922660597457205933767099995396120858",
+            "kind": "text",
+            "linkedObject": {
+              "type": "text",
+              "MerkleTreeHeight": 7,
+              "size": 41,
+              "text": "This is text on level 2. Can be very long"
+            }
+          },
+          "woman": {
+            "data": "19568479839056312372186989986426075833813097455848029420463865331716879702558",
+            "kind": "image",
+            "linkedObject": {
+              "type": "file",
+              "fileMerkleTreeRoot": "4911692193899654945543701504504186590310741443090166466526044610874096406940",
+              "MerkleTreeHeight": 15,
+              "size": 265511,
+              "mimeType": "image/png",
+              "SHA3_512": "LvUjVX9PlqxWsfHgIf3lvpVFy7o5hAcHVAFueQt+RP4hyr6h2f6XyeinP5jwgKhcogOhEyxHchdBdnvbdeDL9A==",
+              "filename": "woman.png",
+              "storage": "i:Qme3jDkLmEKHDkkMpp1H15zzWhQMmqBizVBcRj2UmWe5Lj"
+            }
+          },
+          "level2-4": {
+            "data": "8285588111605202531040894738541072590635328681101967631265604553962773840451",
+            "kind": "map",
+            "linkedObject": {
+              "type": "map",
+              "properties": {
+                "level3-1": { "data": "value31", "kind": "string" },
+                "level3-3": { "data": "value33", "kind": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+```
 
