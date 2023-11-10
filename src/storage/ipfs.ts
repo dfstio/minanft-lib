@@ -11,7 +11,8 @@ class IPFS {
 
   public async pinJSON(params: any): Promise<string | undefined> {
     try {
-      const data = JSON.stringify(params);
+      // replacer will remove all private metadata from the object
+      const data = JSON.stringify(params, replacer, 2);
 
       const config = {
         headers: {
@@ -22,7 +23,7 @@ class IPFS {
 
       if (this.auth === "Bearer ")
         //for running tests
-        return `QmcGhX8buPnsCTPYKk9YJCzTQtb7gG1MB21VwTc81mkzx5`;
+        return `QmTosaezLecDB7bAoUoXcrJzeBavHNZyPbPff1QHWw8xus`;
 
       const res = await axios.post(
         "https://api.pinata.cloud/pinning/pinJSONToIPFS",
@@ -158,4 +159,13 @@ class IPFS {
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function replacer(key: any, value: any) {
+  if (value?.isPrivate === true) {
+    //console.log(`key:`, key, `value:`, value);
+    return undefined;
+  }
+  // Modify the value or return undefined to exclude the property
+  return value;
 }

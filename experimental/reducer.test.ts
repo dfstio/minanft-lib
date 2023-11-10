@@ -19,7 +19,7 @@ import {
   MerkleMap,
   Bool,
 } from "o1js";
-import { MINAURL, ARCHIVEURL, ARCHIVEURL2 } from "../src/config.json";
+import { MINAURL, ARCHIVEURL } from "../src/config.json";
 import { MinaNFT } from "../src/minanft";
 import { DEPLOYER } from "../env.json";
 const transactionFee = 150_000_000;
@@ -115,7 +115,7 @@ beforeAll(async () => {
   } else {
     const network = Mina.Network({
       mina: MINAURL,
-      archive: "https://archive.berkeley.minaexplorer.com",
+      archive: ARCHIVEURL,
     });
     /*
     const Network = Mina.Network({
