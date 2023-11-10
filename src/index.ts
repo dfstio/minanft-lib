@@ -49,3 +49,4 @@ export { IPFS } from "./storage/ipfs";
 export { File, FileData } from "./storage/file";
 export { MapData, MinaNFTMapUpdate } from "./storage/map";
 export { TextData } from "./storage/text";
+export { blockchain, initBlockchain } from "./mina";
