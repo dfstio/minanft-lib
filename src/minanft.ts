@@ -1,11 +1,4 @@
-export {
-  MinaNFT,
-  MinaNFTobject,
-  MinaNFTStringUpdate,
-  MinaNFTFieldUpdate,
-  MinaNFTImageUpdate,
-  MinaNFTTextUpdate,
-};
+export { MinaNFT };
 
 import {
   Mina,
@@ -36,74 +29,17 @@ import { RedactedMinaNFTMapStateProof } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 import { TextData } from "./storage/text";
 import { File, FileData } from "./storage/file";
+import { MapData, MinaNFTMapUpdate } from "./storage/map";
 import { IPFS } from "./storage/ipfs";
+import {
+  MinaNFTStringUpdate,
+  MinaNFTFieldUpdate,
+  MinaNFTImageUpdate,
+  MinaNFTTextUpdate,
+  MinaNFTFileUpdate,
+} from "./update";
 
 import { MINAURL, ARCHIVEURL, MINAFEE } from "../src/config.json";
-
-class MinaNFTobject {
-  metadata: Map<string, string>; // metadata of file
-  root?: Field; // root of Merkle tree with file data
-
-  constructor() {
-    this.metadata = new Map<string, string>();
-  }
-}
-
-/**
- * MinaNFTStringUpdate is the data for the update of the metadata to be written to the NFT state
- * with string value
- * String can be maximum 31 characters long
- * @property key The key of the metadata
- * @property value The value of the metadata
- * @property kind The kind of the metadata, default is "string"
- * @property isPrivate True if the metadata is private, default is false
- */
-interface MinaNFTStringUpdate {
-  key: string;
-  value: string;
-  kind?: string;
-  isPrivate?: boolean;
-}
-
-/**
- * MinaNFTTextUpdate is the data for the update of the metadata to be written to the NFT state
- * with text value
- * Text can be of any length
- * @property key The key of the metadata
- * @property text The text
- * @property isPrivate True if the text is private, default is false
- */
-interface MinaNFTTextUpdate {
-  key: string;
-  text: string;
-  isPrivate?: boolean;
-}
-
-/**
- * MinaNFTImageUpdate is the data for the update of the image to be written to the NFT state
- * Image is always public and has the key "image"
- * @property filename The filename of the image
- * @property pinataJWT Pinata JWT token for uploading to the IPFS
- */
-interface MinaNFTImageUpdate {
-  filename: string;
-  pinataJWT: string;
-}
-
-/**
- * MinaNFTFieldUpdate is the data for the update of the metadata to be written to the NFT state
- * with Field value
- * @property key The key of the metadata
- * @property value The value of the metadata
- * @property kind The kind of the metadata, default is "string"
- * @property isPrivate True if the metadata is private, default is false
- */
-interface MinaNFTFieldUpdate {
-  key: string;
-  value: Field;
-  kind?: string;
-  isPrivate?: boolean;
-}
 
 /**
  * MinaNFT is the class for the NFT, wrapper around the MinaNFTContract
@@ -223,7 +159,9 @@ class MinaNFT extends BaseMinaNFT {
       name: this.name,
       description,
       image,
-      metadata: Object.fromEntries(this.metadata),
+      external_url: "https://minanft.io/" + this.name,
+      version: this.version.add(UInt64.from(1)).toJSON(),
+      properties: Object.fromEntries(this.metadata),
     };
   }
 
@@ -297,6 +235,23 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * updates PrivateMetadata
+   * @param data {@link MinaNFTTextUpdate} update data
+   */
+  public updateMap(data: MinaNFTMapUpdate): void {
+    data.map.setRoot();
+    this.updateMetadata(
+      data.key,
+      new PrivateMetadata({
+        data: data.map.root,
+        kind: MinaNFT.stringToField("map"),
+        isPrivate: data.isPrivate ?? false,
+        linkedObject: data.map,
+      })
+    );
+  }
+
+  /**
+   * updates PrivateMetadata
    * @param data {@link MinaNFTImageUpdate} update data
    */
   public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
@@ -310,6 +265,26 @@ class MinaNFT extends BaseMinaNFT {
         data: fileData.root,
         kind: MinaNFT.stringToField("image"),
         isPrivate: false,
+        linkedObject: fileData,
+      })
+    );
+  }
+
+  /**
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTFileUpdate} update data
+   */
+  public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
+    const file = new File(data.filename);
+    await file.pin(data.pinataJWT);
+    const fileData: FileData = await file.data();
+
+    this.updateMetadata(
+      data.key,
+      new PrivateMetadata({
+        data: fileData.root,
+        kind: MinaNFT.stringToField("file"),
+        isPrivate: data.isPrivate ?? false,
         linkedObject: fileData,
       })
     );
@@ -657,7 +632,7 @@ class MinaNFT extends BaseMinaNFT {
         try {
           //console.log("Waiting for transaction...");
           console.time("Transaction time");
-          await tx.wait({ maxAttempts: 120, interval: 60000 }); // wait 2 hours max
+          await tx.wait({ maxAttempts: 120, interval: 30 * 1000 }); //one hour
           console.timeEnd("Transaction time");
         } catch (error) {
           console.log("Error waiting for transaction", error);
@@ -674,7 +649,7 @@ class MinaNFT extends BaseMinaNFT {
       try {
         //console.log("Waiting for transaction...");
         console.time("Transaction wait time");
-        await tx.wait({ maxAttempts: 120, interval: 60000 }); // wait 2 hours max
+        await tx.wait({ maxAttempts: 120, interval: 30 * 1000 }); //one hour
         console.timeEnd("Transaction wait time");
         return true;
       } catch (error) {

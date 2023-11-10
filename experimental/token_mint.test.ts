@@ -11,6 +11,7 @@ import {
   UInt64,
   state,
   State,
+  checkZkappTransaction,
 } from "o1js";
 
 // Private key of the deployer:
@@ -104,12 +105,27 @@ describe("Mint tokens", () => {
       `deploying the Token contract to an address ${zkAppTokenPublicKey.toBase58()}
 deploying the Counter contract to an address ${zkAppCounterPublicKey.toBase58()}
 using the deployer with public key ${sender.toBase58()}:
-`,
-      transaction.toPretty()
+`
+      //transaction.toPretty()
     );
     if (!useLocalBlockchain) {
+      console.log(
+        `Waiting for the transaction to be included in a block...`,
+        tx
+      );
+      const hash = tx.hash();
+      if (hash === undefined) {
+        throw new Error("Transaction hash is undefined");
+        return;
+      }
+      let status = await checkZkappTransaction(hash);
+      console.log(status);
+      console.log(`Transaction hash: ${hash}`);
       await tx.wait({ maxAttempts: 120, interval: 60000 });
+      status = await checkZkappTransaction(hash);
+      console.log(status);
     }
+
     token = zkAppTokenPublicKey;
     tokenPrivateKey = zkAppTokenPrivateKey;
     counter = zkAppCounterPublicKey;
