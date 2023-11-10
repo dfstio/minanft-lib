@@ -1,5 +1,14 @@
 export { BaseMinaNFT, PrivateMetadata };
-import { Field, Cache, VerificationKey, Encoding } from "o1js";
+import {
+  Field,
+  Cache,
+  VerificationKey,
+  Encoding,
+  state,
+  State,
+  SmartContract,
+  method,
+} from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTContract } from "./contract/nft";
 import { BaseMinaNFTObject } from "./baseminanftobject";
@@ -15,6 +24,16 @@ import { MinaNFTVerifierBadge } from "./plugins/badge";
 import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
 import { PrivateMetadata } from "./privatemetadata";
+
+// Dummy class to ovecome o1js compile bug
+class Key extends SmartContract {
+  @state(Field) key = State<Field>();
+
+  @method mint(key: Field) {
+    this.key.assertEquals(Field(0));
+    this.key.set(key);
+  }
+}
 
 /**
  * Base class for MinaNFT
@@ -179,6 +198,7 @@ class BaseMinaNFT {
   public static async compile(): Promise<VerificationKey> {
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
+      await Key.compile();
       const { verificationKey } = await MinaNFTMetadataUpdate.compile();
       console.timeEnd("MinaNFTMetadataUpdate compiled");
       MinaNFT.updateVerificationKey = verificationKey;

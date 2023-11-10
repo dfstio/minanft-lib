@@ -29,7 +29,7 @@ import { RedactedMinaNFTMapStateProof } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 import { TextData } from "./storage/text";
 import { File, FileData } from "./storage/file";
-import { MapData, MinaNFTMapUpdate } from "./storage/map";
+import { MinaNFTMapUpdate } from "./storage/map";
 import { IPFS } from "./storage/ipfs";
 import {
   MinaNFTStringUpdate,
@@ -38,7 +38,7 @@ import {
   MinaNFTTextUpdate,
   MinaNFTFileUpdate,
 } from "./update";
-
+import { blockchain, initBlockchain } from "./mina";
 import { MINAURL, ARCHIVEURL, MINAFEE } from "../src/config.json";
 
 /**
@@ -169,15 +169,8 @@ class MinaNFT extends BaseMinaNFT {
    * Initialize Mina o1js library
    * @param local Choose Mina network to use. Default is local network
    */
-  public static minaInit(local: boolean = true): void {
-    const berkeley = Mina.Network({
-      mina: MINAURL,
-      archive: ARCHIVEURL,
-    });
-    const Network = local
-      ? Mina.LocalBlockchain({ proofsEnabled: true })
-      : berkeley;
-    Mina.setActiveInstance(Network);
+  public static minaInit(chain: blockchain): void {
+    initBlockchain(chain);
   }
 
   /**
