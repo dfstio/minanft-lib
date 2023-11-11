@@ -34,6 +34,7 @@ import { MinaNFTContract } from "./contract/nft";
 interface MinaNFTBadgeConstructor {
   name: string;
   owner: string;
+  tokenSymbol: string;
   verifiedKey: string;
   verifiedKind: string;
   oracle: PublicKey;
@@ -43,6 +44,7 @@ interface MinaNFTBadgeConstructor {
 class MinaNFTBadge {
   name: string;
   owner: string;
+  tokenSymbol: string;
   verifiedKey: string;
   verifiedKind: string;
   oracle: PublicKey;
@@ -54,12 +56,27 @@ class MinaNFTBadge {
    * @param zkAppPublicKey Public key of the deployed NFT zkApp
    */
   constructor(args: MinaNFTBadgeConstructor) {
+    if (args.name.length > 31)
+      throw new Error("Badge name too long, must be maximum 31 character");
     this.name = args.name;
+    if (args.owner.length > 31)
+      throw new Error("Badge owner too long, must be maximum 31 character");
     this.owner = args.owner;
+    if (args.verifiedKey.length > 31)
+      throw new Error(
+        "Badge verifiedKey too long, must be maximum 31 character"
+      );
     this.verifiedKey = args.verifiedKey;
+    if (args.verifiedKind.length > 31)
+      throw new Error(
+        "Badge verifiedKind too long, must be maximum 31 character"
+      );
     this.verifiedKind = args.verifiedKind;
     this.oracle = args.oracle;
     this.address = args.address;
+    if (args.tokenSymbol.length > 6)
+      throw new Error("Token symbol too long, must be maximum 6 characters");
+    this.tokenSymbol = args.tokenSymbol;
   }
 
   public static async fromPublicKey(
@@ -73,6 +90,7 @@ class MinaNFTBadge {
     const verifiedKey = zkApp.verifiedKey.get();
     const verifiedKind = zkApp.verifiedKind.get();
     const oracle = zkApp.oracle.get();
+    const tokenSymbol: string = "BADGE";
     return new MinaNFTBadge({
       name: MinaNFT.stringFromField(name),
       owner: MinaNFT.stringFromField(owner),
@@ -80,14 +98,16 @@ class MinaNFTBadge {
       verifiedKind: MinaNFT.stringFromField(verifiedKind),
       oracle,
       address: badgePublicKey,
+      tokenSymbol,
     });
   }
 
   public async deploy(
-    deployer: PrivateKey
+    deployer: PrivateKey,
+    privateKey: PrivateKey | undefined = undefined
   ): Promise<Mina.TransactionId | undefined> {
     const sender = deployer.toPublicKey();
-    const zkAppPrivateKey = PrivateKey.random();
+    const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     await MinaNFT.compileBadge();
     console.log(
@@ -95,18 +115,21 @@ class MinaNFTBadge {
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
+    const hasAccount = Mina.hasAccount(zkAppPublicKey);
 
     const zkApp = new MinaNFTVerifierBadge(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
-        AccountUpdate.fundNewAccount(sender);
+        if (!hasAccount) AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
         zkApp.name.set(MinaNFT.stringToField(this.name));
         zkApp.owner.set(MinaNFT.stringToField(this.owner));
         zkApp.verifiedKey.set(MinaNFT.stringToField(this.verifiedKey));
         zkApp.verifiedKind.set(MinaNFT.stringToField(this.verifiedKind));
         zkApp.oracle.set(this.oracle);
+        zkApp.account.tokenSymbol.set(this.tokenSymbol);
+        zkApp.account.zkappUri.set("https://minanft.io/" + this.name);
       }
     );
     transaction.sign([deployer, zkAppPrivateKey]);

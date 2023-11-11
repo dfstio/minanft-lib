@@ -34,10 +34,11 @@ class MinaNFTEscrow {
   }
 
   public async deploy(
-    deployer: PrivateKey
+    deployer: PrivateKey,
+    privateKey: PrivateKey | undefined = undefined
   ): Promise<Mina.TransactionId | undefined> {
     const sender = deployer.toPublicKey();
-    const zkAppPrivateKey = PrivateKey.random();
+    const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     await MinaNFT.compileEscrow();
     console.log(
@@ -45,13 +46,16 @@ class MinaNFTEscrow {
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
+    const hasAccount = Mina.hasAccount(zkAppPublicKey);
 
     const zkApp = new Escrow(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
-        AccountUpdate.fundNewAccount(sender);
+        if (!hasAccount) AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
+        zkApp.account.tokenSymbol.set("ESCROW");
+        zkApp.account.zkappUri.set("https://minanft.io/@escrow");
       }
     );
     transaction.sign([deployer, zkAppPrivateKey]);

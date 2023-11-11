@@ -662,12 +662,13 @@ class MinaNFT extends BaseMinaNFT {
     deployer: PrivateKey,
     owner: Field,
     pinataJWT: string,
+    privateKey: PrivateKey | undefined = undefined,
     escrow: Field = Field(0)
   ): Promise<Mina.TransactionId | undefined> {
     await MinaNFT.compile();
     //console.log("Minting NFT...");
     const sender = deployer.toPublicKey();
-    const zkAppPrivateKey = PrivateKey.random();
+    const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     this.address = zkAppPrivateKey.toPublicKey();
     const zkApp = new MinaNFTContract(this.address);
 
@@ -682,11 +683,12 @@ class MinaNFT extends BaseMinaNFT {
 
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.address });
+    const hasAccount = Mina.hasAccount(this.address);
 
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
-        AccountUpdate.fundNewAccount(sender);
+        if (!hasAccount) AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
         zkApp.name.set(MinaNFT.stringToField(this.name));
         zkApp.metadata.set(root);

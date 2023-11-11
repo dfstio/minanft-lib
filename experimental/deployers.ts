@@ -46,14 +46,17 @@ async function main() {
   for (i = 0; i < 100; i++) {
     try {
       const acc = generateAccount();
+      /*
       await topupAccount(acc.publicKey);
       const delay: number = 1000 + Math.floor(Math.random() * 1000);
       await sleep(delay);
       const balance = await accountBalance(acc.publicKey);
-      if (balance !== 0) console.log(`"${acc.privateKey}",`);
+      if (balance !== 0)
+      */
+      console.log(`"${acc.privateKey}" "${acc.publicKey}"`);
     } catch (error: any) {
       console.log(error);
-      await sleep(1000 * 60 * 10);
+      //await sleep(1000 * 60 * 10);
     }
   }
 }
