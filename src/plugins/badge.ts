@@ -62,10 +62,6 @@ class MinaNFTVerifierBadge extends SmartContract {
     this.account.permissions.set({
       ...Permissions.default(),
       setDelegate: Permissions.proof(),
-      setPermissions: Permissions.proof(),
-      setVerificationKey: Permissions.proof(),
-      setZkappUri: Permissions.proof(),
-      setTokenSymbol: Permissions.proof(),
       incrementNonce: Permissions.proof(),
       setVotingFor: Permissions.proof(),
       setTiming: Permissions.proof(),
