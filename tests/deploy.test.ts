@@ -41,13 +41,14 @@ import {
 } from "../src/config.json";
 
 const pinataJWT = PINATA_JWT;
-const useLocalBlockchain: boolean = true;
+const useLocalBlockchain: boolean = false;
 
 let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
+  /*
   const data = await initBlockchain(
-    useLocalBlockchain ? "local" : "berkeley",
+    useLocalBlockchain ? "local" : "testworld2",
     0
   );
   expect(data).toBeDefined();
@@ -57,6 +58,9 @@ beforeAll(async () => {
   deployer = useLocalBlockchain
     ? d
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
+    */
+  MinaNFT.minaInit("testworld2");
+  deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;
   const balanceDeployer =
