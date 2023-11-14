@@ -40,10 +40,7 @@ class Escrow extends SmartContract {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
-      setDelegate: Permissions.proof(),
-      incrementNonce: Permissions.proof(),
-      setVotingFor: Permissions.proof(),
-      setTiming: Permissions.proof(),
+      editState: Permissions.proof(),
     });
     this.emitEvent("deploy", Field(0));
   }

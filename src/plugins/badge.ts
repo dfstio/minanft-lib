@@ -61,10 +61,7 @@ class MinaNFTVerifierBadge extends SmartContract {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
-      setDelegate: Permissions.proof(),
-      incrementNonce: Permissions.proof(),
-      setVotingFor: Permissions.proof(),
-      setTiming: Permissions.proof(),
+      editState: Permissions.proof(),
     });
   }
 
@@ -99,7 +96,9 @@ class MinaNFTVerifierBadge extends SmartContract {
     );
     Metadata.assertEquals(badgeProof.publicInput.data, badgeEvent.data);
 
-    signature.verify(this.oracle.getAndAssertEquals(), badgeEvent.toFields());
+    signature
+      .verify(this.oracle.getAndAssertEquals(), badgeEvent.toFields())
+      .assertEquals(true);
     proof.verify();
     badgeProof.verify();
 
