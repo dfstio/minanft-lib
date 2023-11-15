@@ -6,13 +6,48 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
+import {
+  CONTRACT_DEPLOYER_SK,
+  MINANFT_NAME_SERVICE_SK,
+  NAMES_ORACLE_SK,
+} from "../env.json";
+import {
+  CONTRACT_DEPLOYER,
+  MINANFT_NAME_SERVICE,
+  NAMES_ORACLE,
+} from "../src/config.json";
+
+const useLocalBlockchain: boolean = true;
 
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = "local";
 
 let deployer: PrivateKey | undefined = undefined;
 let namesService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
+
+beforeAll(async () => {
+  const data = await initBlockchain(
+    useLocalBlockchain ? "local" : "testworld2",
+    0
+  );
+  expect(data).toBeDefined();
+  if (data === undefined) return;
+
+  const { deployer: d } = data;
+  deployer = useLocalBlockchain
+    ? d
+    : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
+  oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
+
+  //MinaNFT.minaInit("testworld2");
+  //deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
+  expect(deployer).toBeDefined();
+  if (deployer === undefined) return;
+  const balanceDeployer =
+    Number((await accountBalance(deployer.toPublicKey())).toBigInt()) / 1e9;
+  expect(balanceDeployer).toBeGreaterThan(15);
+  if (balanceDeployer <= 15) return;
+});
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 0);

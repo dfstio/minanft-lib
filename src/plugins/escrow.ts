@@ -9,17 +9,16 @@ import {
   Signature,
   PublicKey,
   Poseidon,
-  AccountUpdate,
   Struct,
 } from "o1js";
-import { MinaNFTContract } from "../contract/nft";
+import { MinaNFTNameServiceContract } from "../contract/names";
 import { EscrowTransfer } from "../contract/escrow";
 
 class EscrowDeposit extends Struct({
   data: EscrowTransfer,
   signature: Signature,
 }) {
-  constructor(args: any) {
+  constructor(args: { data: EscrowTransfer; signature: Signature }) {
     super(args);
   }
 }
@@ -62,6 +61,7 @@ class Escrow extends SmartContract {
 
   @method transfer(
     nft: PublicKey,
+    nameService: PublicKey,
     data: EscrowTransfer,
     signature1: Signature,
     signature2: Signature,
@@ -77,8 +77,9 @@ class Escrow extends SmartContract {
     data.tokenId.assertEquals(Field(0)); // should be MINA
     data.oldOwner.assertEquals(Poseidon.hash(seller.toFields()));
     data.newOwner.assertEquals(Poseidon.hash(buyer.toFields()));
-    const minanft = new MinaNFTContract(nft);
+    const minanft = new MinaNFTNameServiceContract(nameService);
     minanft.transfer(
+      nft,
       data,
       signature1,
       signature2,

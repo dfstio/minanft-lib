@@ -28,7 +28,14 @@ class MinaNFTVerifierBadgeEvent extends Struct({
   data: Metadata,
   key: Field,
 }) {
-  constructor(args: any) {
+  constructor(args: {
+    address: PublicKey;
+    owner: Field;
+    name: Field;
+    version: UInt64;
+    data: Metadata;
+    key: Field;
+  }) {
     super(args);
   }
 
@@ -67,16 +74,26 @@ class MinaNFTVerifierBadge extends SmartContract {
 
   @method issueBadge(
     nft: PublicKey,
+    nftTokenId: Field,
     badgeEvent: MinaNFTVerifierBadgeEvent,
     signature: Signature,
     proof: RedactedMinaNFTMapStateProof,
     badgeProof: MinaNFTBadgeProof
   ) {
-    const minanft = new MinaNFTContract(nft);
+    /*
+    Excluded pending resolution of the issue
+    https://github.com/o1-labs/o1js/issues/1245
+    
+    const minanft = new MinaNFTContract(nft, nftTokenId);
     badgeEvent.owner.assertEquals(minanft.owner.getAndAssertEquals());
     badgeEvent.address.assertEquals(nft);
     badgeEvent.name.assertEquals(minanft.name.getAndAssertEquals());
     badgeEvent.version.assertEquals(minanft.version.getAndAssertEquals());
+    Metadata.assertEquals(
+      minanft.metadata.getAndAssertEquals(),
+      proof.publicInput.originalRoot
+    );
+    */
     badgeProof.publicInput.data.kind.assertEquals(
       this.verifiedKind.getAndAssertEquals(),
       "Kind mismatch"
@@ -86,10 +103,6 @@ class MinaNFTVerifierBadge extends SmartContract {
       "Key mismatch"
     );
 
-    Metadata.assertEquals(
-      minanft.metadata.getAndAssertEquals(),
-      proof.publicInput.originalRoot
-    );
     Metadata.assertEquals(
       badgeProof.publicInput.root,
       proof.publicInput.redactedRoot
@@ -128,11 +141,11 @@ class MinaNFTVerifierBadge extends SmartContract {
     this.emitEvent("revoke", nft);
   }
 
-  @method verifyBadge(nft: PublicKey) {
+  @method verifyBadge(nft: PublicKey, nftTokenId: Field) {
     const account = Account(nft, this.token.id);
     const tokenBalance = account.balance.getAndAssertEquals();
 
-    const minanft = new MinaNFTContract(nft);
+    const minanft = new MinaNFTContract(nft, nftTokenId);
     const version = minanft.version.getAndAssertEquals();
 
     version.assertEquals(tokenBalance);

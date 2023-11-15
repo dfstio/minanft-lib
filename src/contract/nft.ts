@@ -4,8 +4,6 @@ import {
   state,
   State,
   method,
-  DeployArgs,
-  Permissions,
   SmartContract,
   UInt64,
   Signature,
@@ -34,25 +32,6 @@ class MinaNFTContract extends SmartContract {
   @state(UInt64) version = State<UInt64>();
 
   /**
-   * @event
-   */
-  events = {
-    mint: Field,
-    update: Update,
-    transfer: EscrowTransfer,
-    approveEscrow: EscrowApproval,
-  };
-
-  deploy(args: DeployArgs) {
-    super.deploy(args);
-    this.account.permissions.set({
-      ...Permissions.default(),
-      editState: Permissions.proof(),
-    });
-    this.emitEvent("mint", Field(0));
-  }
-
-  /**
    * Update metadata of the NFT
    * @param update {@link Update} - data for the update
    * @param signature signature of the owner
@@ -64,7 +43,6 @@ class MinaNFTContract extends SmartContract {
     signature: Signature,
     owner: PublicKey,
     proof: MinaNFTMetadataUpdateProof
-    //uri: Types.ZkappUri
   ) {
     // Check that the metadata is correct
     const metadata = this.metadata.getAndAssertEquals();
@@ -90,9 +68,6 @@ class MinaNFTContract extends SmartContract {
     this.metadata.set(update.newRoot);
     this.version.set(newVersion);
     this.storage.set(update.storage);
-    //this.account.zkappUri.set(uri.data);
-
-    this.emitEvent("update", update);
   }
   /**
    * Transfer the NFT to new owner
@@ -139,8 +114,6 @@ class MinaNFTContract extends SmartContract {
     this.owner.set(data.newOwner);
     this.version.set(newVersion);
     this.escrow.set(Field(0));
-
-    this.emitEvent("transfer", data);
   }
   /**
    * Approve setting of the new escrow
@@ -165,7 +138,5 @@ class MinaNFTContract extends SmartContract {
 
     this.version.set(newVersion);
     this.escrow.set(data.escrow);
-
-    this.emitEvent("approveEscrow", data);
   }
 }

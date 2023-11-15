@@ -52,7 +52,7 @@ class Token extends SmartContract {
     });
   }
 
-  @method mint(address: PublicKey, vk: VerificationKey) {
+  @method mint(address: PublicKey, vk: VerificationKey, value: Field) {
     this.token.mint({ address, amount: 1_000_000_000 });
     const update = AccountUpdate.createSigned(address, this.token.id);
     update.body.update.verificationKey = { isSome: Bool(true), value: vk };
@@ -63,6 +63,7 @@ class Token extends SmartContract {
         editState: Permissions.proof(),
       },
     };
+    update.body.update.appState[0] = { isSome: Bool(true), value };
   }
 
   @method update(value: Field, address: PublicKey) {
@@ -89,7 +90,7 @@ class Token2 extends SmartContract {
     this.version.set(Field(1));
   }
   events = {
-    mint: Field,
+    mint: PublicKey,
   };
 
   deploy(args: DeployArgs) {
@@ -106,7 +107,12 @@ class Token2 extends SmartContract {
     tokenBalance.assertEquals(UInt64.from(1_000_000_000));
   }
 
-  @method mint(address: PublicKey, vk: VerificationKey, data: Field) {
+  @method mint(
+    address: PublicKey,
+    vk: VerificationKey,
+    value1: Field,
+    value2: Field
+  ) {
     this.token.mint({ address, amount: 1_000_000_000 });
     const update = AccountUpdate.createSigned(address, this.token.id);
     update.body.update.verificationKey = { isSome: Bool(true), value: vk };
@@ -117,7 +123,17 @@ class Token2 extends SmartContract {
         editState: Permissions.proof(),
       },
     };
-    this.emitEvent("mint", data);
+    update.body.update.appState = [
+      { isSome: Bool(true), value: value1 },
+      { isSome: Bool(true), value: value2 },
+      { isSome: Bool(true), value: Field(0) },
+      { isSome: Bool(true), value: Field(0) },
+      { isSome: Bool(true), value: Field(0) },
+      { isSome: Bool(true), value: Field(0) },
+      { isSome: Bool(true), value: Field(0) },
+      { isSome: Bool(true), value: Field(0) },
+    ];
+    this.emitEvent("mint", address);
   }
 
   @method upgrade(address: PublicKey, vk: VerificationKey) {
@@ -136,6 +152,12 @@ class Token2 extends SmartContract {
 class TokenAccount2 extends SmartContract {
   @state(Field) value1 = State<Field>();
   @state(Field) value2 = State<Field>();
+  @state(Field) value3 = State<Field>();
+  @state(Field) value4 = State<Field>();
+  @state(Field) value5 = State<Field>();
+  @state(Field) value6 = State<Field>();
+  @state(Field) value7 = State<Field>();
+  @state(Field) value8 = State<Field>();
 
   @method update(value1: Field, value2: Field) {
     const oldValue1 = this.value1.getAndAssertEquals();
@@ -249,14 +271,11 @@ using the deployer with public key ${sender.toBase58()}:
     const user2PrivateKey: PrivateKey = userPrivateKey2;
     const zkToken = new Token(token!);
     const sender = deployer.toPublicKey();
-    const tokenId = zkToken.token.id;
-    const zkAppTokenAccount1 = new TokenAccount(user1PublicKey, tokenId);
     const transaction1 = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
       () => {
         AccountUpdate.fundNewAccount(sender);
-        zkToken.mint(user1PublicKey, verificationKey!);
-        zkAppTokenAccount1.account.zkappUri.set("https://minanft.io/@token1");
+        zkToken.mint(user1PublicKey, verificationKey!, Field(10));
       }
     );
     await transaction1.prove();
@@ -268,13 +287,11 @@ using the deployer with public key ${sender.toBase58()}:
     // We do not need to wait for the transaction to be included in the block
     // Just send next immediately using the same deployer account
 
-    const zkAppTokenAccount2 = new TokenAccount(user2PublicKey, tokenId);
     const transaction2 = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
       () => {
         AccountUpdate.fundNewAccount(sender);
-        zkToken.mint(user2PublicKey, verificationKey!);
-        zkAppTokenAccount2.account.zkappUri.set("https://minanft.io/@token2");
+        zkToken.mint(user2PublicKey, verificationKey!, Field(10));
       }
     );
     await transaction2.prove();
@@ -342,14 +359,14 @@ using the deployer with public key ${sender.toBase58()}:
         value2.toJSON()
       );
       expect(value1).toBeDefined();
-      expect(value1.toJSON()).toBe(i.toString());
+      expect(value1.toJSON()).toBe((i + 10).toString());
       expect(value2).toBeDefined();
-      expect(value2.toJSON()).toBe(i.toString());
+      expect(value2.toJSON()).toBe((i + 10).toString());
 
       const transaction1 = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
         () => {
-          zkToken.update(Field(i + 1), user1PublicKey);
+          zkToken.update(Field(i + 11), user1PublicKey);
         }
       );
       await transaction1.prove();
@@ -361,7 +378,7 @@ using the deployer with public key ${sender.toBase58()}:
       const transaction2 = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
         () => {
-          zkToken.update(Field(i + 1), user2PublicKey);
+          zkToken.update(Field(i + 11), user2PublicKey);
         }
       );
       await transaction2.prove();
@@ -544,12 +561,12 @@ using the deployer with public key ${sender.toBase58()}:
         value22.toJSON()
       );
       expect(value11).toBeDefined();
-      expect(value11.toJSON()).toBe((i + NUMBER_ITERATIONS).toString());
+      expect(value11.toJSON()).toBe((i + 10 + NUMBER_ITERATIONS).toString());
       expect(value12).toBeDefined();
       expect(value12.toJSON()).toBe(i.toString());
 
       expect(value21).toBeDefined();
-      expect(value21.toJSON()).toBe((i + NUMBER_ITERATIONS).toString());
+      expect(value21.toJSON()).toBe((i + 10 + NUMBER_ITERATIONS).toString());
       expect(value22).toBeDefined();
       expect(value22.toJSON()).toBe(i.toString());
 
@@ -557,7 +574,7 @@ using the deployer with public key ${sender.toBase58()}:
         { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
         () => {
           zkToken.update(
-            Field(i + 1 + NUMBER_ITERATIONS),
+            Field(i + 11 + NUMBER_ITERATIONS),
             Field(i + 1),
             user1PublicKey
           );
@@ -573,7 +590,7 @@ using the deployer with public key ${sender.toBase58()}:
         { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
         () => {
           zkToken.update(
-            Field(i + 1 + NUMBER_ITERATIONS),
+            Field(i + 11 + NUMBER_ITERATIONS),
             Field(i + 1),
             user2PublicKey
           );
@@ -620,7 +637,7 @@ using the deployer with public key ${sender.toBase58()}:
       { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
       () => {
         AccountUpdate.fundNewAccount(sender);
-        zkToken.mint(user3PublicKey, verificationKey!, Field(3));
+        zkToken.mint(user3PublicKey, verificationKey!, Field(20), Field(5));
       }
     );
     await transaction1.prove();
@@ -636,7 +653,7 @@ using the deployer with public key ${sender.toBase58()}:
       { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
       () => {
         AccountUpdate.fundNewAccount(sender);
-        zkToken.mint(user4PublicKey, verificationKey!, Field(4));
+        zkToken.mint(user4PublicKey, verificationKey!, Field(20), Field(6));
       }
     );
     await transaction2.prove();
@@ -674,8 +691,8 @@ using the deployer with public key ${sender.toBase58()}:
     const user2PublicKey: PublicKey = user4;
     const zkToken = new Token2(token);
     const tokenId = zkToken.token.id;
-    const zkTokenAccount1 = new TokenAccount(user1PublicKey, tokenId);
-    const zkTokenAccount2 = new TokenAccount(user2PublicKey, tokenId);
+    const zkTokenAccount1 = new TokenAccount2(user1PublicKey, tokenId);
+    const zkTokenAccount2 = new TokenAccount2(user2PublicKey, tokenId);
 
     const sender = deployer.toPublicKey();
 
@@ -688,8 +705,8 @@ using the deployer with public key ${sender.toBase58()}:
       await fetchAccount({ publicKey: user2PublicKey, tokenId });
       const hasAccount1 = Mina.hasAccount(user1PublicKey, tokenId);
       const hasAccount2 = Mina.hasAccount(user2PublicKey, tokenId);
-      const value1 = zkTokenAccount1.value.get();
-      const value2 = zkTokenAccount2.value.get();
+      const value1 = zkTokenAccount1.value1.get();
+      const value2 = zkTokenAccount2.value1.get();
       console.log(
         "Iteration",
         i,
@@ -703,14 +720,14 @@ using the deployer with public key ${sender.toBase58()}:
         value2.toJSON()
       );
       expect(value1).toBeDefined();
-      expect(value1.toJSON()).toBe(i.toString());
+      expect(value1.toJSON()).toBe((i + 20).toString());
       expect(value2).toBeDefined();
-      expect(value2.toJSON()).toBe(i.toString());
+      expect(value2.toJSON()).toBe((i + 20).toString());
 
       const transaction1 = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
         () => {
-          zkToken.update(Field(i + 1), Field(6), user1PublicKey);
+          zkToken.update(Field(i + 21), Field(6), user1PublicKey);
         }
       );
       await transaction1.prove();
@@ -722,7 +739,7 @@ using the deployer with public key ${sender.toBase58()}:
       const transaction2 = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
         () => {
-          zkToken.update(Field(i + 1), Field(6), user2PublicKey);
+          zkToken.update(Field(i + 21), Field(6), user2PublicKey);
         }
       );
       await transaction2.prove();

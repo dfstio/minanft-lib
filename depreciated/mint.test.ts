@@ -1,21 +1,35 @@
 import { describe, expect, it } from "@jest/globals";
-import { PrivateKey, Poseidon } from "o1js";
+import {
+  SmartContract,
+  method,
+  Field,
+  state,
+  State,
+  PrivateKey,
+  Poseidon,
+} from "o1js";
 
 import { MinaNFT } from "../src/minanft";
-import { MinaNFTNameService } from "../src/minanftnames";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
 
-const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const pinataJWT = PINATA_JWT;
+const blockchainInstance: blockchain = "berkeley";
+
+class Key extends SmartContract {
+  @state(Field) key = State<Field>();
+
+  @method mint(key: Field) {
+    this.key.assertEquals(Field(0));
+    this.key.set(key);
+  }
+}
 
 let deployer: PrivateKey | undefined = undefined;
-let namesService: MinaNFTNameService | undefined = undefined;
-let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  const data = await initBlockchain(blockchainInstance, 0);
+  const data = await initBlockchain(blockchainInstance, 3);
   expect(data).toBeDefined();
   if (data === undefined) return;
 
@@ -29,33 +43,15 @@ describe(`MinaNFT contract`, () => {
   it(`should compile contracts`, async () => {
     console.log(`Compiling...`);
     console.time(`compiled all`);
+    await Key.compile();
     await MinaNFT.compile();
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
 
-  it(`should deploy NameService`, async () => {
-    expect(deployer).toBeDefined();
-    if (deployer === undefined) return;
-    oraclePrivateKey = PrivateKey.random();
-    const names = new MinaNFTNameService({
-      oraclePrivateKey,
-    });
-    const tx = await names.deploy(deployer);
-    expect(tx).toBeDefined();
-    if (tx === undefined) return;
-    Memory.info(`names service deployed`);
-    expect(await MinaNFT.wait(tx)).toBe(true);
-    namesService = names;
-  });
-
   it(`should mint NFT`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
-    expect(namesService).toBeDefined();
-    if (namesService === undefined) return;
-    expect(oraclePrivateKey).toBeDefined();
-    if (oraclePrivateKey === undefined) return;
     const ownerPrivateKey = PrivateKey.random();
     const ownerPublicKey = ownerPrivateKey.toPublicKey();
     const owner = Poseidon.hash(ownerPublicKey.toFields());
@@ -91,7 +87,7 @@ describe(`MinaNFT contract`, () => {
     nft.updateMap({ key: `level 2 and 3 data`, map });
 
     console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
-    const tx = await nft.mint({ namesService, deployer, owner, pinataJWT });
+    const tx = await nft.mint(deployer, owner, pinataJWT);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`minted`);

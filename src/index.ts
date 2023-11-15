@@ -1,18 +1,28 @@
 export { MinaNFT } from "./minanft";
+export { MinaNFTNameService } from "./minanftnames";
 export {
   MinaNFTStringUpdate,
   MinaNFTFieldUpdate,
   MinaNFTImageUpdate,
-  MinaNFTTextUpdate,
   MinaNFTFileUpdate,
+  MinaNFTTextUpdate,
+  MinaNFTMint,
+  MinaNFTTransfer,
+  MinaNFTApproval,
+  MinaNFTCommit,
 } from "./update";
 export { MinaNFTBadge, MinaNFTBadgeConstructor } from "./minanftbadge";
-export { MinaNFTEscrow } from "./escrow";
+export { MinaNFTEscrow, EscrowTransferData } from "./escrow";
 export { RedactedMinaNFT } from "./redactedminanft";
 export { BaseMinaNFT } from "./baseminanft";
 export { PrivateMetadata } from "./privatemetadata";
 export { BaseMinaNFTObject } from "./baseminanftobject";
 export { MinaNFTContract } from "./contract/nft";
+export {
+  MinaNFTNameServiceContract,
+  NFTMintData,
+  MintData,
+} from "./contract/names";
 export { EscrowTransfer, EscrowApproval } from "./contract/escrow";
 export {
   Update,

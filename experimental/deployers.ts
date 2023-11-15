@@ -43,9 +43,9 @@ async function minaInit() {
 async function main() {
   await minaInit();
   let i: number;
-  for (i = 0; i < 100; i++) {
+  for (i = 0; i < 1000000000; i++) {
     try {
-      const acc = generateAccount();
+      //const acc = generateAccount();
       /*
       await topupAccount(acc.publicKey);
       const delay: number = 1000 + Math.floor(Math.random() * 1000);
@@ -53,10 +53,23 @@ async function main() {
       const balance = await accountBalance(acc.publicKey);
       if (balance !== 0)
       */
-      console.log(`"${acc.privateKey}" "${acc.publicKey}"`);
+      const zkAppPrivateKey = PrivateKey.random();
+      const str = zkAppPrivateKey.toPublicKey().toBase58();
+      if (str.toLowerCase().includes("minanft"))
+        console.log(
+          `MinaNFT: "${zkAppPrivateKey.toBase58()}" "${zkAppPrivateKey
+            .toPublicKey()
+            .toBase58()}"`
+        );
+      if (str.endsWith("mNFT"))
+        console.log(
+          `NFT: "${zkAppPrivateKey.toBase58()}" "${zkAppPrivateKey
+            .toPublicKey()
+            .toBase58()}"`
+        );
     } catch (error: any) {
       console.log(error);
-      //await sleep(1000 * 60 * 10);
+      await sleep(1000 * 60);
     }
   }
 }

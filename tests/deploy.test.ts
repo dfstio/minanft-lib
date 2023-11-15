@@ -1,12 +1,11 @@
 import { describe, expect, it } from "@jest/globals";
-import { PrivateKey, Poseidon, PublicKey } from "o1js";
+import { PrivateKey, PublicKey } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTEscrow } from "../src/escrow";
 import { MinaNFTBadge } from "../src/minanftbadge";
 import { Memory, initBlockchain, accountBalance } from "../utils/testhelpers";
 import {
-  PINATA_JWT,
   CONTRACT_DEPLOYER_SK,
   MINANFT_NFT_ADDRESS_SK,
   BADGE_TWITTER_SK,
@@ -21,7 +20,7 @@ import {
   BADGE_TELEGRAM_ORACLE_SK,
   BADGE_GITHUB_ORACLE_SK,
   BADGE_LINKEDIN_ORACLE_SK,
-  MINANFT_NFT_OWNER_SK,
+  MINANFT_NAME_SERVICE_SK,
 } from "../env.json";
 import {
   CONTRACT_DEPLOYER,
@@ -38,15 +37,14 @@ import {
   BADGE_TELEGRAM_ORACLE,
   BADGE_GITHUB_ORACLE,
   BADGE_LINKEDIN_ORACLE,
+  MINANFT_NAME_SERVICE,
 } from "../src/config.json";
 
-const pinataJWT = PINATA_JWT;
-const useLocalBlockchain: boolean = false;
+const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  /*
   const data = await initBlockchain(
     useLocalBlockchain ? "local" : "testworld2",
     0
@@ -58,9 +56,9 @@ beforeAll(async () => {
   deployer = useLocalBlockchain
     ? d
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
-    */
-  MinaNFT.minaInit("testworld2");
-  deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
+
+  //MinaNFT.minaInit("testworld2");
+  //deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;
   const balanceDeployer =
@@ -117,6 +115,9 @@ describe(`Deploying contracts`, () => {
     expect(CONTRACT_DEPLOYER).toBe(
       PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK).toPublicKey().toBase58()
     );
+    expect(MINANFT_NAME_SERVICE).toBe(
+      PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK).toPublicKey().toBase58()
+    );
   });
 
   it(`should compile contracts`, async () => {
@@ -129,6 +130,7 @@ describe(`Deploying contracts`, () => {
     Memory.info(`compiled`);
   });
 
+  /* - moved to mint.test
   it(`should mint minanft NFT`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -153,12 +155,12 @@ describe(`Deploying contracts`, () => {
     });
 
     console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
-    const tx = await nft.mint(
+    const tx = await nft.mint({
       deployer,
       owner,
       pinataJWT,
-      PrivateKey.fromBase58(MINANFT_NFT_ADDRESS_SK)
-    );
+      privateKey: PrivateKey.fromBase58(MINANFT_NFT_ADDRESS_SK),
+    });
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`minted`);
@@ -171,7 +173,7 @@ describe(`Deploying contracts`, () => {
     );
     console.log(`NFT minanft minted to the address:`, nft.address.toJSON());
   });
-
+*/
   it(`should deploy Escrow contract`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
