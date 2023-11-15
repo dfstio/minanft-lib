@@ -20,7 +20,7 @@ const ITERATIONS_NUMBER = 2;
 const pinataJWT = ""; //PINATA_JWT;
 const blockchainInstance: blockchain = "local";
 
-let namesService: MinaNFTNameService | undefined = undefined;
+let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 let deployer: PrivateKey | undefined = undefined;
@@ -73,7 +73,7 @@ describe(`MinaNFT contract`, () => {
     if (tx === undefined) return;
     Memory.info(`names service deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    namesService = names;
+    nameService = names;
   });
 
   it(`should mint NFTs`, async () => {
@@ -91,7 +91,7 @@ describe(`MinaNFT contract`, () => {
         deployer,
         owner: ownerHash,
         pinataJWT,
-        namesService,
+        nameService,
         nonce: nonce++,
       });
       expect(tx).toBeDefined();
@@ -131,7 +131,7 @@ describe(`MinaNFT contract`, () => {
             data,
             signature,
             ownerPublicKey: owners[i].toPublicKey(),
-            namesService,
+            nameService,
             nonce: nonce++,
           });
           expect(tx).toBeDefined();
@@ -191,7 +191,7 @@ describe(`MinaNFT contract`, () => {
           escrow1: escrowPublicKey1,
           escrow2: escrowPublicKey2,
           escrow3: escrowPublicKey3,
-          namesService,
+          nameService,
           nonce: nonce++,
         });
         expect(tx).toBeDefined();

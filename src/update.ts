@@ -91,7 +91,7 @@ interface MinaNFTFieldUpdate {
  * @property pinataJWT Pinata JWT token for uploading to the IPFS
  * @property privateKey The private key of the owner, if not provided, will be generated
  * @property escrow The escrow of the NFT - Poseidon hash of three escrow's public keys
- * @property namesService The names service that will mint the NFT
+ * @property nameService The names service that will mint the NFT
  * @property nonce The nonce of the minting transaction
  */
 interface MinaNFTMint {
@@ -100,7 +100,7 @@ interface MinaNFTMint {
   pinataJWT: string;
   privateKey?: PrivateKey;
   escrow?: Field;
-  namesService?: MinaNFTNameService;
+  nameService?: MinaNFTNameService;
   nonce?: number;
 }
 
@@ -114,7 +114,7 @@ interface MinaNFTMint {
  * @property escrow1 public key of the first escrow
  * @property escrow2 public key of the second escrow
  * @property escrow3 public key of the third escrow
- * @property namesService The names service that will transfer the NFT
+ * @property nameService The names service that will transfer the NFT
  * @property nonce The nonce of the transfer transaction
  */
 interface MinaNFTTransfer {
@@ -126,7 +126,7 @@ interface MinaNFTTransfer {
   escrow1: PublicKey;
   escrow2: PublicKey;
   escrow3: PublicKey;
-  namesService?: MinaNFTNameService;
+  nameService?: MinaNFTNameService;
   nonce?: number;
 }
 
@@ -136,7 +136,7 @@ interface MinaNFTTransfer {
  * @property data {@link EscrowApproval} - data for the approval
  * @property signature signature of the owner
  * @property ownerPublicKey owner's public key
- * @property namesService The names service that will send the escrow change
+ * @property nameService The names service that will send the escrow change
  * @property nonce The nonce of the approval transaction
  */
 interface MinaNFTApproval {
@@ -144,7 +144,7 @@ interface MinaNFTApproval {
   data: EscrowApproval;
   signature: Signature;
   ownerPublicKey: PublicKey;
-  namesService?: MinaNFTNameService;
+  nameService?: MinaNFTNameService;
   nonce?: number;
 }
 
@@ -153,13 +153,13 @@ interface MinaNFTApproval {
  * @property deployer The deployer of the contract
  * @property ownerPrivateKey The private key of the owner
  * @property pinataJWT Pinata JWT token for uploading to the IPFS
- * @property namesService The names service that will commit the NFT
+ * @property nameService The names service that will commit the NFT
  * @property nonce The nonce of the commit transaction
  */
 interface MinaNFTCommit {
   deployer: PrivateKey;
   ownerPrivateKey: PrivateKey;
   pinataJWT: string;
-  namesService?: MinaNFTNameService;
+  nameService?: MinaNFTNameService;
   nonce?: number;
 }

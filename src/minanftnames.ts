@@ -66,7 +66,7 @@ class MinaNFTNameService {
     );
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
-    await MinaNFT.transactionInfo(tx, "names service deploy", false);
+    await MinaNFT.transactionInfo(tx, "name service deploy", false);
     if (tx.isSuccess) {
       this.address = zkAppPublicKey;
       this.tokenId = zkApp.token.id;
@@ -78,6 +78,7 @@ class MinaNFTNameService {
     nft: NFTMintData,
     verificationKeyHash: Field
   ): Promise<Signature> {
+    if (nft.address === undefined) throw new Error("NFT address is not set");
     if (nft.name.toJSON() !== nft.initialState[0].toJSON())
       throw new Error("Name mismatch");
     if (this.address === undefined)

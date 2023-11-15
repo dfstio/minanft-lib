@@ -49,6 +49,7 @@ class BaseMinaNFT {
   static badgeVerifierVerificationKey: VerificationKey | undefined;
   static badgeVerificationKey: string | undefined;
   static escrowVerificationKey: VerificationKey | undefined;
+  static cache: Cache | undefined;
 
   constructor() {
     this.metadata = new Map<string, PrivateMetadata>();
@@ -193,33 +194,46 @@ class BaseMinaNFT {
   }
 
   /**
+   * Sets a cache for prover keys
+   */
+  public static setCache(cache: Cache): void {
+    MinaNFT.cache = cache;
+  }
+
+  /**
+   * Sets a cache folder for prover keys
+   * @param folder folder for prover keys
+   * default is "./nftcache"
+   */
+  public static setCacheFolder(folder: string = "cd ./nftcache"): void {
+    MinaNFT.cache = Cache.FileSystem(folder);
+  }
+
+  /**
    * Compiles MinaNFT contract
    * @returns verification key
    */
   public static async compile(): Promise<VerificationKey> {
-    const cache: Cache = Cache.FileSystem("./nftcache");
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
-      await Key.compile({ cache });
-      const { verificationKey } = await MinaNFTMetadataUpdate.compile({
-        cache,
-      });
+      await Key.compile(options);
+      const { verificationKey } = await MinaNFTMetadataUpdate.compile(options);
       console.timeEnd("MinaNFTMetadataUpdate compiled");
       MinaNFT.updateVerificationKey = verificationKey;
     }
 
     if (MinaNFT.verificationKey == undefined) {
       console.time("MinaNFT compiled");
-      const { verificationKey } = await MinaNFTContract.compile({ cache });
+      const { verificationKey } = await MinaNFTContract.compile(options);
       console.timeEnd("MinaNFT compiled");
       MinaNFT.verificationKey = verificationKey as VerificationKey;
     }
 
     if (MinaNFT.namesVerificationKey == undefined) {
       console.time("MinaNFTNameServiceContract compiled");
-      const { verificationKey } = await MinaNFTNameServiceContract.compile({
-        cache,
-      });
+      const { verificationKey } =
+        await MinaNFTNameServiceContract.compile(options);
       console.timeEnd("MinaNFTNameServiceContract compiled");
       MinaNFT.namesVerificationKey = verificationKey as VerificationKey;
     }
@@ -232,15 +246,17 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileVerifier(): Promise<VerificationKey> {
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
-      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      const { verificationKey } =
+        await RedactedMinaNFTMapCalculation.compile(options);
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }
     if (MinaNFT.verifierVerificationKey === undefined) {
       console.time("MinaNFTVerifier compiled");
-      const { verificationKey } = await MinaNFTVerifier.compile();
+      const { verificationKey } = await MinaNFTVerifier.compile(options);
       console.timeEnd("MinaNFTVerifier compiled");
       MinaNFT.verifierVerificationKey = verificationKey as VerificationKey;
     }
@@ -252,21 +268,24 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileBadge(): Promise<VerificationKey> {
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
-      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      const { verificationKey } =
+        await RedactedMinaNFTMapCalculation.compile(options);
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }
     if (MinaNFT.badgeVerificationKey === undefined) {
       console.time("MinaNFTBadgeCalculation compiled");
-      const { verificationKey } = await MinaNFTBadgeCalculation.compile();
+      const { verificationKey } =
+        await MinaNFTBadgeCalculation.compile(options);
       console.timeEnd("MinaNFTBadgeCalculation compiled");
       MinaNFT.badgeVerificationKey = verificationKey;
     }
     if (MinaNFT.badgeVerifierVerificationKey === undefined) {
       console.time("MinaNFTVerifierBadge compiled");
-      const { verificationKey } = await MinaNFTVerifierBadge.compile();
+      const { verificationKey } = await MinaNFTVerifierBadge.compile(options);
       console.timeEnd("MinaNFTVerifierBadge compiled");
       MinaNFT.badgeVerifierVerificationKey = verificationKey as VerificationKey;
     }
@@ -278,9 +297,10 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileEscrow(): Promise<VerificationKey> {
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
     if (MinaNFT.escrowVerificationKey === undefined) {
       console.time("Escrow compiled");
-      const { verificationKey } = await Escrow.compile();
+      const { verificationKey } = await Escrow.compile(options);
       console.timeEnd("Escrow compiled");
       MinaNFT.escrowVerificationKey = verificationKey as VerificationKey;
     }
@@ -292,9 +312,11 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileRedactedMap(): Promise<string> {
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
-      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile();
+      const { verificationKey } =
+        await RedactedMinaNFTMapCalculation.compile(options);
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }

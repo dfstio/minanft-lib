@@ -181,8 +181,13 @@ class MinaNFT extends BaseMinaNFT {
    * Initialize Mina o1js library
    * @param local Choose Mina network to use. Default is local network
    */
-  public static minaInit(chain: blockchain): void {
-    initBlockchain(chain);
+  public static minaInit(chain: blockchain):
+    | {
+        publicKey: PublicKey;
+        privateKey: PrivateKey;
+      }[]
+    | undefined {
+    return initBlockchain(chain);
   }
 
   /**
@@ -320,8 +325,8 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("Names contract address is undefined");
 
     const address: PublicKey = this.address;
-    const namesService = new MinaNFTNameServiceContract(this.namesAddress);
-    const tokenId = namesService.token.id;
+    const nameService = new MinaNFTNameServiceContract(this.namesAddress);
+    const tokenId = nameService.token.id;
     await fetchAccount({ publicKey: address, tokenId });
     if (!Mina.hasAccount(address, tokenId)) {
       console.error("NFT contract is not deployed");
@@ -382,7 +387,7 @@ class MinaNFT extends BaseMinaNFT {
       deployer,
       ownerPrivateKey,
       pinataJWT,
-      namesService,
+      nameService,
       nonce: nonceArg,
     } = commitData;
 
@@ -402,9 +407,9 @@ class MinaNFT extends BaseMinaNFT {
       return undefined;
     }
 
-    if (namesService === undefined)
+    if (nameService === undefined)
       throw new Error("Names Service is undefined");
-    if (namesService.address === undefined)
+    if (nameService.address === undefined)
       throw new Error("Names service address is undefined");
 
     /*
@@ -470,11 +475,11 @@ class MinaNFT extends BaseMinaNFT {
     }
     //console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
-    const zkApp = new MinaNFTNameServiceContract(namesService.address);
+    const zkApp = new MinaNFTNameServiceContract(nameService.address);
     const tokenId = zkApp.token.id;
     const zkAppNFT = new MinaNFTContract(address, tokenId);
     await fetchAccount({ publicKey: this.address, tokenId });
-    await fetchAccount({ publicKey: namesService.address });
+    await fetchAccount({ publicKey: nameService.address });
     await fetchAccount({ publicKey: sender });
     const hasAccount = Mina.hasAccount(this.address, tokenId);
     if (!hasAccount) throw new Error("NFT is not deployed, no account");
@@ -493,7 +498,7 @@ class MinaNFT extends BaseMinaNFT {
       oldRoot: proof.publicInput.oldRoot,
       newRoot: proof.publicInput.newRoot,
       storage: storageHash,
-      verifier: namesService.address,
+      verifier: nameService.address,
       version: newVersion,
       name: MinaNFT.stringToField(this.name),
       owner,
@@ -698,7 +703,7 @@ class MinaNFT extends BaseMinaNFT {
     minaData: MinaNFTMint
   ): Promise<Mina.TransactionId | undefined> {
     const {
-      namesService,
+      nameService,
       deployer,
       owner,
       pinataJWT,
@@ -706,10 +711,10 @@ class MinaNFT extends BaseMinaNFT {
       escrow: escrowArg,
       nonce: nonceArg,
     } = minaData;
-    if (namesService === undefined)
+    if (nameService === undefined)
       throw new Error("Names service is undefined");
-    const escrow = escrowArg ?? Field(0);
-    if (namesService.address === undefined)
+    const escrow: Field = escrowArg ?? Field(0);
+    if (nameService.address === undefined)
       throw new Error("Names service address is undefined");
     await MinaNFT.compile();
     if (MinaNFT.verificationKey === undefined)
@@ -739,23 +744,23 @@ class MinaNFT extends BaseMinaNFT {
               @state(Field) escrow = State<Field>();
               @state(UInt64) version = State<UInt64>();
     */
-    // TODO check that state is correct
+
     const nft = new NFTMintData({
       name,
       address: this.address,
       initialState: [
         name,
-        root.data,
-        root.kind,
+        root.data, // metadata.data,
+        root.kind, // metadata.kind,
         storageHash.hashString[0],
         storageHash.hashString[1],
         owner,
         escrow,
-        Field.from(1),
+        Field.from(1), //version
       ],
-      verifier: namesService.address,
+      verifier: nameService.address,
     });
-    const signature = await namesService.issueNameSignature(
+    const signature = await nameService.issueNameSignature(
       nft,
       verificationKey.hash
     );
@@ -765,12 +770,12 @@ class MinaNFT extends BaseMinaNFT {
       signature,
     });
 
-    const zkApp = new MinaNFTNameServiceContract(namesService.address);
+    const zkApp = new MinaNFTNameServiceContract(nameService.address);
     const tokenId = zkApp.token.id;
     this.tokenId = tokenId;
 
     await fetchAccount({ publicKey: this.address, tokenId });
-    await fetchAccount({ publicKey: namesService.address });
+    await fetchAccount({ publicKey: nameService.address });
     await fetchAccount({ publicKey: sender });
     const account = Account(sender);
     const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
@@ -805,7 +810,7 @@ class MinaNFT extends BaseMinaNFT {
       this.owner = owner;
       this.escrow = escrow;
       this.version = UInt64.from(1);
-      this.namesAddress = namesService.address;
+      this.namesAddress = nameService.address;
       return sentTx;
     } else return undefined;
 
@@ -867,7 +872,7 @@ class MinaNFT extends BaseMinaNFT {
       escrow1,
       escrow2,
       escrow3,
-      namesService,
+      nameService,
       nonce: nonceArg,
     } = transferData;
     if (this.address === undefined) {
@@ -880,9 +885,9 @@ class MinaNFT extends BaseMinaNFT {
       return undefined;
     }
 
-    if (namesService === undefined)
+    if (nameService === undefined)
       throw new Error("Names service is undefined");
-    if (namesService.address === undefined)
+    if (nameService.address === undefined)
       throw new Error("Names service address is undefined");
 
     await MinaNFT.compile();
@@ -892,12 +897,12 @@ class MinaNFT extends BaseMinaNFT {
     }
 
     //console.log("Transferring NFT...");
-    this.namesAddress = namesService.address;
+    this.namesAddress = nameService.address;
     if (false === (await this.checkState())) {
       throw new Error("State verification error");
     }
     const sender = deployer.toPublicKey();
-    const zkApp = new MinaNFTNameServiceContract(namesService.address);
+    const zkApp = new MinaNFTNameServiceContract(nameService.address);
     const tokenId = zkApp.token.id;
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: address, tokenId });
@@ -948,7 +953,7 @@ class MinaNFT extends BaseMinaNFT {
       data,
       signature,
       ownerPublicKey,
-      namesService,
+      nameService,
       nonce: nonceArg,
     } = aprovalData;
     if (this.address === undefined) {
@@ -962,10 +967,10 @@ class MinaNFT extends BaseMinaNFT {
       return undefined;
     }
 
-    if (namesService === undefined)
+    if (nameService === undefined)
       throw new Error("Names service is undefined");
 
-    if (namesService.address === undefined)
+    if (nameService.address === undefined)
       throw new Error("Names service address is undefined");
 
     await MinaNFT.compile();
@@ -974,14 +979,14 @@ class MinaNFT extends BaseMinaNFT {
       return undefined;
     }
 
-    this.namesAddress = namesService.address;
+    this.namesAddress = nameService.address;
     if (false === (await this.checkState())) {
       throw new Error("State verification error");
     }
     const sender = deployer.toPublicKey();
-    const zkApp = new MinaNFTNameServiceContract(namesService.address);
+    const zkApp = new MinaNFTNameServiceContract(nameService.address);
     const tokenId = zkApp.token.id;
-    await fetchAccount({ publicKey: namesService.address });
+    await fetchAccount({ publicKey: nameService.address });
     await fetchAccount({ publicKey: address, tokenId });
     await fetchAccount({ publicKey: sender });
     const account = Account(sender);

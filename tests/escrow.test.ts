@@ -45,7 +45,7 @@ let escrowHash: Field | undefined = undefined;
 const price: UInt64 = UInt64.from(7_000_000_000n);
 let escrowData: EscrowTransfer | undefined = undefined;
 
-let namesService: MinaNFTNameService | undefined = undefined;
+let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
@@ -142,7 +142,7 @@ describe(`MinaNFT contract`, () => {
     if (tx === undefined) return;
     Memory.info(`names service deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    namesService = names;
+    nameService = names;
   });
 
   it(`should mint NFT`, async () => {
@@ -156,7 +156,7 @@ describe(`MinaNFT contract`, () => {
       deployer: sellerPrivateKey,
       owner: sellerHash,
       escrow: escrowHash,
-      namesService,
+      nameService,
       pinataJWT,
     });
     expect(mintTx).toBeDefined();
@@ -234,10 +234,10 @@ describe(`MinaNFT contract`, () => {
 
   it(`should check the balance of tokens`, async () => {
     expect(nft.address).toBeDefined();
-    expect(namesService).toBeDefined();
-    if (namesService === undefined) return;
-    expect(namesService.address).toBeDefined();
-    if (namesService.address === undefined) return;
+    expect(nameService).toBeDefined();
+    if (nameService === undefined) return;
+    expect(nameService.address).toBeDefined();
+    if (nameService.address === undefined) return;
     expect(sellerDeposited).toBeDefined();
     if (sellerDeposited === undefined) return;
     expect(buyerDeposited).toBeDefined();
@@ -262,10 +262,10 @@ describe(`MinaNFT contract`, () => {
 
   it(`escrow should transfer NFT and funds`, async () => {
     expect(nft.address).toBeDefined();
-    expect(namesService).toBeDefined();
-    if (namesService === undefined) return;
-    expect(namesService.address).toBeDefined();
-    if (namesService.address === undefined) return;
+    expect(nameService).toBeDefined();
+    if (nameService === undefined) return;
+    expect(nameService.address).toBeDefined();
+    if (nameService.address === undefined) return;
     expect(sellerDeposited).toBeDefined();
     if (sellerDeposited === undefined) return;
     expect(buyerDeposited).toBeDefined();
@@ -281,7 +281,7 @@ describe(`MinaNFT contract`, () => {
       sellerDeposited,
       buyerDeposited,
       nft: nft.address,
-      nameService: namesService.address,
+      nameService: nameService.address,
       tokenId: nft.tokenId,
       seller: sellerPublicKey!,
       buyer: buyerPublicKey!,
