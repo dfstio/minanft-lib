@@ -59,4 +59,14 @@ export { IPFS } from "./storage/ipfs";
 export { File, FileData } from "./storage/file";
 export { MapData, MinaNFTMapUpdate } from "./storage/map";
 export { TextData } from "./storage/text";
-export { blockchain, initBlockchain } from "./mina";
+export {
+  blockchain,
+  initBlockchain,
+  Memory,
+  makeString,
+  sleep,
+  accountBalance,
+  accountBalanceMina,
+} from "./mina";
+import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config.json";
+export { NAMES_ORACLE, MINANFT_NAME_SERVICE };

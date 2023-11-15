@@ -7,7 +7,6 @@ import {
   fetchAccount,
   Field,
   Signature,
-  MerkleMap,
   Account,
 } from "o1js";
 import { MinaNFT } from "./minanft";
@@ -44,8 +43,6 @@ class MinaNFTNameService {
       `deploying the MinaNFTNameServiceContract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
 
-    const map = new MerkleMap();
-    const emptyRoot: Field = map.getRoot();
     const zkApp = new MinaNFTNameServiceContract(zkAppPublicKey);
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
@@ -62,8 +59,6 @@ class MinaNFTNameService {
       () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
-        zkApp.namesRoot0.set(emptyRoot);
-        zkApp.namesRoot1.set(emptyRoot);
         zkApp.oracle.set(oracle);
         zkApp.account.zkappUri.set("https://minanft.io");
         zkApp.account.tokenSymbol.set("NFT");

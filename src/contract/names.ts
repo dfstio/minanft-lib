@@ -21,6 +21,14 @@ import { Update } from "./metadata";
 import { MinaNFTMetadataUpdateProof } from "./update";
 import { EscrowTransfer, EscrowApproval } from "./escrow";
 
+/**
+ * NFTMintData is the data for the minting of the NFT
+ * @property address The address of the NFT
+ * @property name The name of the NFT encoded in Field
+ * @property initialState The initial state of the NFT (8 Fields)
+ * @property verifier The verifier of the NFT - the Name Service contract that sends this update
+ */
+
 class NFTMintData extends Struct({
   address: PublicKey,
   name: Field,
@@ -37,6 +45,12 @@ class NFTMintData extends Struct({
   }
 }
 
+/**
+ * MintData is the data for the minting of the NFT
+ * @property nft The {@link NFTMintData} of the NFT
+ * @property verificationKey The verification key of the MinaNFTContract
+ * @property signature The signature of the name service allowing the use of name
+ */
 class MintData extends Struct({
   nft: NFTMintData,
   verificationKey: VerificationKey,
@@ -51,9 +65,11 @@ class MintData extends Struct({
   }
 }
 
+/**
+ * MinaNFTNameServiceContract is a smart contract that implements the Mina NFT Name Service standard.
+ * @property oracle The oracle of the contract - the public key used to sign name allowances
+ */
 class MinaNFTNameServiceContract extends SmartContract {
-  @state(Field) namesRoot0 = State<Field>();
-  @state(Field) namesRoot1 = State<Field>();
   @state(PublicKey) oracle = State<PublicKey>();
 
   init() {
@@ -75,15 +91,6 @@ class MinaNFTNameServiceContract extends SmartContract {
     });
   }
 
-  @method setNames(namesRoot0: Field, namesRoot1: Field, signature: Signature) {
-    const oracle = this.oracle.getAndAssertEquals();
-    signature
-      .verify(oracle, [namesRoot0, namesRoot1, ...this.address.toFields()])
-      .assertEquals(true);
-    this.namesRoot0.set(namesRoot0);
-    this.namesRoot1.set(namesRoot1);
-  }
-
   @method setOracle(newOracle: PublicKey, signature: Signature) {
     const oracle = this.oracle.getAndAssertEquals();
     signature
@@ -98,6 +105,12 @@ class MinaNFTNameServiceContract extends SmartContract {
     tokenBalance.assertEquals(UInt64.from(1_000_000_000));
   }
 
+  /**
+   * Upgrade the NFT to the new version
+   * @param address the address of the NFT
+   * @param vk the verification key of the new MinaNFTContract
+   * @param signature the signature of the name service allowing the upgrading of the NFT
+   */
   @method upgrade(
     address: PublicKey,
     vk: VerificationKey,
@@ -113,6 +126,10 @@ class MinaNFTNameServiceContract extends SmartContract {
     this.emitEvent("upgrade", address);
   }
 
+  /**
+   * Mints the NFT
+   * @param data the {@link MintData} of the NFT
+   */
   @method mint(data: MintData) {
     const oracle = this.oracle.getAndAssertEquals();
     data.signature
@@ -154,7 +171,7 @@ class MinaNFTNameServiceContract extends SmartContract {
   }
 
   /**
-   * Update metadata of the NFT
+   * Updates metadata of the NFT
    * @param address address of the NFT
    * @param update {@link Update} - data for the update
    * @param signature signature of the owner
@@ -196,7 +213,8 @@ class MinaNFTNameServiceContract extends SmartContract {
     escrow2: PublicKey,
     escrow3: PublicKey
   ) {
-    this.isNFT(address);
+    // TODO: Return back after bug resolution https://github.com/o1-labs/o1js/issues/1245
+    //this.isNFT(address);
     const nft = new MinaNFTContract(address, this.token.id);
     nft.transfer(
       data,

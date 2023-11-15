@@ -24,7 +24,7 @@ import {
 import { PINATA_JWT } from "../env.json";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "berkeley";
+const blockchainInstance: blockchain = "testworld2";
 
 let deployer: PrivateKey | undefined = undefined;
 const deployers: PrivateKey[] = [];
