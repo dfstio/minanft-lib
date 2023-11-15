@@ -8,7 +8,7 @@ export {
   accountBalanceMina,
 };
 
-import { Mina, PublicKey, UInt64, fetchAccount } from "o1js";
+import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount } from "o1js";
 import {
   MINAURL,
   ARCHIVEURL,
@@ -18,10 +18,16 @@ import {
 
 type blockchain = "local" | "berkeley" | "testworld2" | "mainnet";
 
-function initBlockchain(instance: blockchain): void {
+function initBlockchain(instance: blockchain):
+  | {
+      publicKey: PublicKey;
+      privateKey: PrivateKey;
+    }[]
+  | undefined {
   if (instance === "local") {
     const Local = Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
+    return Local.testAccounts;
   } else if (instance === "berkeley" || instance === "testworld2") {
     const network = Mina.Network(
       instance === "berkeley"
@@ -38,6 +44,7 @@ function initBlockchain(instance: blockchain): void {
   } else {
     throw new Error("Mainnet is not supported yet.");
   }
+  return undefined;
 }
 
 async function accountBalance(address: PublicKey): Promise<UInt64> {

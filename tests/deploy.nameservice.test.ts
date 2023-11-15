@@ -15,8 +15,8 @@ import { MinaNFTNameServiceContract } from "../src/contract/names";
 const useLocalBlockchain: boolean = false;
 
 let deployer: PrivateKey | undefined = undefined;
-let namesService: MinaNFTNameService | undefined = undefined;
-let namesServicePrivateKey: PrivateKey | undefined = undefined;
+let nameService: MinaNFTNameService | undefined = undefined;
+let nameServicePrivateKey: PrivateKey | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
@@ -32,7 +32,7 @@ beforeAll(async () => {
     ? d
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
-  namesServicePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK);
+  nameServicePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK);
 
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;
@@ -50,30 +50,30 @@ describe(`Deploy MinaNFT Name Service contract`, () => {
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-  /*
+  
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
-    expect(namesServicePrivateKey).toBeDefined();
-    if (namesServicePrivateKey === undefined) return;
+    expect(nameServicePrivateKey).toBeDefined();
+    if (nameServicePrivateKey === undefined) return;
     expect(oraclePrivateKey).toBeDefined();
     if (oraclePrivateKey === undefined) return;
     const names = new MinaNFTNameService({
       oraclePrivateKey,
     });
-    const tx = await names.deploy(deployer, namesServicePrivateKey);
+    const tx = await names.deploy(deployer, nameServicePrivateKey);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`names service deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    namesService = names;
-    expect(namesService).toBeDefined();
-    if (namesService === undefined) return;
-    expect(namesService.address).toBeDefined();
-    if (namesService.address === undefined) return;
-    expect(namesService.address.toBase58()).toBe(MINANFT_NAME_SERVICE);
+    nameService = names;
+    expect(nameService).toBeDefined();
+    if (nameService === undefined) return;
+    expect(nameService.address).toBeDefined();
+    if (nameService.address === undefined) return;
+    expect(nameService.address.toBase58()).toBe(MINANFT_NAME_SERVICE);
   });
-*/
+
   it(`should check Name Service contract`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;

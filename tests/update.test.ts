@@ -17,7 +17,7 @@ const ITERATIONS_NUMBER = 1;
 const pinataJWT = PINATA_JWT;
 const blockchainInstance: blockchain = "testworld2";
 
-let namesService: MinaNFTNameService | undefined = undefined;
+let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 let badgeOraclePrivateKey: PrivateKey | undefined = undefined;
 
@@ -72,11 +72,11 @@ describe(`MinaNFT contract`, () => {
     if (tx === undefined) return;
     Memory.info(`names service deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    namesService = names;
-    expect(namesService).toBeDefined();
-    if (namesService === undefined) return;
-    expect(namesService.tokenId).toBeDefined();
-    if (namesService.tokenId === undefined) return;
+    nameService = names;
+    expect(nameService).toBeDefined();
+    if (nameService === undefined) return;
+    expect(nameService.tokenId).toBeDefined();
+    if (nameService.tokenId === undefined) return;
   });
 
   it(`should deploy Badge contract`, async () => {
@@ -107,7 +107,7 @@ describe(`MinaNFT contract`, () => {
         deployer,
         owner: ownerHash,
         pinataJWT,
-        namesService,
+        nameService,
         nonce: nonce++,
       });
       expect(tx).toBeDefined();
@@ -148,7 +148,7 @@ describe(`MinaNFT contract`, () => {
             deployer,
             ownerPrivateKey: owners[i],
             pinataJWT,
-            namesService,
+            nameService,
             nonce: nonce++,
           }); // commit the update to blockchain
           expect(tx).toBeDefined();
