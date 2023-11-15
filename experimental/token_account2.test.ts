@@ -213,7 +213,7 @@ using the deployer with public key ${sender.toBase58()}:
       const transaction = await Mina.transaction(
         { sender, fee: transactionFee, memo: "minanft.io" },
         () => {
-          zkToken.update(Field(i + 1), userPublicKey);
+          zkToken.update(Field(i + 1 + (i == 2 ? 1 : 0)), userPublicKey);
         }
       );
       await transaction.prove();

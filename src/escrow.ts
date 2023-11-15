@@ -1,4 +1,4 @@
-export { MinaNFTEscrow };
+export { MinaNFTEscrow, EscrowTransferData };
 import {
   Mina,
   PrivateKey,
@@ -6,21 +6,25 @@ import {
   AccountUpdate,
   fetchAccount,
   Signature,
-  UInt64,
+  Field,
+  Account,
 } from "o1js";
 import { MinaNFT } from "./minanft";
 import { Escrow, EscrowDeposit } from "./plugins/escrow";
 import { EscrowTransfer } from "./contract/escrow";
 
-/**
- * interface for MinaNFTBadge constructor
- * @param name Name of the Badge issuer
- * @param owner Name of the Badge owner
- * @param verifiedKey Key of the Badge that is verified (like "twitter")
- * @param verifiedKind Kind of the Badge that is verified (like "string")
- * @param oracle Oracle public key that verifies the Badge
- *
- */
+interface EscrowTransferData {
+  data: EscrowTransfer;
+  escrow: PrivateKey;
+  sellerDeposited: EscrowDeposit;
+  buyerDeposited: EscrowDeposit;
+  nft: PublicKey;
+  nameService: PublicKey;
+  tokenId: Field;
+  seller: PublicKey;
+  buyer: PublicKey;
+  isKYCpassed: boolean;
+}
 
 class MinaNFTEscrow {
   address?: PublicKey;
@@ -135,15 +139,21 @@ class MinaNFTEscrow {
   }
 
   public async transfer(
-    data: EscrowTransfer,
-    escrow: PrivateKey,
-    sellerDeposited: EscrowDeposit,
-    buyerDeposited: EscrowDeposit,
-    nft: PublicKey,
-    seller: PublicKey,
-    buyer: PublicKey,
-    isKYCpassed: boolean
+    transferData: EscrowTransferData
   ): Promise<Mina.TransactionId | undefined> {
+    const {
+      data,
+      escrow,
+      sellerDeposited,
+      buyerDeposited,
+      nft,
+      nameService,
+      tokenId,
+      seller,
+      buyer,
+      isKYCpassed,
+    } = transferData;
+
     if (this.address === undefined) {
       throw new Error("Escrow not deployed");
     }
@@ -159,7 +169,18 @@ class MinaNFTEscrow {
     const signature: Signature = Signature.create(escrow, data.toFields());
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.address });
-
+    await fetchAccount({ publicKey: nameService });
+    await fetchAccount({ publicKey: nft, tokenId });
+    const hasAccount = Mina.hasAccount(nft, tokenId);
+    const account = Account(nft, tokenId);
+    const balance = Mina.getBalance(nft, tokenId);
+    console.log(
+      `transfer checks result:`,
+      hasAccount,
+      tokenId.toJSON(),
+      account.balance.get().toString(),
+      balance.toString()
+    );
     /*
       @method transfer(
         nft: PublicKey,
@@ -181,6 +202,7 @@ class MinaNFTEscrow {
       () => {
         zkApp.transfer(
           nft,
+          nameService,
           data,
           sellerDeposited.signature,
           buyerDeposited.signature,

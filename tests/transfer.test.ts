@@ -1,57 +1,44 @@
 import { describe, expect, it } from "@jest/globals";
 import {
-  SmartContract,
-  method,
   Field,
-  state,
-  State,
   PrivateKey,
   Mina,
   Poseidon,
   Signature,
   UInt64,
+  Account,
 } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
+import { MinaNFTNameService } from "../src/minanftnames";
 import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import { PINATA_JWT } from "../env.json";
 
-// 'local' or 'berkeley' or 'mainnet'
+const CONTRACTS_NUMBER = 2;
+const ITERATIONS_NUMBER = 2;
+const pinataJWT = ""; //PINATA_JWT;
 const blockchainInstance: blockchain = "local";
-//const blockchainInstance: blockchain = 'berkeley';
-//const blockchainInstance: blockchain = "testworld2";
 
-const DEPLOYERS_NUMBER = 3;
-const ITERATIONS_NUMBER = 5;
+let namesService: MinaNFTNameService | undefined = undefined;
+let oraclePrivateKey: PrivateKey | undefined = undefined;
 
-jest.setTimeout(1000 * 60 * 60 * 24); // 24 hours
-
-class Key extends SmartContract {
-  @state(Field) key = State<Field>();
-
-  @method mint(key: Field) {
-    this.key.assertEquals(Field(0));
-    this.key.set(key);
-  }
-}
+let deployer: PrivateKey | undefined = undefined;
+let nonce: number = 0;
 
 describe(`MinaNFT contract`, () => {
-  const deployers: PrivateKey[] = [];
-
   it(`should initialize blockchain`, async () => {
-    const data = await initBlockchain(blockchainInstance, DEPLOYERS_NUMBER);
+    const data = await initBlockchain(blockchainInstance, 0);
     expect(data).toBeDefined();
     if (data === undefined) return;
-    const { deployers: ds } = data;
-    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
-      deployers.push(ds[i]);
-    }
+    const { deployer: d } = data;
+    expect(d).toBeDefined();
+    deployer = d;
   });
 
   it(`should compile contracts`, async () => {
     console.log(`Compiling...`);
     console.time(`compiled all`);
-    await Key.compile();
     await MinaNFT.compile();
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
@@ -71,16 +58,42 @@ describe(`MinaNFT contract`, () => {
     Poseidon.hash(escrowPublicKey3.toFields()),
   ]);
 
+  it(`should deploy NameService`, async () => {
+    expect(deployer).toBeDefined();
+    if (deployer === undefined) return;
+    const sender = deployer.toPublicKey();
+    const account = Account(sender);
+    nonce = Number(account.nonce.get().toBigint());
+    oraclePrivateKey = PrivateKey.random();
+    const names = new MinaNFTNameService({
+      oraclePrivateKey,
+    });
+    const tx = await names.deploy(deployer, undefined, nonce++);
+    expect(tx).toBeDefined();
+    if (tx === undefined) return;
+    Memory.info(`names service deployed`);
+    expect(await MinaNFT.wait(tx)).toBe(true);
+    namesService = names;
+  });
+
   it(`should mint NFTs`, async () => {
-    //console.log(`Minting...`);
-    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+    console.log(`Minting...`);
+    expect(deployer).toBeDefined();
+    if (deployer === undefined) return;
+    for (let i = 0; i < CONTRACTS_NUMBER; i++) {
       nft.push(new MinaNFT(`@test`));
       nft[i].update({ key: `description`, value: `my nft @test` });
       nft[i].update({ key: `twitter`, value: `@builder` });
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
 
-      const tx = await nft[i].mint(deployers[i], ownerHash);
+      const tx = await nft[i].mint({
+        deployer,
+        owner: ownerHash,
+        pinataJWT,
+        namesService,
+        nonce: nonce++,
+      });
       expect(tx).toBeDefined();
       if (tx === undefined) return;
       txs.push(tx);
@@ -90,7 +103,7 @@ describe(`MinaNFT contract`, () => {
   });
 
   it(`should wait for mint transactions to be included into the block`, async () => {
-    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+    for (let i = 0; i < CONTRACTS_NUMBER; i++) {
       expect(await MinaNFT.wait(txs[i])).toBe(true);
       expect(await nft[i].checkState()).toBe(true);
     }
@@ -98,9 +111,11 @@ describe(`MinaNFT contract`, () => {
 
   for (let iteration = 1; iteration <= ITERATIONS_NUMBER; iteration++) {
     it(`should approve escrow, iteration ${iteration}`, async () => {
-      //console.log(`Updating and issuing badges, iteration ${iteration}...`);
+      console.log(`Approving escrow, iteration ${iteration}...`);
+      expect(deployer).toBeDefined();
+      if (deployer === undefined) return;
 
-      for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      for (let i = 0; i < CONTRACTS_NUMBER; i++) {
         // update metadata
         const data: EscrowApproval = new EscrowApproval({
           name: MinaNFT.stringToField(nft[i].name),
@@ -111,12 +126,14 @@ describe(`MinaNFT contract`, () => {
         const signature = Signature.create(owners[i], data.toFields());
 
         try {
-          const tx = await nft[i].approve(
-            deployers[i],
+          const tx = await nft[i].approve({
+            deployer,
             data,
             signature,
-            owners[i].toPublicKey()
-          );
+            ownerPublicKey: owners[i].toPublicKey(),
+            namesService,
+            nonce: nonce++,
+          });
           expect(tx).toBeDefined();
           if (tx === undefined) return;
           txs[i] = tx;
@@ -128,14 +145,17 @@ describe(`MinaNFT contract`, () => {
     });
 
     it(`should wait for approve transactions to be included into the block, iteration ${iteration}`, async () => {
-      for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      for (let i = 0; i < CONTRACTS_NUMBER; i++) {
         expect(await MinaNFT.wait(txs[i])).toBe(true);
         expect(await nft[i].checkState()).toBe(true);
       }
     });
 
     it(`should transfer NFTs, iteration ${iteration}`, async () => {
-      for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      console.log(`Transferring, iteration ${iteration}...`);
+      expect(deployer).toBeDefined();
+      if (deployer === undefined) return;
+      for (let i = 0; i < CONTRACTS_NUMBER; i++) {
         const ownerHash = Poseidon.hash(owners[i].toPublicKey().toFields());
         const newOwnerPrivateKey = PrivateKey.random();
         const newOwnerPublicKey = newOwnerPrivateKey.toPublicKey();
@@ -162,16 +182,18 @@ describe(`MinaNFT contract`, () => {
           escrowPrivateKey3,
           escrowData.toFields()
         );
-        const tx = await nft[i].transfer(
-          deployers[i],
-          escrowData,
+        const tx = await nft[i].transfer({
+          deployer,
+          data: escrowData,
           signature1,
           signature2,
           signature3,
-          escrowPublicKey1,
-          escrowPublicKey2,
-          escrowPublicKey3
-        );
+          escrow1: escrowPublicKey1,
+          escrow2: escrowPublicKey2,
+          escrow3: escrowPublicKey3,
+          namesService,
+          nonce: nonce++,
+        });
         expect(tx).toBeDefined();
         if (tx === undefined) return;
         txs[i] = tx;
@@ -183,7 +205,7 @@ describe(`MinaNFT contract`, () => {
     });
 
     it(`should wait for transfer transactions to be included into the block, iteration ${iteration}`, async () => {
-      for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+      for (let i = 0; i < CONTRACTS_NUMBER; i++) {
         expect(await MinaNFT.wait(txs[i])).toBe(true);
         expect(await nft[i].checkState()).toBe(true);
       }
@@ -191,7 +213,7 @@ describe(`MinaNFT contract`, () => {
     });
   }
   it(`should verify the final state of NFTs`, async () => {
-    for (let i = 0; i < DEPLOYERS_NUMBER; i++) {
+    for (let i = 0; i < CONTRACTS_NUMBER; i++) {
       expect(await MinaNFT.wait(txs[i])).toBe(true);
       expect(await nft[i].checkState()).toBe(true);
     }

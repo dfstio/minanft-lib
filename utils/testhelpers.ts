@@ -1,5 +1,6 @@
 export {
   accountBalance,
+  accountBalanceMina,
   sleep,
   makeString,
   Memory,
@@ -80,6 +81,10 @@ async function accountBalance(address: PublicKey): Promise<UInt64> {
   await fetchAccount({ publicKey: address });
   if (Mina.hasAccount(address)) return Mina.getBalance(address);
   else return UInt64.from(0);
+}
+
+async function accountBalanceMina(address: PublicKey): Promise<number> {
+  return Number((await accountBalance(address)).toBigInt()) / 1e9;
 }
 
 function sleep(ms: number) {

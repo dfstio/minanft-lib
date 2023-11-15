@@ -1,6 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { Encoding, MerkleMap, MerkleMapWitness, Field } from "o1js";
-import { MinaNFT } from "../src/minanft";
+import { Encoding, MerkleMap, Field, PublicKey } from "o1js";
 
 function add(
   map1: MerkleMap,
@@ -15,6 +14,9 @@ function add(
 describe("Merkle Map", () => {
   it("should generate witnesses and verify roots", async () => {
     const map1 = new MerkleMap();
+    const root: Field = map1.getRoot();
+    const key: PublicKey = PublicKey.fromFields([root, root]);
+    console.log("key", key.toBase58());
     const map2 = new MerkleMap();
     add(map1, map2, Field(1), Field(2), Field(7));
     add(map1, map2, Field(2), Field(4), Field(8));

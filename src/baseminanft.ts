@@ -11,7 +11,7 @@ import {
 } from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTContract } from "./contract/nft";
-import { BaseMinaNFTObject } from "./baseminanftobject";
+import { MinaNFTNameServiceContract } from "./contract/names";
 import { Metadata, MetadataWitness } from "./contract/metadata";
 import {
   MinaNFTMetadataUpdate,
@@ -41,6 +41,7 @@ class Key extends SmartContract {
 class BaseMinaNFT {
   metadata: Map<string, PrivateMetadata>;
   static verificationKey: VerificationKey | undefined;
+  static namesVerificationKey: VerificationKey | undefined;
   static updaterVerificationKey: VerificationKey | undefined;
   static updateVerificationKey: string | undefined;
   static verifierVerificationKey: VerificationKey | undefined;
@@ -196,22 +197,33 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compile(): Promise<VerificationKey> {
+    const cache: Cache = Cache.FileSystem("./nftcache");
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
-      await Key.compile();
-      const { verificationKey } = await MinaNFTMetadataUpdate.compile();
+      await Key.compile({ cache });
+      const { verificationKey } = await MinaNFTMetadataUpdate.compile({
+        cache,
+      });
       console.timeEnd("MinaNFTMetadataUpdate compiled");
       MinaNFT.updateVerificationKey = verificationKey;
     }
 
-    if (MinaNFT.verificationKey !== undefined) {
-      return MinaNFT.verificationKey;
+    if (MinaNFT.verificationKey == undefined) {
+      console.time("MinaNFT compiled");
+      const { verificationKey } = await MinaNFTContract.compile({ cache });
+      console.timeEnd("MinaNFT compiled");
+      MinaNFT.verificationKey = verificationKey as VerificationKey;
     }
-    const cache: Cache = Cache.FileSystem("./nftcache");
-    console.time("MinaNFT compiled");
-    const { verificationKey } = await MinaNFTContract.compile({ cache });
-    console.timeEnd("MinaNFT compiled");
-    MinaNFT.verificationKey = verificationKey as VerificationKey;
+
+    if (MinaNFT.namesVerificationKey == undefined) {
+      console.time("MinaNFTNameServiceContract compiled");
+      const { verificationKey } = await MinaNFTNameServiceContract.compile({
+        cache,
+      });
+      console.timeEnd("MinaNFTNameServiceContract compiled");
+      MinaNFT.namesVerificationKey = verificationKey as VerificationKey;
+    }
+
     return MinaNFT.verificationKey;
   }
 

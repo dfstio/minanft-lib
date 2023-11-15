@@ -1,18 +1,17 @@
 import { describe, expect, it } from "@jest/globals";
 import {
-  SmartContract,
-  method,
   Field,
-  state,
-  State,
   PrivateKey,
   Mina,
   Poseidon,
   UInt64,
   PublicKey,
+  fetchAccount,
+  Account,
 } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
+import { MinaNFTNameService } from "../src/minanftnames";
 import { EscrowTransfer } from "../src/contract/escrow";
 import { MinaNFTEscrow } from "../src/escrow";
 import { EscrowDeposit } from "../src/plugins/escrow";
@@ -22,20 +21,10 @@ import {
   blockchain,
   initBlockchain,
 } from "../utils/testhelpers";
+import { PINATA_JWT } from "../env.json";
 
-// 'local' or 'berkeley' or 'mainnet'
-const blockchainInstance: blockchain = "local";
-//const blockchainInstance: blockchain = "testworld2";
-//const blockchainInstance: blockchain = 'berkeley';
-
-class Key extends SmartContract {
-  @state(Field) key = State<Field>();
-
-  @method mint(key: Field) {
-    this.key.assertEquals(Field(0));
-    this.key.set(key);
-  }
-}
+const pinataJWT = PINATA_JWT;
+const blockchainInstance: blockchain = "testworld2";
 
 let deployer: PrivateKey | undefined = undefined;
 const deployers: PrivateKey[] = [];
@@ -55,6 +44,9 @@ let escrowPublicKey: PublicKey | undefined = undefined;
 let escrowHash: Field | undefined = undefined;
 const price: UInt64 = UInt64.from(7_000_000_000n);
 let escrowData: EscrowTransfer | undefined = undefined;
+
+let namesService: MinaNFTNameService | undefined = undefined;
+let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 3);
@@ -107,7 +99,6 @@ describe(`MinaNFT contract`, () => {
   it(`should compile contracts`, async () => {
     console.log(`Compiling...`);
     console.time(`compiled all`);
-    await Key.compile();
     await MinaNFT.compile();
     await MinaNFT.compileEscrow();
     console.timeEnd(`compiled all`);
@@ -133,6 +124,27 @@ describe(`MinaNFT contract`, () => {
     expect(escrowTx).toBeDefined();
   });
 
+  it(`should wait for escrow deploy transaction to be included into the block`, async () => {
+    expect(escrowTx).toBeDefined();
+    if (escrowTx === undefined) return;
+    expect(await MinaNFT.wait(escrowTx)).toBe(true);
+  });
+
+  it(`should deploy NameService`, async () => {
+    expect(deployer).toBeDefined();
+    if (deployer === undefined) return;
+    oraclePrivateKey = PrivateKey.random();
+    const names = new MinaNFTNameService({
+      oraclePrivateKey,
+    });
+    const tx = await names.deploy(deployer);
+    expect(tx).toBeDefined();
+    if (tx === undefined) return;
+    Memory.info(`names service deployed`);
+    expect(await MinaNFT.wait(tx)).toBe(true);
+    namesService = names;
+  });
+
   it(`should mint NFT`, async () => {
     expect(sellerPrivateKey).toBeDefined();
     if (sellerPrivateKey === undefined) return;
@@ -140,16 +152,17 @@ describe(`MinaNFT contract`, () => {
     nft.update({ key: `twitter`, value: `@builder` });
     const sellerHash = Poseidon.hash(sellerPublicKey!.toFields());
 
-    mintTx = await nft.mint(sellerPrivateKey, sellerHash, escrowHash);
+    mintTx = await nft.mint({
+      deployer: sellerPrivateKey,
+      owner: sellerHash,
+      escrow: escrowHash,
+      namesService,
+      pinataJWT,
+    });
     expect(mintTx).toBeDefined();
     Memory.info(`minted`);
   });
 
-  it(`should wait for escrow deploy transaction to be included into the block`, async () => {
-    expect(escrowTx).toBeDefined();
-    if (escrowTx === undefined) return;
-    expect(await MinaNFT.wait(escrowTx)).toBe(true);
-  });
   let isKYCpassed = false;
 
   it(`should wait for KYC to be passed`, async () => {
@@ -216,37 +229,66 @@ describe(`MinaNFT contract`, () => {
     expect(depositTx).toBeDefined();
     if (depositTx === undefined) return;
     expect(await MinaNFT.wait(depositTx)).toBe(true);
+    Memory.info(`deposited and approved`);
   });
 
-  it(`escrow should transfer NFT and funds`, async () => {
-    /*
-      public async transfer(
-        data: EscrowTransfer,
-        escrow: PrivateKey,
-        sellerDeposited: EscrowDeposit,
-        buyerDeposited: EscrowDeposit,
-        nft: PublicKey,
-        seller: PublicKey,
-        buyer: PublicKey
-  )
-    */
+  it(`should check the balance of tokens`, async () => {
     expect(nft.address).toBeDefined();
+    expect(namesService).toBeDefined();
+    if (namesService === undefined) return;
+    expect(namesService.address).toBeDefined();
+    if (namesService.address === undefined) return;
     expect(sellerDeposited).toBeDefined();
     if (sellerDeposited === undefined) return;
     expect(buyerDeposited).toBeDefined();
     if (buyerDeposited === undefined) return;
+    expect(nft.address).toBeDefined();
     if (nft.address === undefined) return;
-    transferTx = await escrow.transfer(
-      escrowData!,
-      escrowPrivateKey!,
+    expect(nft.tokenId).toBeDefined();
+    if (nft.tokenId === undefined) return;
+    const tokenId = nft.tokenId;
+    await fetchAccount({ publicKey: nft.address, tokenId });
+    const hasAccount = Mina.hasAccount(nft.address, tokenId);
+    const account = Account(nft.address, tokenId);
+    const balance = Mina.getBalance(nft.address, tokenId);
+    console.log(
+      `Checks result:`,
+      hasAccount,
+      tokenId.toJSON(),
+      account.balance.get().toString(),
+      balance.toString()
+    );
+  });
+
+  it(`escrow should transfer NFT and funds`, async () => {
+    expect(nft.address).toBeDefined();
+    expect(namesService).toBeDefined();
+    if (namesService === undefined) return;
+    expect(namesService.address).toBeDefined();
+    if (namesService.address === undefined) return;
+    expect(sellerDeposited).toBeDefined();
+    if (sellerDeposited === undefined) return;
+    expect(buyerDeposited).toBeDefined();
+    if (buyerDeposited === undefined) return;
+    expect(nft.address).toBeDefined();
+    if (nft.address === undefined) return;
+    expect(nft.tokenId).toBeDefined();
+    if (nft.tokenId === undefined) return;
+
+    transferTx = await escrow.transfer({
+      data: escrowData!,
+      escrow: escrowPrivateKey!,
       sellerDeposited,
       buyerDeposited,
-      nft.address,
-      sellerPublicKey!,
-      buyerPublicKey!,
-      isKYCpassed
-    );
+      nft: nft.address,
+      nameService: namesService.address,
+      tokenId: nft.tokenId,
+      seller: sellerPublicKey!,
+      buyer: buyerPublicKey!,
+      isKYCpassed,
+    });
     expect(transferTx).toBeDefined();
+    Memory.info(`transferred`);
   });
 
   it(`should verify the final state of NFT, seller and buyer`, async () => {
@@ -276,5 +318,6 @@ describe(`MinaNFT contract`, () => {
         .sub(await MinaNFT.fee())
         .toBigInt()
     ); // buyer pays the price
+    Memory.info(`verified`);
   });
 });
