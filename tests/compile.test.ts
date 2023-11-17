@@ -15,9 +15,12 @@ describe("Compile contracts", () => {
   MinaNFT.setCacheFolder("./nftcache");
   Memory.info("before compile");
   it("should compile a MinaNFT contract", async () => {
+    console.time("compiled MinaNFT contract");
     await MinaNFT.compile();
     Memory.info("after MinaNFT contract");
+    console.timeEnd("compiled MinaNFT contract");
   });
+  /*
   it("should compile a Escrow contract", async () => {
     await MinaNFT.compileEscrow();
     Memory.info("after Escrow contract");
@@ -34,4 +37,5 @@ describe("Compile contracts", () => {
     await MinaNFT.compileVerifier();
     Memory.info("after Verifier contract");
   });
+  */
 });

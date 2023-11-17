@@ -205,7 +205,7 @@ class BaseMinaNFT {
    * @param folder folder for prover keys
    * default is "./nftcache"
    */
-  public static setCacheFolder(folder: string = "cd ./nftcache"): void {
+  public static setCacheFolder(folder: string = "./nftcache"): void {
     MinaNFT.cache = Cache.FileSystem(folder);
   }
 
