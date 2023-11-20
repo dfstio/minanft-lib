@@ -74,6 +74,7 @@ class MinaNFT extends BaseMinaNFT {
   */
 
   name: string;
+  creator: string;
   storage: string;
   owner: Field;
   escrow: Field;
@@ -91,15 +92,16 @@ class MinaNFT extends BaseMinaNFT {
    * @param name Name of NFT
    * @param address Public key of the deployed NFT zkApp
    */
-  constructor(name: string, address: PublicKey | undefined = undefined) {
+  constructor(value: {name: string, address?: PublicKey, creator?: string}) {
     super();
-    this.name = name;
+    this.name = (value.name[0] === '@') ? value.name: '@' + value.name;
+    this.creator = value.creator?? "MinaNFT library";
     this.storage = "";
     this.owner = Field(0);
     this.escrow = Field(0);
     this.version = UInt64.from(0);
-    this.isMinted = address === undefined ? false : true;
-    this.address = address;
+    this.isMinted = value.address === undefined ? false : true;
+    this.address = value.address;
     this.updates = [];
     const metadataMap = new MetadataMap();
     this.metadataRoot = metadataMap.getRoot();
@@ -169,10 +171,12 @@ class MinaNFT extends BaseMinaNFT {
 
     return {
       name: this.name,
-      description,
+      description: description ?? "",
       image,
       external_url: "https://minanft.io/" + this.name,
       version: this.version.add(UInt64.from(1)).toJSON(),
+      time: Date.now(),
+      creator: this.creator,
       properties: Object.fromEntries(this.metadata),
     };
   }
@@ -266,9 +270,18 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
     const file = new File(data.filename);
+    console.log("Pinning image to IPFS...");
     await file.pin(data.pinataJWT);
+    console.log("Calculating image Merkle tree root...");
+    console.time("Image Merkle tree root calculated");
+    await file.treeData();
+    console.timeEnd("Image Merkle tree root calculated");
+    console.time("Calculated SHA-3 512");
+    await file.sha3_512();
+    console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
-
+    this.updateFileData("image", "image", fileData, false);
+/*
     this.updateMetadata(
       "image",
       new PrivateMetadata({
@@ -278,6 +291,7 @@ class MinaNFT extends BaseMinaNFT {
         linkedObject: fileData,
       })
     );
+*/
   }
 
   /**
@@ -286,9 +300,18 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename);
+    console.log("Pinning file to IPFS...");
     await file.pin(data.pinataJWT);
+    console.log("Calculating file Merkle tree root...");
+    console.time("File Merkle tree root calculated");
+    await file.treeData();
+    console.timeEnd("File Merkle tree root calculated");
+    console.time("Calculated SHA-3 512");
+    await file.sha3_512();
+    console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
-
+    this.updateFileData(data.key, "file", fileData, data.isPrivate ?? false);
+/*
     this.updateMetadata(
       data.key,
       new PrivateMetadata({
@@ -296,6 +319,26 @@ class MinaNFT extends BaseMinaNFT {
         kind: MinaNFT.stringToField("file"),
         isPrivate: data.isPrivate ?? false,
         linkedObject: fileData,
+      })
+    );
+*/
+  }
+
+  /**
+   * updates PrivateMetadata
+   * @param key key to update
+   * @param type type of metadata ('file' or 'image' for example)
+   * @param data {@link FileData} file data
+   * @param isPrivate is metadata private
+   */
+  public updateFileData(key: string, type: string, data: FileData, isPrivate: boolean): void {
+    this.updateMetadata(
+      key,
+      new PrivateMetadata({
+        data: data.root,
+        kind: MinaNFT.stringToField(type),
+        isPrivate: isPrivate,
+        linkedObject: data,
       })
     );
   }

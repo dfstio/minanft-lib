@@ -87,6 +87,12 @@ class FileData extends BaseMinaNFTObject {
 class File {
   filename: string;
   storage?: string;
+  sha3_512_hash?: string;
+  size?: number;
+  mimeType?: string;
+  root?: Field; 
+  height?: number;
+  leavesNumber?: number
   constructor(filename: string) {
     this.filename = filename;
   }
@@ -109,7 +115,9 @@ class File {
     for await (const chunk of stream) {
       hash.update(chunk);
     }
-    return hash.digest("base64");
+    this.sha3_512_hash = hash.digest("base64");
+    stream.close();
+    return this.sha3_512_hash;
   }
 
   public async pin(pinataJWT: string) {
@@ -126,6 +134,8 @@ class File {
     stream.close();
     if (hash === undefined) throw new Error(`IPFS pin failed`);
     this.storage = `i:${hash}`;
+    this.size = metadata.size;
+    this.mimeType = metadata.mimeType;
   }
 
   public async treeData(): Promise<{
@@ -154,20 +164,31 @@ class File {
       throw new Error(`File is too big for this Merkle tree`);
     // First field is the height, second number is the number of fields
     tree.fill([Field.from(height), Field.from(fields.length), ...fields]);
-    return { root: tree.getRoot(), height, leavesNumber: fields.length };
+    this.root = tree.getRoot();
+    this.height = height;
+    this.leavesNumber = fields.length;
+    stream.close();
+    return { root: this.root, height, leavesNumber: this.leavesNumber };
   }
 
   public async data(): Promise<FileData> {
     if (this.storage === undefined) throw new Error(`File: storage not set`);
-    const metadata = await this.metadata();
-    const sha3_512 = await this.sha3_512();
-    const treeData = await this.treeData();
+    if (this.sha3_512_hash === undefined)
+      throw new Error(`File: SHA3-512 hash not set`);
+    if (this.size === undefined) throw new Error(`File: size not set`);
+    if (this.mimeType === undefined) throw new Error(`File: MIME type not set`);
+    if (this.root === undefined) throw new Error(`File: root not set`);
+    if (this.height === undefined) throw new Error(`File: height not set`);
+    if (this.leavesNumber === undefined) throw new Error(`File: leavesNumber not set`);
+    //const metadata = await this.metadata();
+    //const sha3_512 = await this.sha3_512();
+    //const treeData = await this.treeData();
     return new FileData({
-      fileRoot: treeData.root,
-      height: treeData.height,
-      size: metadata.size,
-      mimeType: metadata.mimeType.slice(0, 31),
-      sha3_512,
+      fileRoot: this.root,
+      height: this.height,
+      size: this.size,
+      mimeType: this.mimeType.slice(0, 31),
+      sha3_512: this.sha3_512_hash,
       filename: path.basename(this.filename).slice(0, 31),
       storage: this.storage,
     });

@@ -84,10 +84,11 @@ class IPFS {
     }
     return undefined;
   }
+  
   /*
-  public async addLink(file: string): Promise<string | undefined> {
+  public async pinLink(file: string): Promise<string | undefined> {
     try {
-      console.log("addLink", file);
+      console.log("pinLink", file);
       const auth: string = this.auth;
       const client = new S3Client({});
 
