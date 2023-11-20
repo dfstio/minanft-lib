@@ -7,7 +7,7 @@ import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
 
-const pinataJWT = ""; //PINATA_JWT;
+const pinataJWT = PINATA_JWT;
 const blockchainInstance: blockchain = "local";
 
 let deployer: PrivateKey | undefined = undefined;
@@ -60,7 +60,7 @@ describe(`MinaNFT contract`, () => {
     const ownerPublicKey = ownerPrivateKey.toPublicKey();
     const owner = Poseidon.hash(ownerPublicKey.toFields());
 
-    const nft = new MinaNFT(`@test`);
+    const nft = new MinaNFT({ name: `@test`});
     nft.updateText({
       key: `description`,
       text: "This is my long description of the NFT. Can be of any length, supports markdown.",

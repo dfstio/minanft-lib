@@ -112,7 +112,15 @@ class MapData extends BaseMinaNFTObject {
    */
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename);
+    console.log("Pinning file to IPFS...");
     await file.pin(data.pinataJWT);
+    console.log("Calculating file Merkle tree root...");
+    console.time("File Merkle tree root calculated");
+    await file.treeData();
+    console.timeEnd("File Merkle tree root calculated");
+    console.time("Calculated SHA-3 512");
+    await file.sha3_512();
+    console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
 
     this.updateMetadata(
@@ -125,6 +133,7 @@ class MapData extends BaseMinaNFTObject {
       })
     );
   }
+
 
   /**
    * updates PrivateMetadata
