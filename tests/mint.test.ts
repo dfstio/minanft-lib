@@ -7,7 +7,7 @@ import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
 
-const pinataJWT = PINATA_JWT;
+const pinataJWT = ""; //PINATA_JWT;
 const blockchainInstance: blockchain = "local";
 
 let deployer: PrivateKey | undefined = undefined;
@@ -69,6 +69,11 @@ describe(`MinaNFT contract`, () => {
     nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
     await nft.updateImage({
       filename: "./images/navigator.jpg",
+      pinataJWT,
+    });
+    await nft.updateFile({
+      key: "sea",
+      filename: "./images/sea.png",
       pinataJWT,
     });
     const map = new MapData();

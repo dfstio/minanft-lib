@@ -20,7 +20,6 @@ describe("Compile contracts", () => {
     Memory.info("after MinaNFT contract");
     console.timeEnd("compiled MinaNFT contract");
   });
-  /*
   it("should compile a Escrow contract", async () => {
     await MinaNFT.compileEscrow();
     Memory.info("after Escrow contract");
@@ -37,5 +36,4 @@ describe("Compile contracts", () => {
     await MinaNFT.compileVerifier();
     Memory.info("after Verifier contract");
   });
-  */
 });

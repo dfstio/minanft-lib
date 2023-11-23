@@ -12,7 +12,7 @@ import {
 import { MINANFT_NAME_SERVICE, NAMES_ORACLE } from "../src/config.json";
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
-const useLocalBlockchain: boolean = false;
+const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;

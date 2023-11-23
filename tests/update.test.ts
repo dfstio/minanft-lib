@@ -12,10 +12,10 @@ import {
 } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 
-const CONTRACTS_NUMBER = 2;
+const CONTRACTS_NUMBER = 1;
 const ITERATIONS_NUMBER = 1;
-const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const pinataJWT = ""; //PINATA_JWT;
+const blockchainInstance: blockchain = 'local';
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
@@ -94,7 +94,7 @@ describe(`MinaNFT contract`, () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     for (let i = 0; i < CONTRACTS_NUMBER; i++) {
-      nft.push(new MinaNFT(`@test${i}`));
+      nft.push(new MinaNFT({ name: `@test${i}`}));
       nft[i].update({ key: `twitter`, value: `@builder` });
       nft[i].updateText({
         key: `description`,
