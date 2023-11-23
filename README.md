@@ -5,12 +5,14 @@ corporations with MinaNFT, allowing to start minting NFTs, adding public and pri
 and verifying data off-chain and on-chain within one hour with easy and intiutive API
 
 ## Installation
+
 ```
 yarn add minanft
 ```
 
 ## Documentation
 
+https://docs.minanft.io
 https://lib.minanft.io
 
 ## Website
@@ -28,7 +30,6 @@ https://github.com/dfstio/minanft-lib-example
 ## Faucet
 
 https://faucet.minaprotocol.com
-
 
 ## Example:
 
@@ -68,6 +69,7 @@ const tx = await nft.mint(deployer, owner, pinataJWT);
 ```
 
 console.log() output:
+
 ```
 {
   "name": "@test",
@@ -151,4 +153,3 @@ console.log() output:
 }
 
 ```
-

@@ -23,6 +23,7 @@
     "compilets": "rm -rf dist/lib && tsc",
     "test": "jest",
     "deployers": "ts-node experimental/deployers.ts",
+    "age": "ts-node experimental/age1.ts",
     "await": "ts-node experimental/await.ts",
     "testworld2": "ts-node experimental/testworld2.ts",
     "coverage": "jest --coverage",
@@ -86,8 +87,7 @@
     "testTimeout": 10800000,
     "verbose": true,
     "roots": [
-      "tests",
-      "experimental"
+      "tests"
     ],
     "setupFilesAfterEnv": [
       "./jest-config.ts"

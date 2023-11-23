@@ -81,7 +81,7 @@ describe(`MinaNFT contract`, () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     for (let i = 0; i < CONTRACTS_NUMBER; i++) {
-      nft.push(new MinaNFT(`@test`));
+      nft.push(new MinaNFT({ name: `@test`}));
       nft[i].update({ key: `description`, value: `my nft @test` });
       nft[i].update({ key: `twitter`, value: `@builder` });
       const owner: PrivateKey = PrivateKey.random();

@@ -24,7 +24,7 @@ import {
 import { PINATA_JWT } from "../env.json";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 
 let deployer: PrivateKey | undefined = undefined;
 const deployers: PrivateKey[] = [];
@@ -115,7 +115,7 @@ describe(`MinaNFT contract`, () => {
   let buyerDeposited: EscrowDeposit | undefined = undefined;
 
   const escrow = new MinaNFTEscrow();
-  const nft = new MinaNFT(`@test`);
+  const nft = new MinaNFT({ name: `@test`});
 
   it(`should deploy Escrow contract`, async () => {
     expect(escrowPrivateKey).toBeDefined();
