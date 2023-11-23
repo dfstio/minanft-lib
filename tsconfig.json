@@ -17,6 +17,7 @@
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
     "out": "docs",
+    "plugin": ["typedoc-plugin-mermaid", "@mxssfd/typedoc-theme"],
     "theme": "my-theme",
     "sourceLinkTemplate": "https://github.com/dfstio/minanft-lib/blob/master/{path}#L{line}"
   },
