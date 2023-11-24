@@ -28,7 +28,6 @@ import { EscrowTransfer, EscrowApproval } from "./escrow";
  * @property initialState The initial state of the NFT (8 Fields)
  * @property verifier The verifier of the NFT - the Name Service contract that sends this update
  */
-
 class NFTMintData extends Struct({
   address: PublicKey,
   name: Field,
