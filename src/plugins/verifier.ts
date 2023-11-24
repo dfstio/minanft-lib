@@ -6,6 +6,7 @@ import {
   Permissions,
   SmartContract,
   PublicKey,
+  Field,
 } from "o1js";
 
 import { RedactedMinaNFTMapStateProof } from "./redactedmap";
@@ -26,9 +27,10 @@ class MinaNFTVerifier extends SmartContract {
 
   @method verifyRedactedMetadata(
     nft: PublicKey,
+    tokenId: Field,
     proof: RedactedMinaNFTMapStateProof
   ) {
-    const minanft = new MinaNFTContract(nft);
+    const minanft = new MinaNFTContract(nft, tokenId);
     const nftMetadata: Metadata = minanft.metadata.get();
     Metadata.assertEquals(nftMetadata, proof.publicInput.originalRoot);
 

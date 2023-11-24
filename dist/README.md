@@ -1,17 +1,16 @@
-# Mina NFT nodejs library for TypeScript and Javascript
+# Mina NFT nodejs library for TypeScript and JavaScript
 
-This library is designed for the easy integration for third-party developers and
-corporations with MinaNFT, allowing to start minting NFTs, adding public and private keys
-and verifying data off-chain and on-chain within one hour with easy and intiutive API
+This library is designed for easy integration of third-party developers and corporations with MinaNFT, allowing them to start minting NFTs, adding public and private keys, and verifying data off-chain and on-chain within one hour with easy and intuitive API
 
 ## Installation
+
 ```
 yarn add minanft
 ```
 
 ## Documentation
 
-https://lib.minanft.io
+https://docs.minanft.io
 
 ## Website
 
@@ -29,11 +28,10 @@ https://github.com/dfstio/minanft-lib-example
 
 https://faucet.minaprotocol.com
 
-
 ## Example:
 
 ```typescript
-const nft = new MinaNFT(`@test`);
+const nft = new MinaNFT({ name: `@test` });
 nft.updateText({
   key: `description`,
   text: "This is my long description of the NFT. Can be of any length, supports markdown.",
@@ -64,10 +62,16 @@ map.updateMap({ key: `level2-4`, map: mapLevel3 });
 nft.updateMap({ key: `level 2 and 3 data`, map });
 
 console.log(`metadata json:`, JSON.stringify(nft.toJSON(), null, 2));
-const tx = await nft.mint(deployer, owner, pinataJWT);
+const tx = await nft.mint({
+  deployer,
+  owner,
+  pinataJWT,
+  nameService,
+});
 ```
 
 console.log() output:
+
 ```
 {
   "name": "@test",
@@ -151,4 +155,3 @@ console.log() output:
 }
 
 ```
-

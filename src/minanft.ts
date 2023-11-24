@@ -1061,6 +1061,7 @@ class MinaNFT extends BaseMinaNFT {
     deployer: PrivateKey,
     verifier: PublicKey,
     nft: PublicKey,
+    tokenId: Field,
     proof: RedactedMinaNFTMapStateProof
   ) {
     const address = nft;
@@ -1075,7 +1076,7 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
       () => {
-        zkApp.verifyRedactedMetadata(address, proof);
+        zkApp.verifyRedactedMetadata(address, tokenId, proof);
       }
     );
     await tx.prove();
