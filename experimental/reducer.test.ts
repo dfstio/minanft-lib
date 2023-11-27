@@ -41,18 +41,18 @@ class Update extends Struct({
 
 class NFT extends SmartContract {
   @state(Field) root = State<Field>();
-  //@state(Field) pwdHash = State<Field>();
+  @state(Field) pwdHash = State<Field>();
   @state(Field) actionState = State<Field>();
-  //@state(Bool) isDispatched = State<Bool>();
+  @state(Bool) isDispatched = State<Bool>();
 
-  reducer = Reducer({ actionType: Field });
+  reducer = Reducer({ actionType: Update });
 
-  /*
+  
   events = {
     deploy: Field,
     update: Update,
   };
-  */
+  
 
   deploy(args: DeployArgs) {
     super.deploy(args);
@@ -67,21 +67,21 @@ class NFT extends SmartContract {
       setVotingFor: Permissions.proof(),
       setTiming: Permissions.proof(),
     });
-    // this.emitEvent("deploy", Field(0));
+    this.emitEvent("deploy", Field(0));
   }
 
   init() {
     super.init();
   }
 
-  @method dispatchState(data: Field) {
-    //this.pwdHash.assertEquals(this.pwdHash.get());
-    //this.pwdHash.assertEquals(Poseidon.hash([secret]));
+  @method dispatchState(data: Update, secret: Field) {
+    this.pwdHash.assertEquals(this.pwdHash.get());
+    this.pwdHash.assertEquals(Poseidon.hash([secret]));
     this.reducer.dispatch(data);
-    //this.emitEvent("update", data);
-    //this.isDispatched.assertEquals(this.isDispatched.get());
-    //this.isDispatched.assertEquals(Bool(false));
-    //this.isDispatched.set(Bool(true));
+    this.emitEvent("update", data);
+    this.isDispatched.assertEquals(this.isDispatched.get());
+    this.isDispatched.assertEquals(Bool(false));
+    this.isDispatched.set(Bool(true));
   }
 
   @method reduceState() {
@@ -101,8 +101,8 @@ class NFT extends SmartContract {
       // state type
       Field,
       // function that says how to apply an action
-      (state: Field, action: Field) => {
-        return action;
+      (state: Field, action: Update) => {
+        return action.newRoot;
       },
       { state: root, actionState }
     );
@@ -110,7 +110,7 @@ class NFT extends SmartContract {
     // update on-chain state
     this.root.set(newRoot);
     this.actionState.set(newActionState);
-    //this.isDispatched.set(Bool(false));
+    this.isDispatched.set(Bool(false));
   }
 }
 
@@ -122,8 +122,8 @@ beforeAll(async () => {
     deployer = privateKey;
   } else {
     const network = Mina.Network({
-      mina: TESTWORLD2,
-      archive: TESTWORLD2_ARCHIVE,
+      mina: TESTWORLD2, // MINAURL, 
+      archive: TESTWORLD2_ARCHIVE, // ARCHIVEURL 
     });
     /*
     const Network = Mina.Network({
@@ -178,9 +178,9 @@ describe("Actions and Reducer", () => {
         AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
         zkApp.root.set(root);
-        //zkApp.pwdHash.set(pwdHash);
+        zkApp.pwdHash.set(pwdHash);
         zkApp.actionState.set(actionState);
-        //zkApp.isDispatched.set(Bool(false));
+        zkApp.isDispatched.set(Bool(false));
       }
     );
 
@@ -198,7 +198,7 @@ describe("Actions and Reducer", () => {
     console.log(
       "Pending actions",
       pendingActions.length,
-      pendingActions.toString()
+      JSON.stringify(pendingActions)
     );
     map.set(Field(3), Field(4));
     map.set(Field(5), Field(6));
@@ -211,7 +211,7 @@ describe("Actions and Reducer", () => {
     transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
-        zkApp.dispatchState(root2);
+        zkApp.dispatchState(data, secret);
       }
     );
 
@@ -228,8 +228,9 @@ describe("Actions and Reducer", () => {
     console.log(
       "Pending actions",
       pendingActions.length,
-      pendingActions.toString()
+      JSON.stringify(pendingActions)
     );
+
     console.log("Reduce 1");
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
@@ -254,7 +255,7 @@ describe("Actions and Reducer", () => {
     console.log(
       "Pending actions",
       pendingActions.length,
-      pendingActions.toString()
+      JSON.stringify(pendingActions)
     );
     const newRoot = zkApp.root.get();
     expect(newRoot.toJSON()).toBe(root2.toJSON());
@@ -271,7 +272,7 @@ describe("Actions and Reducer", () => {
     transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
-        zkApp.dispatchState(root3);
+        zkApp.dispatchState(data, secret);
       }
     );
 
@@ -281,12 +282,11 @@ describe("Actions and Reducer", () => {
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
     if (!useLocal) await MinaNFT.transactionInfo(tx);
-    await sleep(600 * 1000);
     await fetchAccount({ publicKey: zkAppPublicKey });
     pendingActions = await zkApp.reducer.fetchActions({
       fromActionState: actionState,
     });
-    console.log("Pending actions", pendingActions.length, pendingActions);
+    console.log("Pending actions", pendingActions.length, JSON.stringify(pendingActions));
     console.log("Reduce 2");
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
@@ -303,7 +303,6 @@ describe("Actions and Reducer", () => {
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
     if (!useLocal) await MinaNFT.transactionInfo(tx);
-    await sleep(600 * 1000);
 
     await fetchAccount({ publicKey: zkAppPublicKey });
 
@@ -313,7 +312,7 @@ describe("Actions and Reducer", () => {
     console.log(
       "Pending actions",
       pendingActions.length,
-      pendingActions.toString()
+      JSON.stringify(pendingActions)
     );
     const newRoot3 = zkApp.root.get();
     expect(newRoot3.toJSON()).toBe(root3.toJSON());

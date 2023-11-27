@@ -37,6 +37,7 @@ describe(`MinaNFT contract`, () => {
   });
 
   it(`should compile contracts`, async () => {
+    MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();

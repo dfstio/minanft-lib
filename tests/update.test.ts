@@ -13,9 +13,9 @@ import {
 import { PINATA_JWT } from "../env.json";
 
 const CONTRACTS_NUMBER = 1;
-const ITERATIONS_NUMBER = 1;
+const ITERATIONS_NUMBER = 2;
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = 'testworld2';
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
@@ -35,6 +35,7 @@ describe(`MinaNFT contract`, () => {
   });
 
   it(`should compile contracts`, async () => {
+    MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();
