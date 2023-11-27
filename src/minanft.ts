@@ -498,10 +498,12 @@ class MinaNFT extends BaseMinaNFT {
     }
     proofs = [];
 
+    console.time("Update proof verified");
     const verificationResult: boolean = await verify(
       proof.toJSON(),
       MinaNFT.updateVerificationKey
     );
+    console.timeEnd("Update proof verified");
     console.timeEnd(logMsg);
     //console.log("Proof verification result:", verificationResult);
     if (verificationResult === false) {
@@ -559,7 +561,9 @@ class MinaNFT extends BaseMinaNFT {
     try {
       await tx.prove();
       tx.sign([deployer]);
+      console.time("Update transaction sent");
       sentTx = await tx.send();
+      console.timeEnd("Update transaction sent");
     } catch (error) {
       throw new Error("Prooving error");
     }

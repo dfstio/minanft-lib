@@ -213,7 +213,7 @@ class MinaNFTNameServiceContract extends SmartContract {
     escrow3: PublicKey
   ) {
     // TODO: Return back after bug resolution https://github.com/o1-labs/o1js/issues/1245
-    //this.isNFT(address);
+    this.isNFT(address);
     const nft = new MinaNFTContract(address, this.token.id);
     nft.transfer(
       data,
