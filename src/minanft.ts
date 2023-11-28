@@ -14,6 +14,7 @@ import {
   VerificationKey,
   Account,
 } from "o1js";
+import axios from "axios";
 
 import { BaseMinaNFT, PrivateMetadata } from "./baseminanft";
 import { MinaNFTContract } from "./contract/nft";
@@ -49,7 +50,7 @@ import {
   MinaNFTCommit,
 } from "./update";
 import { blockchain, initBlockchain } from "./mina";
-import { MINAFEE } from "../src/config.json";
+import { MINAFEE, MINANFT_NAME_SERVICE } from "../src/config.json";
 
 /**
  * MinaNFT is the class for the NFT, wrapper around the MinaNFTContract
@@ -82,7 +83,7 @@ class MinaNFT extends BaseMinaNFT {
   isMinted: boolean;
   address: PublicKey | undefined;
   tokenId: Field | undefined;
-  namesAddress: PublicKey | undefined;
+  nameService: PublicKey | undefined;
 
   private updates: MetadataUpdate[];
   private metadataRoot: Metadata;
@@ -92,10 +93,15 @@ class MinaNFT extends BaseMinaNFT {
    * @param name Name of NFT
    * @param address Public key of the deployed NFT zkApp
    */
-  constructor(value: {name: string, address?: PublicKey, creator?: string}) {
+  constructor(value: {
+    name: string;
+    address?: PublicKey;
+    nameService?: PublicKey;
+    creator?: string;
+  }) {
     super();
-    this.name = (value.name[0] === '@') ? value.name: '@' + value.name;
-    this.creator = value.creator?? "MinaNFT library";
+    this.name = value.name[0] === "@" ? value.name : "@" + value.name;
+    this.creator = value.creator ?? "MinaNFT library";
     this.storage = "";
     this.owner = Field(0);
     this.escrow = Field(0);
@@ -105,6 +111,7 @@ class MinaNFT extends BaseMinaNFT {
     this.updates = [];
     const metadataMap = new MetadataMap();
     this.metadataRoot = metadataMap.getRoot();
+    this.nameService = value.nameService;
   }
 
   /**
@@ -115,23 +122,200 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("address is undefined");
       return;
     }
-    const zkApp = new MinaNFTContract(this.address);
-    const account = await fetchAccount({ publicKey: this.address });
-    if (
-      !Mina.hasAccount(this.address) ||
-      account.account === undefined ||
-      account.account.zkapp?.zkappUri === undefined
-    ) {
+    if (this.nameService === undefined) {
+      this.nameService = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
+    }
+    const nameService = new MinaNFTNameServiceContract(this.nameService);
+    const tokenId = nameService.token.id;
+    const nft = new MinaNFTContract(this.address, tokenId);
+    await fetchAccount({ publicKey: this.address, tokenId });
+    if (!Mina.hasAccount(this.address, tokenId)) {
       throw new Error("NFT is not deployed");
       return;
     }
-    this.name = MinaNFT.stringFromField(zkApp.name.get());
-    this.metadataRoot = zkApp.metadata.get();
-    this.storage = account.account.zkapp?.zkappUri;
-    this.owner = zkApp.owner.get();
-    this.escrow = zkApp.escrow.get();
-    this.version = zkApp.version.get();
-    //TODO: load metadata from IPFS/Arweave
+
+    const name = nft.name.get();
+    const storage = nft.storage.get();
+    const owner = nft.owner.get();
+    const escrow = nft.escrow.get();
+    const metadata = nft.metadata.get();
+    const version = nft.version.get();
+
+    /*
+      metadata: Map<string, PrivateMetadata>;
+      +name: string;
+      creator: string;
+      +storage: string;
+      +owner: Field;
+      +escrow: Field;
+      +version: UInt64;
+      +isMinted: boolean;
+      +address: PublicKey | undefined;
+      +tokenId: Field | undefined;
+      +nameService: PublicKey | undefined;
+
+      +private updates: MetadataUpdate[];
+      +private metadataRoot: Metadata;
+    */
+
+    const nameStr = MinaNFT.stringFromField(name);
+    if (nameStr !== this.name) throw new Error("NFT name mismatch");
+    const storageStr = MinaNFT.stringFromFields(storage.toFields());
+    this.storage = storageStr;
+    this.owner = owner;
+    this.escrow = escrow;
+    this.version = version;
+    this.metadataRoot = metadata;
+    this.isMinted = true;
+    this.tokenId = tokenId;
+    this.nameService = nameService.address;
+
+    try {
+      const data = await axios.get(
+        "https://ipfs.io/ipfs/" + storageStr.slice(2)
+      );
+      const uri = data.data;
+      const image = data.data.properties.image;
+      console.log("IPFS uri:", JSON.stringify(uri, null, 2));
+      console.log("IPFS image:", image);
+      this.creator = uri.creator ?? "";
+      if (uri.name !== this.name) throw new Error("uri: NFT name mismatch");
+      if (uri.version !== this.version.toString())
+        throw new Error("uri: NFT version mismatch");
+      if (uri.metadata.data !== this.metadataRoot.data.toJSON())
+        throw new Error("uri: NFT metadata data mismatch");
+      if (uri.metadata.kind !== this.metadataRoot.kind.toJSON())
+        throw new Error("uri: NFT metadata kind mismatch");
+
+      Object.entries(uri.properties).forEach(([key, value]) => {
+        if (typeof key !== "string")
+          throw new Error("uri: NFT metadata key mismatch - should be string");
+        if (typeof value !== "object")
+          throw new Error(
+            "uri: NFT metadata value mismatch - should be object"
+          );
+        const obj = value as any;
+        const data = obj.data;
+        const kind = obj.kind;
+        const linkedObject = obj.linkedObject;
+        const isPrivate: boolean = obj.isPrivate ?? false;
+        if (data === undefined)
+          throw new Error("uri: NFT metadata: data should present");
+
+        if (kind === undefined || typeof kind !== "string")
+          throw new Error(
+            "uri: NFT metadata: kind mismatch - should be string"
+          );
+
+        switch (kind) {
+          case "text":
+            {
+              if (
+                linkedObject === undefined ||
+                typeof linkedObject !== "object" ||
+                linkedObject.text === undefined ||
+                typeof linkedObject.text !== "string"
+              )
+                throw new Error(
+                  "uri: NFT metadata: text mismatch - should be string"
+                );
+              const text = new TextData(linkedObject.text as string);
+              if (text.root.toJSON() !== data)
+                throw new Error("uri: NFT metadata: text root mismatch");
+              this.metadata.set(
+                key,
+                new PrivateMetadata({
+                  data: text.root,
+                  kind: MinaNFT.stringToField(kind),
+                  isPrivate: isPrivate,
+                  linkedObject: text,
+                })
+              );
+            }
+            break;
+          case "string":
+            this.metadata.set(
+              key,
+              new PrivateMetadata({
+                data: MinaNFT.stringToField(data),
+                kind: MinaNFT.stringToField(kind),
+                isPrivate: isPrivate,
+              })
+            );
+            break;
+          /*
+          case "file":
+            this.metadata.set(
+              data,
+              new PrivateMetadata({
+                data: MinaNFT.stringToField(data),
+                kind: MinaNFT.stringToField(kind),
+                isPrivate: false,
+                linkedObject: new FileData({
+                  root: MinaNFT.stringToField(linkedObject.root),
+                  hash: MinaNFT.stringToField(linkedObject.hash),
+                  hashStr: linkedObject.hashStr,
+                  filename: linkedObject.filename,
+                  size: linkedObject.size,
+                  mime: linkedObject.mime,
+                  sha3_512: MinaNFT.stringToField(linkedObject.sha3_512),
+                }),
+              })
+            );
+            break;
+          case "image":
+            this.metadata.set(
+              data,
+              new PrivateMetadata({
+                data: MinaNFT.stringToField(data),
+                kind: MinaNFT.stringToField(kind),
+                isPrivate: false,
+                linkedObject: new FileData({
+                  root: MinaNFT.stringToField(linkedObject.root),
+                  hash: MinaNFT.stringToField(linkedObject.hash),
+                  hashStr: linkedObject.hashStr,
+                  filename: linkedObject.filename,
+                  size: linkedObject.size,
+                  mime: linkedObject.mime,
+                  sha3_512: MinaNFT.stringToField(linkedObject.sha3_512),
+                }),
+              })
+            );
+            break;
+          case "map":
+            this.metadata.set(
+              data,
+              new PrivateMetadata({
+                data: MinaNFT.stringToField(data),
+                kind: MinaNFT.stringToField(kind),
+                isPrivate: false,
+                linkedObject: new MapData(linkedObject),
+              })
+            );
+            break;
+          */
+          default:
+            this.metadata.set(
+              key,
+              new PrivateMetadata({
+                data: Field.fromJSON(data),
+                kind: MinaNFT.stringToField(kind),
+                isPrivate: isPrivate,
+              })
+            );
+            break;
+        }
+      });
+    } catch (error) {
+      throw new Error(`IPFS uri import error: ${error}`);
+    }
+    if (!this.checkState())
+      throw new Error("State verification error after loading metadata");
+    const { root } = this.getMetadataRootAndMap();
+    if (root.data.toJSON() !== this.metadataRoot.data.toJSON())
+      throw new Error("Metadata root data mismatch");
+    if (root.kind.toJSON() !== this.metadataRoot.kind.toJSON())
+      throw new Error("Metadata root kind mismatch");
   }
 
   /**
@@ -151,6 +335,15 @@ class MinaNFT extends BaseMinaNFT {
    * @returns map as JSON object
    */
   public toJSON(): object {
+    return this.exportToJSON();
+  }
+
+  /**
+   * Converts a Map to JSON
+   * @param map map to convert
+   * @returns map as JSON object
+   */
+  public exportToJSON(increaseVersion: boolean = false): object {
     let description: string | undefined = undefined;
     const descriptionObject = this.getMetadata("description");
     if (
@@ -169,14 +362,20 @@ class MinaNFT extends BaseMinaNFT {
       image =
         "https://ipfs.io/ipfs/" + imageObject.linkedObject.storage.slice(2);
 
+    const { root } = this.getMetadataRootAndMap();
+    const version = increaseVersion
+      ? this.version.add(UInt64.from(1)).toJSON()
+      : this.version.toJSON();
+
     return {
       name: this.name,
       description: description ?? "",
       image,
       external_url: "https://minanft.io/" + this.name,
-      version: this.version.add(UInt64.from(1)).toJSON(),
+      version,
       time: Date.now(),
       creator: this.creator,
+      metadata: { data: root.data.toJSON(), kind: root.kind.toJSON() },
       properties: Object.fromEntries(this.metadata),
     };
   }
@@ -281,7 +480,7 @@ class MinaNFT extends BaseMinaNFT {
     console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
     this.updateFileData("image", "image", fileData, false);
-/*
+    /*
     this.updateMetadata(
       "image",
       new PrivateMetadata({
@@ -311,7 +510,7 @@ class MinaNFT extends BaseMinaNFT {
     console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
     this.updateFileData(data.key, "file", fileData, data.isPrivate ?? false);
-/*
+    /*
     this.updateMetadata(
       data.key,
       new PrivateMetadata({
@@ -331,7 +530,12 @@ class MinaNFT extends BaseMinaNFT {
    * @param data {@link FileData} file data
    * @param isPrivate is metadata private
    */
-  public updateFileData(key: string, type: string, data: FileData, isPrivate: boolean): void {
+  public updateFileData(
+    key: string,
+    type: string,
+    data: FileData,
+    isPrivate: boolean
+  ): void {
     this.updateMetadata(
       key,
       new PrivateMetadata({
@@ -364,11 +568,11 @@ class MinaNFT extends BaseMinaNFT {
     if (this.address === undefined)
       throw new Error("NFT contract is not deployed");
 
-    if (this.namesAddress === undefined)
+    if (this.nameService === undefined)
       throw new Error("Names contract address is undefined");
 
     const address: PublicKey = this.address;
-    const nameService = new MinaNFTNameServiceContract(this.namesAddress);
+    const nameService = new MinaNFTNameServiceContract(this.nameService);
     const tokenId = nameService.token.id;
     await fetchAccount({ publicKey: address, tokenId });
     if (!Mina.hasAccount(address, tokenId)) {
@@ -402,12 +606,13 @@ class MinaNFT extends BaseMinaNFT {
       console.error("Metadata kind mismatch");
       result = false;
     }
-    /*
+
     const oldStorage = zkApp.storage.get();
-    if (oldStorage.equals(storageHash).toBoolean() === false) {
+    const storage: string = MinaNFT.stringFromFields(oldStorage.toFields());
+    if (this.storage !== storage) {
       throw new Error("Storage mismatch");
     }
-    */
+
     const name = zkApp.name.get();
     if (name.equals(MinaNFT.stringToField(this.name)).toBoolean() === false) {
       console.error("Name mismatch");
@@ -577,7 +782,7 @@ class MinaNFT extends BaseMinaNFT {
       this.metadataRoot = newRoot;
       this.updates = [];
       this.version = newVersion;
-      this.storage = storage.url;
+      this.storage = storage.hashStr;
       return sentTx;
     } else return undefined;
   }
@@ -630,16 +835,17 @@ class MinaNFT extends BaseMinaNFT {
 */
   private async pinToStorage(
     pinataJWT: string
-  ): Promise<{ hash: Storage; url: string } | undefined> {
+  ): Promise<{ hash: Storage; hashStr: string } | undefined> {
     console.log("Pinning to IPFS...");
     const ipfs = new IPFS(pinataJWT);
-    const hash = await ipfs.pinJSON(this.toJSON());
+    const hash = await ipfs.pinJSON(this.exportToJSON(true));
     if (hash === undefined) return undefined;
-    const ipfs_fields = MinaNFT.stringToFields("i:" + hash);
+    const hashStr = "i:" + hash;
+    const ipfs_fields = MinaNFT.stringToFields(hashStr);
     if (ipfs_fields.length !== 2) throw new Error("IPFS hash encoding error");
     return {
       hash: new Storage({ hashString: ipfs_fields as [Field, Field] }),
-      url: "https://ipfs.io/ipfs/" + hash,
+      hashStr,
     };
   }
 
@@ -853,11 +1059,11 @@ class MinaNFT extends BaseMinaNFT {
     if (sentTx.isSuccess) {
       this.isMinted = true;
       this.metadataRoot = root;
-      this.storage = storage.url;
+      this.storage = storage.hashStr;
       this.owner = owner;
       this.escrow = escrow;
       this.version = UInt64.from(1);
-      this.namesAddress = nameService.address;
+      this.nameService = nameService.address;
       return sentTx;
     } else return undefined;
 
@@ -944,7 +1150,7 @@ class MinaNFT extends BaseMinaNFT {
     }
 
     //console.log("Transferring NFT...");
-    this.namesAddress = nameService.address;
+    this.nameService = nameService.address;
     if (false === (await this.checkState())) {
       throw new Error("State verification error");
     }
@@ -1026,7 +1232,7 @@ class MinaNFT extends BaseMinaNFT {
       return undefined;
     }
 
-    this.namesAddress = nameService.address;
+    this.nameService = nameService.address;
     if (false === (await this.checkState())) {
       throw new Error("State verification error");
     }

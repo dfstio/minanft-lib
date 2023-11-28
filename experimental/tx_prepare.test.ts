@@ -15,6 +15,7 @@ import {
   DeployArgs,
   Permissions,
   PrivateKey,
+  verify,
 } from "o1js";
 import { sender as senderPublicKey } from "../json/sender.json";
 import { zkAppPublicKey as zkAppPublicKey58 } from "../json/mysmartcontract.json";
@@ -83,13 +84,16 @@ class MySmartContract extends SmartContract {
   }
 }
 
+let verificationKeyZkProgram: string | undefined = undefined;
+
 describe("Compile a contract", () => {
   it("should compile a contract", async () => {
     const cache: Cache = Cache.FileSystem("./mycache");
     memory();
     console.time("compiled MyZkProgram");
-    await MyZkProgram.compile(); // { cache } argument is not supported
+    const { verificationKey } = await MyZkProgram.compile(); // { cache } argument is not supported
     console.timeEnd("compiled MyZkProgram");
+    verificationKeyZkProgram = verificationKey;
     memory();
     console.time("compiled MySmartContract");
     await MySmartContract.compile({ cache });
@@ -116,6 +120,10 @@ describe("Compile a contract", () => {
       value2: Field(2),
     });
     const proof = await MyZkProgram.create(element);
+    const ok = await verify(proof, verificationKeyZkProgram!);
+    expect(ok).toBeTruthy();
+    await fs.writeFile("./json/proof7.json", JSON.stringify(proof.toJSON()));
+    await fs.writeFile("./json/vkzk.json", JSON.stringify({ verificationKey: verificationKeyZkProgram }));
 
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
