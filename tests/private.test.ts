@@ -15,7 +15,7 @@ let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 let nftPublicKey: PublicKey | undefined = undefined;
 const nftName = `@test`;
-let json: object = {};
+let json: string = "";
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 0);
@@ -70,44 +70,43 @@ describe(`MinaNFT contract`, () => {
       text: "This is my long description of the NFT. Can be of any length, supports markdown.",
     });
     nft.update({ key: `twitter`, value: `@builder` });
-    /*
     nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
-    */
+
     await nft.updateImage({
       filename: "./images/navigator.jpg",
       pinataJWT,
     });
 
     await nft.updateFile({
-      key: "sea",
+      key: "middemo",
       filename: "./images/image.jpg",
       pinataJWT,
+      isPrivate: true,
     });
 
     const map = new MapData();
     map.update({ key: `level2-1`, value: `value21` });
-    map.update({ key: `level2-2`, value: `value22` });
+    map.update({ key: `level2-2`, value: `value22`, isPrivate: true });
     map.updateText({
       key: `level2-3`,
       text: `This is text on level 2. Can be very long`,
+      isPrivate: true,
     });
 
     await map.updateFile({
       key: "woman",
       filename: "./images/woman.png",
       pinataJWT,
+      isPrivate: true,
     });
 
     const mapLevel3 = new MapData();
     mapLevel3.update({ key: `level3-1`, value: `value31` });
-    mapLevel3.update({ key: `level3-2`, value: `value32` });
-    mapLevel3.update({ key: `level3-3`, value: `value33` });
-    map.updateMap({ key: `level2-4`, map: mapLevel3 });
+    mapLevel3.update({ key: `level3-2`, value: `value32`, isPrivate: true });
+    mapLevel3.update({ key: `level3-3`, value: `value33`, isPrivate: true });
+    map.updateMap({ key: `level2-4`, map: mapLevel3, isPrivate: true });
     nft.updateMap({ key: `level 2 and 3 data`, map });
 
-    json = nft.toJSON();
-
-    console.log(`json:`, JSON.stringify(json, null, 2));
     const tx = await nft.mint({ nameService, deployer, owner, pinataJWT });
     expect(tx).toBeDefined();
     if (tx === undefined) return;
@@ -115,9 +114,11 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     expect(await nft.checkState()).toBe(true);
     nftPublicKey = nft.address;
+    json = JSON.stringify(nft.toJSON(), null, 2);
+    console.log(`json:`, json);
   });
 
-  it(`should load NFT from the blockchain`, async () => {
+  it(`should load NFT from the json`, async () => {
     expect(nftPublicKey).toBeDefined();
     if (nftPublicKey === undefined) return;
     expect(nameService).toBeDefined();
@@ -130,7 +131,7 @@ describe(`MinaNFT contract`, () => {
       address: nftPublicKey,
       nameService: nameService.address,
     });
-    await nft.loadMetadata();
+    await nft.loadMetadata(JSON.parse(json));
     const loadedJson = nft.toJSON();
     console.log(`json:`, JSON.stringify(loadedJson, null, 2));
     expect(await nft.checkState()).toBe(true);

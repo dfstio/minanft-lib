@@ -31,5 +31,36 @@ class TextData extends BaseMinaNFTObject {
       text: this.text,
     };
   }
-  public fromJSON(json: object): void {}
+  public static fromJSON(json: object): TextData {
+    const obj = json as any;
+    const data = obj.data;
+    const kind = obj.kind;
+    const linkedObject = obj.linkedObject;
+    if (data === undefined)
+      throw new Error("uri: NFT metadata: data should present");
+
+    if (kind === undefined || typeof kind !== "string" || kind !== "text")
+      throw new Error("uri: NFT metadata: kind mismatch");
+    if (
+      linkedObject === undefined ||
+      typeof linkedObject !== "object" ||
+      linkedObject.text === undefined ||
+      typeof linkedObject.text !== "string" ||
+      linkedObject.size === undefined ||
+      linkedObject.MerkleTreeHeight === undefined ||
+      linkedObject.type === undefined ||
+      typeof linkedObject.type !== "string" ||
+      linkedObject.type !== "text"
+    )
+      throw new Error("uri: NFT metadata: text json mismatch");
+    const text = new TextData(linkedObject.text as string);
+    if (text.root.toJSON() !== data)
+      throw new Error("uri: NFT metadata: text root mismatch");
+    if (text.size !== linkedObject.size)
+      throw new Error("uri: NFT metadata: text size mismatch");
+    if (text.height !== linkedObject.MerkleTreeHeight)
+      throw new Error("uri: NFT metadata: text height mismatch");
+
+    return text;
+  }
 }

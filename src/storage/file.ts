@@ -81,7 +81,43 @@ class FileData extends BaseMinaNFTObject {
       storage: this.storage,
     };
   }
-  public fromJSON(json: object): void {}
+  public static fromJSON(json: object): FileData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const obj = json as any;
+    const data = obj.linkedObject;
+    if (data === undefined)
+      throw new Error(`uri: NFT metadata: data should be present: ${json}`);
+    if (data.type !== "file")
+      throw new Error(`uri: NFT metadata: type mismatch: ${json}`);
+    if (data.fileMerkleTreeRoot === undefined)
+      throw new Error(
+        `uri: NFT metadata: fileMerkleTreeRoot should be present: ${json}`
+      );
+    if (data.MerkleTreeHeight === undefined)
+      throw new Error(
+        `uri: NFT metadata: MerkleTreeHeight should be present: ${json}`
+      );
+    if (data.size === undefined)
+      throw new Error(`uri: NFT metadata: size should be present: ${json}`);
+    if (data.mimeType === undefined)
+      throw new Error(`uri: NFT metadata: mimeType should be present: ${json}`);
+    if (data.SHA3_512 === undefined)
+      throw new Error(`uri: NFT metadata: SHA3_512 should be present: ${json}`);
+    if (data.filename === undefined)
+      throw new Error(`uri: NFT metadata: filename should be present: ${json}`);
+    if (data.storage === undefined)
+      throw new Error(`uri: NFT metadata: storage should be present: ${json}`);
+
+    return new FileData({
+      fileRoot: Field.fromJSON(data.fileMerkleTreeRoot),
+      height: Number(data.MerkleTreeHeight),
+      size: Number(data.size),
+      mimeType: data.mimeType,
+      sha3_512: data.SHA3_512,
+      filename: data.filename,
+      storage: data.storage,
+    });
+  }
 }
 
 class File {
@@ -90,9 +126,9 @@ class File {
   sha3_512_hash?: string;
   size?: number;
   mimeType?: string;
-  root?: Field; 
+  root?: Field;
   height?: number;
-  leavesNumber?: number
+  leavesNumber?: number;
   constructor(filename: string) {
     this.filename = filename;
   }
@@ -179,7 +215,8 @@ class File {
     if (this.mimeType === undefined) throw new Error(`File: MIME type not set`);
     if (this.root === undefined) throw new Error(`File: root not set`);
     if (this.height === undefined) throw new Error(`File: height not set`);
-    if (this.leavesNumber === undefined) throw new Error(`File: leavesNumber not set`);
+    if (this.leavesNumber === undefined)
+      throw new Error(`File: leavesNumber not set`);
     //const metadata = await this.metadata();
     //const sha3_512 = await this.sha3_512();
     //const treeData = await this.treeData();
