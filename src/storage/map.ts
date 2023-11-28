@@ -27,6 +27,18 @@ interface MinaNFTMapUpdate {
   isPrivate?: boolean;
 }
 
+interface MinaNFTTextDataUpdate {
+  key: string;
+  textData: TextData;
+  isPrivate?: boolean;
+}
+
+interface MinaNFTFileDataUpdate {
+  key: string;
+  fileData: FileData;
+  isPrivate?: boolean;
+}
+
 class MapData extends BaseMinaNFTObject {
   metadata: Map<string, PrivateMetadata>;
 
@@ -91,6 +103,38 @@ class MapData extends BaseMinaNFTObject {
 
   /**
    * updates PrivateMetadata
+   * @param data {@link MinaNFTTextDataUpdate} update data
+   */
+  public updateTextData(data: MinaNFTTextDataUpdate): void {
+    this.updateMetadata(
+      data.key,
+      new PrivateMetadata({
+        data: data.textData.root,
+        kind: MinaNFT.stringToField("text"),
+        isPrivate: data.isPrivate ?? false,
+        linkedObject: data.textData,
+      })
+    );
+  }
+
+  /**
+   * updates PrivateMetadata
+   * @param data {@link MinaNFTFileDataUpdate} update data
+   */
+  public updateFileData(data: MinaNFTFileDataUpdate): void {
+    this.updateMetadata(
+      data.key,
+      new PrivateMetadata({
+        data: data.fileData.root,
+        kind: MinaNFT.stringToField("file"),
+        isPrivate: data.isPrivate ?? false,
+        linkedObject: data.fileData,
+      })
+    );
+  }
+
+  /**
+   * updates PrivateMetadata
    * @param data {@link MinaNFTTextUpdate} update data
    */
   public updateMap(data: MinaNFTMapUpdate): void {
@@ -134,7 +178,6 @@ class MapData extends BaseMinaNFTObject {
     );
   }
 
-
   /**
    * updates PrivateMetadata
    * @param data {@link MinaNFTFieldUpdate} update data
@@ -157,5 +200,78 @@ class MapData extends BaseMinaNFTObject {
       properties: Object.fromEntries(this.metadata),
     };
   }
-  public fromJSON(json: object): void {}
+  public static fromJSON(json: object): MapData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const obj = json as any;
+    const data = obj.data;
+    const kind = obj.kind;
+    const linkedObject = obj.linkedObject;
+    if (data === undefined)
+      throw new Error(`uri: NFT metadata: data should present: ${json}`);
+
+    if (kind === undefined || typeof kind !== "string" || kind !== "map")
+      throw new Error("uri: NFT metadata: kind mismatch");
+    if (
+      linkedObject === undefined ||
+      typeof linkedObject !== "object" ||
+      linkedObject.properties === undefined ||
+      typeof linkedObject.properties !== "object" ||
+      linkedObject.type === undefined ||
+      typeof linkedObject.type !== "string" ||
+      linkedObject.type !== "map"
+    )
+      throw new Error("uri: NFT metadata: map json mismatch");
+    const map = new MapData();
+    for (const key in linkedObject.properties) {
+      const value = linkedObject.properties[key];
+      if (value === undefined || typeof value !== "object")
+        throw new Error("uri: NFT metadata: map json mismatch");
+      const kind = value.kind;
+      const data = value.data;
+      const isPrivate: boolean = value.isPrivate ?? false;
+      if (
+        kind === undefined ||
+        typeof kind !== "string" ||
+        data === undefined ||
+        typeof data !== "string"
+      )
+        throw new Error("uri: NFT metadata: map kind or data mismatch");
+      switch (kind) {
+        case "string":
+          map.update({
+            key,
+            value: data,
+            isPrivate,
+          });
+          break;
+        case "text":
+          map.updateTextData({
+            key,
+            textData: TextData.fromJSON(value),
+            isPrivate,
+          });
+          break;
+        case "map":
+          map.updateMap({
+            key,
+            map: MapData.fromJSON(value),
+            isPrivate,
+          });
+          break;
+        case "file":
+          map.updateFileData({
+            key,
+            fileData: FileData.fromJSON(value),
+            isPrivate,
+          });
+          break;
+        default:
+          throw new Error("uri: NFT metadata: map json mismatch");
+      }
+    }
+    map.setRoot();
+    if (map.root.toJSON() !== data)
+      throw new Error("uri: NFT metadata: map root mismatch");
+    return map;
+  }
 }
