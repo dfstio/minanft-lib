@@ -22,6 +22,8 @@ import {
   Permissions,
   Struct,
   Cache,
+  JsonProof,
+  verify
 } from "o1js";
 
 import { DEPLOYER } from "../env.json";
@@ -97,7 +99,7 @@ describe("Compile a contract", () => {
     console.timeEnd("compiled MyZkProgram");
     memory();
     console.time("compiled MySmartContract");
-    await MySmartContract.compile({ cache });
+    //await MySmartContract.compile({ cache });
     console.timeEnd("compiled MySmartContract");
     memory();
   });
@@ -121,6 +123,15 @@ describe("Send a transaction", () => {
     expect(balanceDeployer).toBeGreaterThan(2);
     if (balanceDeployer <= 2) return;
 
+    const proofJson = await fs.readFile("./json/proof7.json", "utf8");
+    const proof: JsonProof = JSON.parse(proofJson) as JsonProof;
+    const vkJson = await fs.readFile("./json/vkzk.json", "utf8");
+    const vk: string = JSON.parse(vkJson).verificationKey;
+    const ok = await verify(proof, vk);
+    expect(ok).toBeTruthy();
+    return;
+    
+
     /*
     const file = await fs.readFile("./json/mytx.json", "utf8");
     const txJSON = JSON.parse(file);
@@ -132,6 +143,7 @@ describe("Send a transaction", () => {
       zkCommand
     ) as Mina.Transaction;
     */
+   /*
     const transaction: Mina.Transaction = Mina.Transaction.fromJSON(
       JSON.parse(
         await fs.readFile("./json/mytx4.json", "utf8")
@@ -166,6 +178,7 @@ describe("Send a transaction", () => {
     } else console.error("Send fail", tx);
 
     memory();
+    */
   });
 });
 
