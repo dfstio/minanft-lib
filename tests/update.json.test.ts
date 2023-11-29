@@ -12,10 +12,10 @@ import {
 } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 
-const CONTRACTS_NUMBER = 1;
-const ITERATIONS_NUMBER = 2;
-const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const CONTRACTS_NUMBER = 2;
+const ITERATIONS_NUMBER = 4;
+const pinataJWT = ""; //PINATA_JWT;
+const blockchainInstance: blockchain = "local";
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;

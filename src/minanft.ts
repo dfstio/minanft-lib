@@ -538,7 +538,7 @@ class MinaNFT extends BaseMinaNFT {
    * @returns true if on-chain state is equal to off-chain state
    */
   public async checkState(info: string = ""): Promise<boolean> {
-    console.log("Checking state for", this.name, "at", info);
+    //console.log("Checking state for", this.name, "at", info);
     if (this.address === undefined)
       throw new Error("NFT contract is not deployed");
 
@@ -687,12 +687,12 @@ class MinaNFT extends BaseMinaNFT {
     }
     proofs = [];
 
-    console.time("Update proof verified");
+    //console.time("Update proof verified");
     const verificationResult: boolean = await verify(
       proof.toJSON(),
       MinaNFT.updateVerificationKey
     );
-    console.timeEnd("Update proof verified");
+    //console.timeEnd("Update proof verified");
     console.timeEnd(logMsg);
     //console.log("Proof verification result:", verificationResult);
     if (verificationResult === false) {
