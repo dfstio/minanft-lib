@@ -8,14 +8,14 @@ import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 let nftPublicKey: PublicKey | undefined = undefined;
 const nftName = `@test`;
-let json: string = "";
+let metadataURI: string = "";
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 0);
@@ -114,8 +114,8 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     expect(await nft.checkState()).toBe(true);
     nftPublicKey = nft.address;
-    json = JSON.stringify(nft.toJSON(), null, 2);
-    console.log(`json:`, json);
+    metadataURI = JSON.stringify(nft.toJSON(), null, 2);
+    console.log(`metadataURI:`, metadataURI);
   });
 
   it(`should load NFT from the json`, async () => {
@@ -131,7 +131,7 @@ describe(`MinaNFT contract`, () => {
       address: nftPublicKey,
       nameService: nameService.address,
     });
-    await nft.loadMetadata(JSON.parse(json));
+    await nft.loadMetadata(metadataURI);
     const loadedJson = nft.toJSON();
     console.log(`json:`, JSON.stringify(loadedJson, null, 2));
     expect(await nft.checkState()).toBe(true);

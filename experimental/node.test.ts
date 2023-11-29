@@ -11,15 +11,15 @@ import {
   Mina,
   PublicKey,
   UInt64,
-  Lightnet
+  Lightnet,
 } from "o1js";
 import { MINAURL } from "../src/config.json";
 import { DEPLOYER } from "../env.json";
 import { MinaNFT } from "../src/minanft";
 const transactionFee = 150_000_000;
-const LIGHTNET =  "http://localhost:3085"
-const LIGHTNET_ACCOUNTS =  "http://localhost:8181"
-const LIGHTNET_ARCHIVE =  "http://localhost:8282"
+const LIGHTNET = "http://localhost:3085";
+const LIGHTNET_ACCOUNTS = "http://localhost:8181";
+const LIGHTNET_ARCHIVE = "http://localhost:8282";
 
 jest.setTimeout(1000 * 60 * 60); // 1 hour
 
@@ -44,11 +44,19 @@ beforeAll(async () => {
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
   } else {
+    /*
     const network = Mina.Network({
         mina: LIGHTNET,
         lightnetAccountManager: LIGHTNET_ACCOUNTS,
         archive: LIGHTNET_ARCHIVE
     });
+    */
+    const network = Mina.Network({
+      mina: "http://localhost:8080/graphql",
+      archive: "http://localhost:8282",
+      lightnetAccountManager: "http://localhost:8181",
+    });
+
     Mina.setActiveInstance(network);
     //deployer = PrivateKey.fromBase58(DEPLOYER);
     const keyPair = await Lightnet.acquireKeyPair();
