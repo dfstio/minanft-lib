@@ -117,9 +117,10 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Load metadata from blockchain and IPFS/Arweave
+   * @param metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
    */
   public async loadMetadata(
-    json: object | undefined = undefined
+    metadataURI: string | undefined = undefined
   ): Promise<void> {
     if (this.address === undefined) {
       throw new Error("address is undefined");
@@ -175,10 +176,11 @@ class MinaNFT extends BaseMinaNFT {
 
     //try {
     const uri =
-      json ??
-      (await axios.get("https://ipfs.io/ipfs/" + storageStr.slice(2))).data;
+      metadataURI === undefined
+        ? (await axios.get("https://ipfs.io/ipfs/" + storageStr.slice(2))).data
+        : JSON.parse(metadataURI);
     //const image = data.data.properties.image;
-    console.log("IPFS uri:", JSON.stringify(uri, null, 2));
+    //console.log("IPFS uri:", JSON.stringify(uri, null, 2));
     //console.log("IPFS image:", image);
     this.creator = uri.creator ?? "";
     if (uri.name !== this.name) throw new Error("uri: NFT name mismatch");
@@ -280,7 +282,7 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error(`IPFS uri import error: ${error}`);
     }
     */
-    if (!this.checkState())
+    if (!(await this.checkState("load metadata")))
       throw new Error("State verification error after loading metadata");
     const { root } = this.getMetadataRootAndMap();
     if (root.data.toJSON() !== this.metadataRoot.data.toJSON())
@@ -535,7 +537,8 @@ class MinaNFT extends BaseMinaNFT {
    *
    * @returns true if on-chain state is equal to off-chain state
    */
-  public async checkState(): Promise<boolean> {
+  public async checkState(info: string = ""): Promise<boolean> {
+    console.log("Checking state for", this.name, "at", info);
     if (this.address === undefined)
       throw new Error("NFT contract is not deployed");
 
@@ -554,26 +557,34 @@ class MinaNFT extends BaseMinaNFT {
     let result = true;
 
     const version: UInt64 = zkApp.version.get();
-    if (version.equals(this.version).toBoolean() === false) {
+    //console.log("Version:", this.name, info, version.toString());
+    if (version.toBigInt().valueOf() !== this.version.toBigInt().valueOf()) {
       console.error("Version mismatch");
       result = false;
     }
+    //console.log("After version:", this.name, info, version.toString());
     const oldEscrow = zkApp.escrow.get();
-    if (oldEscrow.equals(this.escrow).toBoolean() === false) {
+    if (oldEscrow.toBigInt().valueOf() !== this.escrow.toBigInt().valueOf()) {
       console.error("Escrow mismatch");
       result = false;
     }
     const oldOwner = zkApp.owner.get();
-    if (oldOwner.equals(this.owner).toBoolean() === false) {
+    if (oldOwner.toBigInt().valueOf() !== this.owner.toBigInt().valueOf()) {
       console.error("Owner mismatch");
       result = false;
     }
     const oldMetadata = zkApp.metadata.get();
-    if (oldMetadata.data.equals(this.metadataRoot.data).toBoolean() === false) {
+    if (
+      oldMetadata.data.toBigInt().valueOf() !==
+      this.metadataRoot.data.toBigInt().valueOf()
+    ) {
       console.error("Metadata data mismatch");
       result = false;
     }
-    if (oldMetadata.kind.equals(this.metadataRoot.kind).toBoolean() === false) {
+    if (
+      oldMetadata.kind.toBigInt().valueOf() !==
+      this.metadataRoot.kind.toBigInt().valueOf()
+    ) {
       console.error("Metadata kind mismatch");
       result = false;
     }
@@ -585,10 +596,12 @@ class MinaNFT extends BaseMinaNFT {
     }
 
     const name = zkApp.name.get();
-    if (name.equals(MinaNFT.stringToField(this.name)).toBoolean() === false) {
+    if (MinaNFT.stringFromField(name) !== this.name) {
       console.error("Name mismatch");
       result = false;
     }
+    if (result === false)
+      console.error("State verification error for", this.name, "at", info);
     return result;
   }
 
@@ -691,9 +704,11 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("IPFS Storage error");
     }
     const storageHash: Storage = storage.hash;
-    if (false === (await this.checkState())) {
+
+    if (false === (await this.checkState("commit"))) {
       throw new Error("State verification error");
     }
+
     //console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
@@ -1122,7 +1137,7 @@ class MinaNFT extends BaseMinaNFT {
 
     //console.log("Transferring NFT...");
     this.nameService = nameService.address;
-    if (false === (await this.checkState())) {
+    if (false === (await this.checkState("transfer"))) {
       throw new Error("State verification error");
     }
     const sender = deployer.toPublicKey();
@@ -1204,7 +1219,7 @@ class MinaNFT extends BaseMinaNFT {
     }
 
     this.nameService = nameService.address;
-    if (false === (await this.checkState())) {
+    if (false === (await this.checkState("approve"))) {
       throw new Error("State verification error");
     }
     const sender = deployer.toPublicKey();

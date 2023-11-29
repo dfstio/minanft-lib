@@ -8,14 +8,14 @@ import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 let nftPublicKey: PublicKey | undefined = undefined;
 const nftName = `@test`;
-let json: object = {};
+let metadataURI: string = "";
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 0);
@@ -105,9 +105,8 @@ describe(`MinaNFT contract`, () => {
     map.updateMap({ key: `level2-4`, map: mapLevel3 });
     nft.updateMap({ key: `level 2 and 3 data`, map });
 
-    json = nft.toJSON();
-
-    console.log(`json:`, JSON.stringify(json, null, 2));
+    metadataURI = JSON.stringify(nft.toJSON(), null, 2);
+    console.log(`metadataURI:`, metadataURI);
     const tx = await nft.mint({ nameService, deployer, owner, pinataJWT });
     expect(tx).toBeDefined();
     if (tx === undefined) return;
