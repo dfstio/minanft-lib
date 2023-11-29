@@ -84,7 +84,7 @@ class IPFS {
     }
     return undefined;
   }
-  
+
   /*
   public async pinLink(file: string): Promise<string | undefined> {
     try {

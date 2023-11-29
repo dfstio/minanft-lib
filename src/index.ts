@@ -53,6 +53,13 @@ export {
   RedactedMinaNFTMapStateProof,
   MapElement,
 } from "./plugins/redactedmap";
+export {
+  RedactedMinaNFTTreeCalculation,
+  RedactedMinaNFTTreeState,
+  RedactedMinaNFTTreeStateProof,
+  TreeElement,
+} from "./plugins/redactedtree";
+export { MinaNFTTreeVerifier } from "./plugins/treeverifier";
 export { MinaNFTVerifier } from "./plugins/verifier";
 export { Escrow, EscrowDeposit } from "./plugins/escrow";
 export { IPFS } from "./storage/ipfs";
