@@ -893,7 +893,7 @@ class MinaNFT extends BaseMinaNFT {
     try {
       Mina.getNetworkState();
     } catch (error) {
-      // We're on Berkeley
+      // We're on Berkeley or TestWorld2
       const hash = tx.hash();
       if (hash === undefined) {
         throw new Error("Transaction hash is undefined");

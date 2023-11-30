@@ -8,37 +8,37 @@ import {
   verify,
   Field,
   MerkleTree,
-  MerkleWitness,
 } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 import {
-  RedactedMinaNFTTreeCalculation,
-  RedactedMinaNFTTreeState,
-  RedactedMinaNFTTreeStateProof,
+  MinaNFTTreeVerifierFunction,
   TreeElement,
 } from "../src/plugins/redactedtree";
-import { MinaNFTTreeVerifier } from "../src/plugins/treeverifier";
 
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
 const height = 5;
 const maxElements = 10;
 const minMaskLength = 4;
-class MerkleTreeWitness extends MerkleWitness(height) {}
-class RedactedTreeState extends RedactedMinaNFTTreeState(height) {}
-const RedactedTreeCalculation = RedactedMinaNFTTreeCalculation(height);
-class RedactedTreeProof extends RedactedMinaNFTTreeStateProof(height) {}
-//class TreeVerifier extends MinaNFTTreeVerifier(height) {}
-const TreeVerifier = MinaNFTTreeVerifier(height);
+
+const {
+  RedactedMinaNFTTreeState,
+  RedactedMinaNFTTreeCalculation,
+  MinaNFTTreeVerifier,
+  MerkleTreeWitness,
+  RedactedMinaNFTTreeStateProof,
+} = MinaNFTTreeVerifierFunction(height);
+
+class TreeStateProof extends RedactedMinaNFTTreeStateProof {}
 const tree = new MerkleTree(height);
 const redactedTree = new MerkleTree(height);
 const leaves: Field[] = [];
 const mask: boolean[] = [];
 let maskLength: number = 0;
 const size = 2 ** (height - 1);
-const proofs: RedactedTreeProof[] = [];
-let proof: RedactedTreeProof | undefined = undefined;
+const proofs: TreeStateProof[] = [];
+let proof: TreeStateProof | undefined = undefined;
 let verificationKey: string | undefined = undefined;
 let tx: Mina.TransactionId | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
@@ -58,42 +58,36 @@ beforeAll(async () => {
 
 describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
-    //await MinaNFT.compile();
+
     console.time(`compiled RedactedTreeCalculation`);
-    const { verificationKey: vk } = await RedactedTreeCalculation.compile();
-    verificationKey = vk;
+    verificationKey = (await RedactedMinaNFTTreeCalculation.compile())
+      .verificationKey;
     console.timeEnd(`compiled RedactedTreeCalculation`);
-    /*
+
     console.time(`compiled TreeVerifier`);
-    const treeVK = await TreeVerifier.compile();
-    expect(treeVK).toBeDefined();
-    expect(treeVK?.verificationKey?.hash).toBeDefined();
-    console.log(
-      `TreeVerifier verification key hash: ${treeVK?.verificationKey?.hash}`
-    );
+    await MinaNFTTreeVerifier.compile();
     console.timeEnd(`compiled TreeVerifier`);
-    */
+
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-  /*
+
   it(`should deploy TreeVerifier`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
-    console.time(`deployed TreeVerifier`);
+    console.time(`deployed MinaNFTTreeVerifier`);
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     console.log(
-      `deploying the TreeVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      `deploying the MinaNFTTreeVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
 
-    const zkApp = new TreeVerifier(zkAppPublicKey);
+    const zkApp = new MinaNFTTreeVerifier(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee() },
       () => {
@@ -106,12 +100,11 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
 
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
-    console.timeEnd(`deployed TreeVerifier`);
-    MinaNFT.transactionInfo(tx, "deployed TreeVerifier", false);
+    console.timeEnd(`deployed MinaNFTTreeVerifier`);
+    await MinaNFT.transactionInfo(tx, "deployed MinaNFTTreeVerifier", false);
     verifier = zkAppPublicKey;
     Memory.info(`deployed`);
   });
-  */
 
   it(`should prepare data`, async () => {
     expect(maxElements).toBeGreaterThan(minMaskLength * 2);
@@ -171,13 +164,13 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
           index: Field(i),
           value: leaves[i],
         });
-        const state = RedactedTreeState.create(
+        const state = RedactedMinaNFTTreeState.create(
           element,
           originalWitness,
           redactedWitness
         );
         proofs.push(
-          await RedactedTreeCalculation.create(
+          await RedactedMinaNFTTreeCalculation.create(
             state,
             element,
             originalWitness,
@@ -196,11 +189,11 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     console.time(`merged proofs`);
     proof = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
-      const state = RedactedTreeState.merge(
+      const state = RedactedMinaNFTTreeState.merge(
         proof.publicInput,
         proofs[i].publicInput
       );
-      const mergedProof = await RedactedTreeCalculation.merge(
+      const mergedProof = await RedactedMinaNFTTreeCalculation.merge(
         state,
         proof,
         proofs[i]
@@ -225,13 +218,12 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     console.timeEnd("Proof verified");
   });
 
-  /*
-  it(`should wait for TreeVerifier to be deployed`, async () => {
+  it(`should wait for MinaNFTTreeVerifier to be deployed`, async () => {
     expect(tx).toBeDefined();
     if (tx === undefined) return;
-    console.time(`waited for TreeVerifier to be deployed`);
+    console.time(`waited for MinaNFTTreeVerifier to be deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    console.timeEnd(`waited for TreeVerifier to be deployed`);
+    console.timeEnd(`waited for MinaNFTTreeVerifier to be deployed`);
   });
 
   it(`should verify merged proof on chain`, async () => {
@@ -245,7 +237,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     if (verifier === undefined) return;
     console.time(`verified merged proof on chain`);
     const sender = deployer.toPublicKey();
-    const zkApp = new TreeVerifier(verifier);
+    const zkApp = new MinaNFTTreeVerifier(verifier);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee() },
       () => {
@@ -256,8 +248,8 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     transaction.sign([deployer]);
     tx = await transaction.send();
     console.timeEnd(`verified merged proof on chain`);
-    MinaNFT.transactionInfo(tx, `verified merged proof on chain`);
-    Memory.info(`verified on chain`);
+    await MinaNFT.transactionInfo(tx, `verified merged proof on chain`, false);
+    expect(await MinaNFT.wait(tx)).toBe(true);
+    Memory.info(`verified merged proof on chain`);
   });
-  */
 });
