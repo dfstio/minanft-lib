@@ -1,9 +1,5 @@
-export {
-  RedactedMinaNFTTreeCalculation,
-  RedactedMinaNFTTreeState,
-  RedactedMinaNFTTreeStateProof,
-  TreeElement,
-};
+export { MinaNFTTreeVerifierFunction, TreeElement };
+
 import {
   Field,
   SelfProof,
@@ -11,6 +7,10 @@ import {
   Struct,
   Poseidon,
   MerkleWitness,
+  method,
+  DeployArgs,
+  Permissions,
+  SmartContract,
 } from "o1js";
 
 class TreeElement extends Struct({
@@ -27,10 +27,10 @@ class BaseRedactedMinaNFTTreeState extends Struct({
   count: Field, // number of keys in the Redacted Map
 }) {}
 
-function RedactedMinaNFTTreeState(height: number) {
+function MinaNFTTreeVerifierFunction(height: number) {
   class MerkleTreeWitness extends MerkleWitness(height) {}
 
-  class RedactedMinaNFTTreeState_ extends BaseRedactedMinaNFTTreeState {
+  class RedactedMinaNFTTreeState extends BaseRedactedMinaNFTTreeState {
     static create(
       element: TreeElement,
       originalWitness: MerkleTreeWitness,
@@ -46,7 +46,7 @@ function RedactedMinaNFTTreeState(height: number) {
       const calculatedRedactedIndex = redactedWitness.calculateIndex();
       calculatedRedactedIndex.assertEquals(element.index);
 
-      return new RedactedMinaNFTTreeState_({
+      return new RedactedMinaNFTTreeState({
         originalRoot: element.originalRoot,
         redactedRoot: element.redactedRoot,
         hash: Poseidon.hash([element.index, element.value]),
@@ -55,13 +55,13 @@ function RedactedMinaNFTTreeState(height: number) {
     }
 
     static merge(
-      state1: RedactedMinaNFTTreeState_,
-      state2: RedactedMinaNFTTreeState_
+      state1: RedactedMinaNFTTreeState,
+      state2: RedactedMinaNFTTreeState
     ) {
       state1.originalRoot.assertEquals(state2.originalRoot);
       state1.redactedRoot.assertEquals(state2.redactedRoot);
 
-      return new RedactedMinaNFTTreeState_({
+      return new RedactedMinaNFTTreeState({
         originalRoot: state1.originalRoot,
         redactedRoot: state1.redactedRoot,
         hash: Poseidon.hash([state1.hash, state2.hash]),
@@ -70,8 +70,8 @@ function RedactedMinaNFTTreeState(height: number) {
     }
 
     static assertEquals(
-      state1: RedactedMinaNFTTreeState_,
-      state2: RedactedMinaNFTTreeState_
+      state1: RedactedMinaNFTTreeState,
+      state2: RedactedMinaNFTTreeState
     ) {
       state1.originalRoot.assertEquals(state2.originalRoot);
       state1.redactedRoot.assertEquals(state2.redactedRoot);
@@ -79,33 +79,27 @@ function RedactedMinaNFTTreeState(height: number) {
       state1.count.assertEquals(state2.count);
     }
   }
-  return RedactedMinaNFTTreeState_;
-}
 
-function RedactedMinaNFTTreeCalculation(height: number) {
-  class MerkleTreeWitness extends MerkleWitness(height) {}
-  class RedactedMinaNFTTreeState_ extends RedactedMinaNFTTreeState(height) {}
-
-  const RedactedMinaNFTTreeCalculation_ = ZkProgram({
+  const RedactedMinaNFTTreeCalculation = ZkProgram({
     name: "RedactedMinaNFTTreeCalculation_" + height.toString(),
-    publicInput: RedactedMinaNFTTreeState_,
+    publicInput: RedactedMinaNFTTreeState,
 
     methods: {
       create: {
         privateInputs: [TreeElement, MerkleTreeWitness, MerkleTreeWitness],
 
         method(
-          state: RedactedMinaNFTTreeState_,
+          state: RedactedMinaNFTTreeState,
           element: TreeElement,
           originalWitness: MerkleTreeWitness,
           redactedWitness: MerkleTreeWitness
         ) {
-          const computedState = RedactedMinaNFTTreeState_.create(
+          const computedState = RedactedMinaNFTTreeState.create(
             element,
             originalWitness,
             redactedWitness
           );
-          RedactedMinaNFTTreeState_.assertEquals(computedState, state);
+          RedactedMinaNFTTreeState.assertEquals(computedState, state);
         },
       },
 
@@ -113,29 +107,47 @@ function RedactedMinaNFTTreeCalculation(height: number) {
         privateInputs: [SelfProof, SelfProof],
 
         method(
-          newState: RedactedMinaNFTTreeState_,
-          proof1: SelfProof<RedactedMinaNFTTreeState_, void>,
-          proof2: SelfProof<RedactedMinaNFTTreeState_, void>
+          newState: RedactedMinaNFTTreeState,
+          proof1: SelfProof<RedactedMinaNFTTreeState, void>,
+          proof2: SelfProof<RedactedMinaNFTTreeState, void>
         ) {
           proof1.verify();
           proof2.verify();
-          const computedState = RedactedMinaNFTTreeState_.merge(
+          const computedState = RedactedMinaNFTTreeState.merge(
             proof1.publicInput,
             proof2.publicInput
           );
-          RedactedMinaNFTTreeState_.assertEquals(computedState, newState);
+          RedactedMinaNFTTreeState.assertEquals(computedState, newState);
         },
       },
     },
   });
-  return RedactedMinaNFTTreeCalculation_;
-}
 
-function RedactedMinaNFTTreeStateProof(height: number) {
-  const RedactedMinaNFTTreeCalculation_ =
-    RedactedMinaNFTTreeCalculation(height);
-  class RedactedMinaNFTTreeStateProof_ extends ZkProgram.Proof(
-    RedactedMinaNFTTreeCalculation_
+  class RedactedMinaNFTTreeStateProof extends ZkProgram.Proof(
+    RedactedMinaNFTTreeCalculation
   ) {}
-  return RedactedMinaNFTTreeStateProof_;
+
+  class MinaNFTTreeVerifier extends SmartContract {
+    deploy(args: DeployArgs) {
+      super.deploy(args);
+      this.account.permissions.set({
+        ...Permissions.default(),
+        setDelegate: Permissions.proof(),
+        incrementNonce: Permissions.proof(),
+        setVotingFor: Permissions.proof(),
+        setTiming: Permissions.proof(),
+      });
+    }
+
+    @method verifyRedactedTree(proof: RedactedMinaNFTTreeStateProof) {
+      proof.verify();
+    }
+  }
+  return {
+    RedactedMinaNFTTreeState,
+    RedactedMinaNFTTreeCalculation,
+    MinaNFTTreeVerifier,
+    MerkleTreeWitness,
+    RedactedMinaNFTTreeStateProof,
+  };
 }
