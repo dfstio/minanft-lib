@@ -23,6 +23,7 @@ describe("Compile contracts", () => {
 
   it("should list prover keys files", async () => {
     const files = await fs.readdir(cacheDir);
-    await fs.writeFile("./json/nftfiles.json", JSON.stringify(files, null, 2));
+    const list = files.filter((f) => f.startsWith(".") === false);
+    await fs.writeFile("./json/nftfiles.json", JSON.stringify(list, null, 2));
   });
 });

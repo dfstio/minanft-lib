@@ -26,7 +26,7 @@ export default class api {
     error?: string;
     jobId?: string;
   }> {
-    console.log("mint", data);
+    console.log("mint");
     const result = await this.apiHub("mint_v2", data);
     return { success: result.success, error: result.error, jobId: result.data };
   }
@@ -63,14 +63,14 @@ export default class api {
       jwtToken: this.jwt,
       data: data,
     };
-    console.log("apiHub command", command, data);
+    console.log("apiHub command", command);
 
     try {
       const response = await axios.post(this.endpoint, apiData);
-      console.log("api result", data, response.data);
+      console.log("api result", response.data);
       return { success: true, data: response.data };
     } catch (error) {
-      console.error("catch api", data, error);
+      console.error("catch api", error);
       return { success: false, error: error };
     }
   }

@@ -94,25 +94,33 @@ class MinaNFT extends BaseMinaNFT {
    * @param name Name of NFT
    * @param address Public key of the deployed NFT zkApp
    */
-  constructor(value: {
+  constructor(params: {
     name: string;
     address?: PublicKey;
-    nameService?: PublicKey;
     creator?: string;
+    storage?: string;
+    owner?: Field;
+    escrow?: Field;
+    nameService?: PublicKey;
   }) {
     super();
-    this.name = value.name[0] === "@" ? value.name : "@" + value.name;
-    this.creator = value.creator ?? "MinaNFT library";
-    this.storage = "";
-    this.owner = Field(0);
-    this.escrow = Field(0);
+    this.name = params.name[0] === "@" ? params.name : "@" + params.name;
+    this.creator = params.creator ?? "MinaNFT library";
+    this.storage = params.storage ?? "";
+    this.owner = params.owner ?? Field(0);
+    this.escrow = params.escrow ?? Field(0);
     this.version = UInt64.from(0);
-    this.isMinted = value.address === undefined ? false : true;
-    this.address = value.address;
+    this.isMinted = params.address === undefined ? false : true;
+    this.address = params.address;
     this.updates = [];
     const metadataMap = new MetadataMap();
     this.metadataRoot = metadataMap.getRoot();
-    this.nameService = value.nameService;
+    this.nameService = params.nameService;
+    if (this.nameService === undefined) {
+      this.nameService = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
+    }
+    const nameService = new MinaNFTNameServiceContract(this.nameService);
+    this.tokenId = nameService.token.id;
   }
 
   /**
