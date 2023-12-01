@@ -8,7 +8,8 @@ import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
+const includeFiles = false;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -61,22 +62,24 @@ describe(`MinaNFT contract`, () => {
     const ownerPublicKey = ownerPrivateKey.toPublicKey();
     const owner = Poseidon.hash(ownerPublicKey.toFields());
 
-    const nft = new MinaNFT({ name: `@test`});
+    const nft = new MinaNFT({ name: `@test` });
     nft.updateText({
       key: `description`,
       text: "This is my long description of the NFT. Can be of any length, supports markdown.",
     });
     nft.update({ key: `twitter`, value: `@builder` });
     nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
-    await nft.updateImage({
-      filename: "./images/navigator.jpg",
-      pinataJWT,
-    });
-    await nft.updateFile({
-      key: "sea",
-      filename: "./images/sea.png",
-      pinataJWT,
-    });
+    if (includeFiles) {
+      await nft.updateImage({
+        filename: "./images/navigator.jpg",
+        pinataJWT,
+      });
+      await nft.updateFile({
+        key: "sea",
+        filename: "./images/sea.png",
+        pinataJWT,
+      });
+    }
     const map = new MapData();
     map.update({ key: `level2-1`, value: `value21` });
     map.update({ key: `level2-2`, value: `value22` });
@@ -84,11 +87,12 @@ describe(`MinaNFT contract`, () => {
       key: `level2-3`,
       text: `This is text on level 2. Can be very long`,
     });
-    await map.updateFile({
-      key: "woman",
-      filename: "./images/woman.png",
-      pinataJWT,
-    });
+    if (includeFiles)
+      await map.updateFile({
+        key: "woman",
+        filename: "./images/woman.png",
+        pinataJWT,
+      });
     const mapLevel3 = new MapData();
     mapLevel3.update({ key: `level3-1`, value: `value31` });
     mapLevel3.update({ key: `level3-2`, value: `value32`, isPrivate: true });
