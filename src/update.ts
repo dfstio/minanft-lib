@@ -96,7 +96,7 @@ interface MinaNFTFieldUpdate {
  */
 interface MinaNFTMint {
   deployer: PrivateKey;
-  owner: Field;
+  owner?: Field;
   pinataJWT: string;
   privateKey?: PrivateKey;
   escrow?: Field;

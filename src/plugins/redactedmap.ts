@@ -67,7 +67,7 @@ class RedactedMinaNFTMapState extends Struct({
     return new RedactedMinaNFTMapState({
       originalRoot: state1.originalRoot,
       redactedRoot: state1.redactedRoot,
-      hash: Poseidon.hash([state1.hash, state2.hash]),
+      hash: state1.hash.add(state2.hash),
       count: state1.count.add(state2.count),
     });
   }

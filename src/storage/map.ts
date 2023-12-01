@@ -1,4 +1,9 @@
-export { MapData, MinaNFTMapUpdate };
+export {
+  MapData,
+  MinaNFTMapUpdate,
+  MinaNFTTextDataUpdate,
+  MinaNFTFileDataUpdate,
+};
 import { Poseidon } from "o1js";
 import { BaseMinaNFTObject } from "../baseminanftobject";
 import { PrivateMetadata } from "../privatemetadata";
@@ -200,7 +205,10 @@ class MapData extends BaseMinaNFTObject {
       properties: Object.fromEntries(this.metadata),
     };
   }
-  public static fromJSON(json: object): MapData {
+  public static fromJSON(
+    json: object,
+    skipCalculatingMetadataRoot: boolean = false
+  ): MapData {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const obj = json as any;
     const data = obj.data;
@@ -254,7 +262,7 @@ class MapData extends BaseMinaNFTObject {
         case "map":
           map.updateMap({
             key,
-            map: MapData.fromJSON(value),
+            map: MapData.fromJSON(value, skipCalculatingMetadataRoot),
             isPrivate,
           });
           break;
@@ -269,9 +277,12 @@ class MapData extends BaseMinaNFTObject {
           throw new Error("uri: NFT metadata: map json mismatch");
       }
     }
-    map.setRoot();
-    if (map.root.toJSON() !== data)
-      throw new Error("uri: NFT metadata: map root mismatch");
+
+    if (skipCalculatingMetadataRoot === false) {
+      map.setRoot();
+      if (map.root.toJSON() !== data)
+        throw new Error("uri: NFT metadata: map root mismatch");
+    }
     return map;
   }
 }
