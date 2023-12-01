@@ -9,16 +9,18 @@ import {
   initBlockchain,
   makeString,
 } from "../utils/testhelpers";
-import { PINATA_JWT, JWT } from "../env.json";
+import { PINATA_JWT, JWT, NAMES_ORACLE_SK } from "../env.json";
 import { MINANFT_NAME_SERVICE } from "../src/config.json";
 import { MapData } from "../src/storage/map";
 
-const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const pinataJWT = PINATA_JWT;
+const blockchainInstance: blockchain = "testworld2";
+const includeFiles = true;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
+let uri: string | undefined = undefined;
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 0);
@@ -42,7 +44,8 @@ describe(`MinaNFT mint using api`, () => {
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-
+*/
+  /*
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -70,10 +73,11 @@ describe(`MinaNFT mint using api`, () => {
     });
     nft.update({ key: `twitter`, value: `@builder` });
     nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
-    await nft.updateImage({
-      filename: "./images/image.jpg",
-      pinataJWT,
-    });
+    if (includeFiles)
+      await nft.updateImage({
+        filename: "./images/image.jpg",
+        pinataJWT,
+      });
     /*
     await nft.updateFile({
       key: "sea",
@@ -133,44 +137,59 @@ describe(`MinaNFT mint using api`, () => {
 
     console.log(`nft:`);
     */
-    Memory.info(`created`);
-  });
-  /*
-  it(`should mint NFT using nft imported from JSON`, async () => {
-    expect(nft).toBeDefined();
-    if (nft === undefined) return;
-    expect(deployer).toBeDefined();
-    if (deployer === undefined) return;
-    expect(nameService).toBeDefined();
-    if (nameService === undefined) return;
-    expect(oraclePrivateKey).toBeDefined();
-    if (oraclePrivateKey === undefined) return;
-    expect(nameService).toBeDefined();
-    if (nameService === undefined) return;
-    expect(nameService.address).toBeDefined();
-    if (nameService.address === undefined) return;
-    const ownerPrivateKey = PrivateKey.random();
-    const ownerPublicKey = ownerPrivateKey.toPublicKey();
-    const owner = Poseidon.hash(ownerPublicKey.toFields());
-
-    const uri = nft.exportToString({
+    uri = nft.exportToString({
       increaseVersion: true,
       includePrivateData: false,
     });
-    //console.log("uri", uri);
-    const nft3 = MinaNFT.fromJSON({
+    Memory.info(`created`);
+  });
+
+  /*
+  it(`should mint NFT using nft imported from JSON`, async () => {
+    expect(deployer).toBeDefined();
+    if (deployer === undefined) return;
+    expect(uri).toBeDefined();
+    if (uri === undefined) return;
+    expect(nft).toBeDefined();
+    if (nft === undefined) return;
+
+    const oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
+    const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
+    const nameService = new MinaNFTNameService({
+      oraclePrivateKey,
+      address: nameServiceAddress,
+    });
+
+    const privateKey = "";
+    const zkAppPrivateKey =
+      privateKey === ""
+        ? PrivateKey.random()
+        : PrivateKey.fromBase58(privateKey);
+
+    const nft7 = MinaNFT.fromJSON({
       metadataURI: uri,
-      nameServiceAddress: nameService.address,
+      nameServiceAddress,
       skipCalculatingMetadataRoot: true,
     });
-    const tx = await nft3.mint({ nameService, deployer, owner, pinataJWT });
+
+    console.time("mint");
+    const tx = await nft7.mint(
+      {
+        nameService,
+        deployer,
+        pinataJWT,
+        privateKey: zkAppPrivateKey,
+      },
+      true
+    );
+    console.timeEnd("mint");
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`minted`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    expect(await nft3.checkState()).toBe(true);
+    expect(await nft7.checkState()).toBe(true);
   });
-*/
+  */
   it(`should mint NFT using api call`, async () => {
     expect(nft).toBeDefined();
     if (nft === undefined) return;

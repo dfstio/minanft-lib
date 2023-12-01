@@ -8,6 +8,7 @@ import {
   Field,
   Signature,
   Account,
+  VerificationKey,
 } from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTNameServiceContract, NFTMintData } from "./contract/names";
@@ -67,6 +68,55 @@ class MinaNFTNameService {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "name service deploy", false);
+    if (tx.isSuccess) {
+      this.address = zkAppPublicKey;
+      this.tokenId = zkApp.token.id;
+      return tx;
+    } else return undefined;
+  }
+
+  public async upgrade(
+    deployer: PrivateKey,
+    privateKey: PrivateKey,
+    nonce?: number
+  ): Promise<Mina.TransactionId | undefined> {
+    const sender = deployer.toPublicKey();
+
+    if (this.address === undefined) throw new Error("Address is not set");
+    const zkAppPrivateKey = privateKey;
+    const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
+    if (this.address.toBase58() !== zkAppPublicKey.toBase58())
+      throw new Error("Address mismatch");
+    await MinaNFT.compile();
+    if (MinaNFT.namesVerificationKey === undefined)
+      throw new Error("Compilation error: Verification key is not set");
+    const verificationKey: VerificationKey = MinaNFT.namesVerificationKey;
+    console.log(
+      `upgrading the MinaNFTNameServiceContract on address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+    );
+
+    const zkApp = new MinaNFTNameServiceContract(zkAppPublicKey);
+    await fetchAccount({ publicKey: sender });
+    await fetchAccount({ publicKey: zkAppPublicKey });
+    const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
+    const hasAccount = Mina.hasAccount(zkAppPublicKey);
+    if (!hasAccount) throw new Error("Account does not exist");
+
+    const transaction = await Mina.transaction(
+      {
+        sender,
+        fee: await MinaNFT.fee(),
+        memo: "minanft.io",
+        nonce: deployNonce,
+      },
+      () => {
+        const update = AccountUpdate.createSigned(zkAppPublicKey);
+        update.account.verificationKey.set(verificationKey);
+      }
+    );
+    transaction.sign([deployer, zkAppPrivateKey]);
+    const tx = await transaction.send();
+    await MinaNFT.transactionInfo(tx, "name service upgrade", false);
     if (tx.isSuccess) {
       this.address = zkAppPublicKey;
       this.tokenId = zkApp.token.id;

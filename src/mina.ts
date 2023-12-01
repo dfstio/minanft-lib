@@ -80,6 +80,7 @@ class Memory {
 
   public static info(description: string = ``) {
     const memoryData = process.memoryUsage();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formatMemoryUsage = (data: any) =>
       `${Math.round(data / 1024 / 1024)} MB`;
     const oldRSS = Memory.rss;
