@@ -54,17 +54,19 @@ export {
   MapElement,
 } from "./plugins/redactedmap";
 export {
-  RedactedMinaNFTTreeCalculation,
-  RedactedMinaNFTTreeState,
-  RedactedMinaNFTTreeStateProof,
+  MinaNFTTreeVerifierFunction,
   TreeElement,
 } from "./plugins/redactedtree";
-export { MinaNFTTreeVerifier } from "./plugins/treeverifier";
 export { MinaNFTVerifier } from "./plugins/verifier";
 export { Escrow, EscrowDeposit } from "./plugins/escrow";
 export { IPFS } from "./storage/ipfs";
 export { File, FileData } from "./storage/file";
-export { MapData, MinaNFTMapUpdate } from "./storage/map";
+export {
+  MapData,
+  MinaNFTMapUpdate,
+  MinaNFTTextDataUpdate,
+  MinaNFTFileDataUpdate,
+} from "./storage/map";
 export { TextData } from "./storage/text";
 export {
   blockchain,

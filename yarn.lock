@@ -4492,6 +4492,7 @@ __metadata:
     ts-jest: ^29.1.1
     typedoc: 0.25.3
     typedoc-plugin-mermaid: ^1.10.0
+    typedoc-plugin-missing-exports: ^2.1.0
     typescript: 5.2.2
   languageName: unknown
   linkType: soft
@@ -5557,6 +5558,15 @@ __metadata:
   peerDependencies:
     typedoc: ">=0.23.0"
   checksum: d5d0e27bb2b94001dbce6439258d9728dc79db5e3b9b00b6f543f26ddda29be1555352bf495f5799c3c3577c28534bb7d5195e63d01c9e1e04fd40e692d52e90
+  languageName: node
+  linkType: hard
+
+"typedoc-plugin-missing-exports@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "typedoc-plugin-missing-exports@npm:2.1.0"
+  peerDependencies:
+    typedoc: 0.24.x || 0.25.x
+  checksum: cb9b324c28a68a4ba621f4e3c15ce3b43f75826bdcb09a073aa51c770bbca47b687eb1c0462ba22a09a316573e29c4f9c4f75763b51f8354cce42989dfa68231
   languageName: node
   linkType: hard
 

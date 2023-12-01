@@ -9,10 +9,10 @@ class IPFS {
     this.auth = "Bearer " + token;
   }
 
-  public async pinJSON(params: any): Promise<string | undefined> {
+  public async pinString(data: string): Promise<string | undefined> {
     try {
       // replacer will remove all private metadata from the object
-      const data = JSON.stringify(params, replacer, 2);
+      //const data = JSON.stringify(params, replacer, 2);
 
       const config = {
         headers: {
@@ -156,17 +156,4 @@ class IPFS {
     return undefined;
   }
   */
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function replacer(key: any, value: any) {
-  if (value?.isPrivate === true) {
-    //console.log(`key:`, key, `value:`, value);
-    return undefined;
-  }
-  // Modify the value or return undefined to exclude the property
-  return value;
 }

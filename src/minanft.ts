@@ -292,6 +292,129 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
+   * Load metadata from blockchain and IPFS/Arweave
+   * @param metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
+   * @param nameServiceAddress Public key of the Name Service
+   * @param skipCalculatingMetadataRoot Skip calculating metadata root in case metadataURI does not contains private data
+   * @returns MinaNFT object
+   */
+  public static fromJSON(params: {
+    metadataURI: string;
+    nameServiceAddress: PublicKey;
+    skipCalculatingMetadataRoot?: boolean;
+  }): MinaNFT {
+    const nameService = new MinaNFTNameServiceContract(
+      params.nameServiceAddress
+    );
+    const tokenId = nameService.token.id;
+    const skipCalculatingMetadataRoot: boolean =
+      params.skipCalculatingMetadataRoot ?? false;
+
+    const uri = JSON.parse(params.metadataURI);
+    const nft = new MinaNFT({
+      name: uri.name,
+      nameService: params.nameServiceAddress,
+      creator: uri.creator,
+    });
+    nft.version = UInt64.from(uri.version);
+    nft.metadataRoot = new Metadata({
+      data: Field.fromJSON(uri.metadata.data),
+      kind: Field.fromJSON(uri.metadata.kind),
+    });
+    nft.owner = Field.fromJSON(uri.owner);
+    nft.escrow = Field.fromJSON(uri.escrow);
+    nft.tokenId = tokenId;
+
+    Object.entries(uri.properties).forEach(([key, value]) => {
+      if (typeof key !== "string")
+        throw new Error("uri: NFT metadata key mismatch - should be string");
+      if (typeof value !== "object")
+        throw new Error("uri: NFT metadata value mismatch - should be object");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const obj = value as any;
+      const data = obj.data;
+      const kind = obj.kind;
+      const isPrivate: boolean = obj.isPrivate ?? false;
+      if (data === undefined)
+        throw new Error(
+          `uri: NFT metadata: data should present: ${key} : ${value} kind: ${kind} daya: ${data} isPrivate: ${isPrivate}`
+        );
+
+      if (kind === undefined || typeof kind !== "string")
+        throw new Error(
+          `uri: NFT metadata: kind mismatch - should be string: ${key} : ${value}`
+        );
+      switch (kind) {
+        case "text":
+          nft.metadata.set(
+            key,
+            new PrivateMetadata({
+              data: Field.fromJSON(data),
+              kind: MinaNFT.stringToField(kind),
+              isPrivate: isPrivate,
+              linkedObject: TextData.fromJSON(obj),
+            })
+          );
+          break;
+        case "string":
+          nft.metadata.set(
+            key,
+            new PrivateMetadata({
+              data: MinaNFT.stringToField(data),
+              kind: MinaNFT.stringToField(kind),
+              isPrivate: isPrivate,
+            })
+          );
+          break;
+        case "file":
+          nft.metadata.set(
+            key,
+            new PrivateMetadata({
+              data: Field.fromJSON(data),
+              kind: MinaNFT.stringToField(kind),
+              isPrivate: isPrivate,
+              linkedObject: FileData.fromJSON(obj),
+            })
+          );
+          break;
+        case "image":
+          nft.metadata.set(
+            key,
+            new PrivateMetadata({
+              data: Field.fromJSON(data),
+              kind: MinaNFT.stringToField(kind),
+              isPrivate: isPrivate,
+              linkedObject: FileData.fromJSON(obj),
+            })
+          );
+          break;
+        case "map":
+          nft.metadata.set(
+            key,
+            new PrivateMetadata({
+              data: Field.fromJSON(data),
+              kind: MinaNFT.stringToField(kind),
+              isPrivate: isPrivate,
+              linkedObject: MapData.fromJSON(obj, skipCalculatingMetadataRoot),
+            })
+          );
+          break;
+        default:
+          nft.metadata.set(
+            key,
+            new PrivateMetadata({
+              data: Field.fromJSON(data),
+              kind: MinaNFT.stringToField(kind),
+              isPrivate: isPrivate,
+            })
+          );
+          break;
+      }
+    });
+    return nft;
+  }
+
+  /**
    * Creates a Map from JSON
    * @param map map to convert
    * @returns map as JSON object
@@ -303,8 +426,7 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
-   * Converts a Map to JSON
-   * @param map map to convert
+   * Converts a NFT to JSON
    * @returns map as JSON object
    */
   public toJSON(): object {
@@ -312,8 +434,27 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
+   * Converts a NFT to string
+   * @param increaseVersion increase version by one
+   * @param includePrivateData include private data
+   * @returns NFT's serialized JSON as string
+   */
+  public exportToString(params: {
+    increaseVersion: boolean;
+    includePrivateData: boolean;
+  }): string {
+    return params.includePrivateData
+      ? JSON.stringify(this.exportToJSON(params.increaseVersion), null, 2)
+      : JSON.stringify(
+          this.exportToJSON(params.increaseVersion),
+          (_, value) => (value?.isPrivate === true ? undefined : value),
+          2
+        );
+  }
+
+  /**
    * Converts a Map to JSON
-   * @param map map to convert
+   * @param increaseVersion increase version by one
    * @returns map as JSON object
    */
   public exportToJSON(increaseVersion: boolean = false): object {
@@ -340,6 +481,16 @@ class MinaNFT extends BaseMinaNFT {
       ? this.version.add(UInt64.from(1)).toJSON()
       : this.version.toJSON();
 
+    /*
+    class MinaNFTContract extends SmartContract {
+        @state(Field) name = State<Field>();
+        @state(Metadata) metadata = State<Metadata>();
+        @state(Storage) storage = State<Storage>();
+        @state(Field) owner = State<Field>();
+        @state(Field) escrow = State<Field>();
+        @state(UInt64) version = State<UInt64>();
+    */
+
     return {
       name: this.name,
       description: description ?? "",
@@ -348,6 +499,8 @@ class MinaNFT extends BaseMinaNFT {
       version,
       time: Date.now(),
       creator: this.creator,
+      owner: this.owner.toJSON(),
+      escrow: this.escrow.toJSON(),
       metadata: { data: root.data.toJSON(), kind: root.kind.toJSON() },
       properties: Object.fromEntries(this.metadata),
     };
@@ -824,7 +977,9 @@ class MinaNFT extends BaseMinaNFT {
   ): Promise<{ hash: Storage; hashStr: string } | undefined> {
     console.log("Pinning to IPFS...");
     const ipfs = new IPFS(pinataJWT);
-    const hash = await ipfs.pinJSON(this.exportToJSON(true));
+    const hash = await ipfs.pinString(
+      this.exportToString({ increaseVersion: true, includePrivateData: false })
+    );
     if (hash === undefined) return undefined;
     const hashStr = "i:" + hash;
     const ipfs_fields = MinaNFT.stringToFields(hashStr);
@@ -935,16 +1090,17 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Mints an NFT. Deploys and compiles the MinaNFT contract if needed. Takes a long time.
-   * @param deployer Private key of the account that will mint and deploy if necessary the contract
-   * @param pwdHash Hash of the password used to prove transactions
+   * @param minaData: {@link MinaNFTMint} mint data
+   * @param skipCalculatingMetadataRoot: skip calculating metadata root in case the NFT is imported from the JSON that do not contains private metadata and therefore the root cannot be calculated
    */
   public async mint(
-    minaData: MinaNFTMint
+    minaData: MinaNFTMint,
+    skipCalculatingMetadataRoot: boolean = false
   ): Promise<Mina.TransactionId | undefined> {
     const {
       nameService,
       deployer,
-      owner,
+      owner: ownerArg,
       pinataJWT,
       privateKey,
       escrow: escrowArg,
@@ -953,6 +1109,9 @@ class MinaNFT extends BaseMinaNFT {
     if (nameService === undefined)
       throw new Error("Names service is undefined");
     const escrow: Field = escrowArg ?? Field(0);
+    const owner: Field = ownerArg ?? this.owner;
+    if (owner.toJSON() === Field(0).toJSON())
+      throw new Error("Owner is not defined");
     if (nameService.address === undefined)
       throw new Error("Names service address is undefined");
     await MinaNFT.compile();
@@ -965,7 +1124,9 @@ class MinaNFT extends BaseMinaNFT {
     this.address = zkAppPrivateKey.toPublicKey();
     //const zkApp = new MinaNFTContract(this.address);
 
-    const { root } = this.getMetadataRootAndMap();
+    const root = skipCalculatingMetadataRoot
+      ? this.metadataRoot
+      : this.getMetadataRootAndMap().root;
     const storage = await this.pinToStorage(pinataJWT);
     if (storage === undefined) {
       console.error("IPFS Storage error");
@@ -1025,17 +1186,6 @@ class MinaNFT extends BaseMinaNFT {
       () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
         zkApp.mint(mintData);
-        /*
-        zkApp.deploy({});
-        zkApp.name.set(MinaNFT.stringToField(this.name));
-        zkApp.metadata.set(root);
-        zkApp.owner.set(owner);
-        zkApp.storage.set(storageHash);
-        zkApp.version.set(UInt64.from(1));
-        zkApp.escrow.set(escrow);
-        zkApp.account.tokenSymbol.set("NFT");
-        zkApp.account.zkappUri.set(url);
-        */
       }
     );
     await transaction.prove();
