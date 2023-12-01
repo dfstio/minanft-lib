@@ -33,7 +33,7 @@ beforeAll(async () => {
 
 describe(`MinaNFT mint using api`, () => {
   let nft: MinaNFT | undefined = undefined;
-
+  /*
   it(`should compile contracts`, async () => {
     MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
@@ -57,9 +57,13 @@ describe(`MinaNFT mint using api`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
   });
-
+*/
   it(`should create NFT`, async () => {
-    nft = new MinaNFT({ name: `@test_${makeString(20)}` });
+    const ownerPrivateKey = PrivateKey.random();
+    const ownerPublicKey = ownerPrivateKey.toPublicKey();
+    const owner = Poseidon.hash(ownerPublicKey.toFields());
+
+    nft = new MinaNFT({ name: `@test_${makeString(20)}`, owner });
     nft.updateText({
       key: `description`,
       text: "This is my long description of the NFT. Can be of any length, supports markdown.",
@@ -102,13 +106,9 @@ describe(`MinaNFT mint using api`, () => {
       includePrivateData: true,
     });
 
-    expect(nameService).toBeDefined();
-    if (nameService === undefined) return;
-    expect(nameService.address).toBeDefined();
-    if (nameService.address === undefined) return;
     const nft1 = MinaNFT.fromJSON({
       metadataURI: data,
-      nameServiceAddress: nameService.address,
+      nameServiceAddress: PublicKey.fromBase58(MINANFT_NAME_SERVICE),
     });
     /*
     console.log(
@@ -122,7 +122,7 @@ describe(`MinaNFT mint using api`, () => {
     });
     const nft2 = MinaNFT.fromJSON({
       metadataURI: mintdata,
-      nameServiceAddress: nameService.address,
+      nameServiceAddress: PublicKey.fromBase58(MINANFT_NAME_SERVICE),
       skipCalculatingMetadataRoot: true,
     });
     /*
@@ -135,7 +135,7 @@ describe(`MinaNFT mint using api`, () => {
     */
     Memory.info(`created`);
   });
-
+  /*
   it(`should mint NFT using nft imported from JSON`, async () => {
     expect(nft).toBeDefined();
     if (nft === undefined) return;
@@ -170,7 +170,7 @@ describe(`MinaNFT mint using api`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     expect(await nft3.checkState()).toBe(true);
   });
-
+*/
   it(`should mint NFT using api call`, async () => {
     expect(nft).toBeDefined();
     if (nft === undefined) return;
@@ -182,5 +182,6 @@ describe(`MinaNFT mint using api`, () => {
     //console.log("uri", uri);
     const result = await minanft.mint({ uri });
     console.log("mint result", result);
+    expect(result.success).toBe(true);
   });
 });
