@@ -31,6 +31,16 @@ export default class api {
     return { success: result.success, error: result.error, jobId: result.data };
   }
 
+  public async sum(data: { transactions: string[] }): Promise<{
+    success: boolean;
+    error?: string;
+    jobId?: string;
+  }> {
+    console.log("sum");
+    const result = await this.apiHub("sum", data);
+    return { success: result.success, error: result.error, jobId: result.data };
+  }
+
   public async computeRecursiveProof(data: {
     contractName: string;
     transactions: string[];

@@ -1,10 +1,11 @@
 import { describe, expect, it } from "@jest/globals";
-import { PrivateKey, Poseidon } from "o1js";
+import { PrivateKey, Poseidon, PublicKey } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
-import { PINATA_JWT } from "../env.json";
+import { PINATA_JWT, JWT, NAMES_ORACLE_SK } from "../env.json";
+import { MINANFT_NAME_SERVICE } from "../src/config.json";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = ""; //PINATA_JWT;
@@ -36,6 +37,7 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`compiled`);
   });
 
+  /*
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -49,6 +51,15 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`names service deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
+  });
+*/
+  it(`should use existing NameService`, async () => {
+    oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
+    const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
+    nameService = new MinaNFTNameService({
+      oraclePrivateKey,
+      address: nameServiceAddress,
+    });
   });
 
   it(`should mint NFT`, async () => {
