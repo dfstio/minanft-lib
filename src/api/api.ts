@@ -1,5 +1,6 @@
 import { MINNFTAPIAUTH, MINNFTAPI } from "../config.json";
 import axios from "axios";
+import { sleep } from "../mina";
 
 export default class api {
   jwt: string;
@@ -97,6 +98,50 @@ export default class api {
         error: result.error,
         result: result.data,
       };
+  }
+
+  public async waitForProofResult(data: {
+    jobId: string;
+    maxAttempts?: number;
+    interval?: number;
+  }): Promise<{
+    success: boolean;
+    error?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    result?: any;
+  }> {
+    const maxAttempts = data?.maxAttempts ?? 360; // 2 hours
+    const interval = data?.interval ?? 20000;
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+      const result = await this.apiHub("proofResult", data);
+      if (result.data === "error")
+        return {
+          success: false,
+          error: result.error,
+          result: result.data,
+        };
+      else if (result.data?.jobStatus === "failed")
+        return {
+          success: false,
+          error: result.error,
+          result: result.data,
+        };
+      else if (result.data?.result !== undefined) {
+        return {
+          success: result.success,
+          error: result.error,
+          result: result.data,
+        };
+      }
+      await sleep(interval);
+      attempts++;
+    }
+    return {
+      success: false,
+      error: "Timeout",
+      result: undefined,
+    };
   }
 
   private async apiHub(
