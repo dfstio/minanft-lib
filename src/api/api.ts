@@ -59,14 +59,24 @@ export default class api {
     developer: string;
     name: string;
     task: string;
-    arguments: string[];
+    args: string[];
   }): Promise<{
     success: boolean;
     error?: string;
     jobId?: string;
   }> {
     const result = await this.apiHub("proof", data);
-    return { success: result.success, jobId: result.data, error: result.error };
+    if (result.data === "error")
+      return {
+        success: false,
+        error: result.error,
+      };
+    else
+      return {
+        success: result.success,
+        jobId: result.data,
+        error: result.error,
+      };
   }
 
   public async proofResult(data: { jobId: string }): Promise<{
@@ -75,11 +85,18 @@ export default class api {
     result?: any;
   }> {
     const result = await this.apiHub("proofResult", data);
-    return {
-      success: result.success,
-      error: result.error,
-      result: result.data,
-    };
+    if (result.data === "error")
+      return {
+        success: false,
+        error: result.error,
+        result: result.data,
+      };
+    else
+      return {
+        success: result.success,
+        error: result.error,
+        result: result.data,
+      };
   }
 
   private async apiHub(
