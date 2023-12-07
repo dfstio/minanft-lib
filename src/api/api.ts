@@ -10,10 +10,28 @@ export default class api {
     this.endpoint = MINNFTAPI;
   }
 
-  public async reserveName(
-    name: string
-  ): Promise<{ success: boolean; error?: string }> {
-    return { success: false };
+  public async reserveName(data: { name: string; publicKey: string }): Promise<{
+    success: boolean;
+    error?: string;
+    price?: string;
+    isReserved: boolean;
+    reason?: string;
+  }> {
+    const result = await this.apiHub("reserveName", {
+      transactions: [],
+      developer: "@dfst",
+      name: "reserveName",
+      task: "reserveName",
+      arguments: [data.name, data.publicKey],
+    });
+    return {
+      success: result.success,
+      error: result.error,
+      price: result.data?.price,
+      isReserved:
+        result.data?.isReserved === undefined ? false : result.data.isReserved,
+      reason: result.data?.reason,
+    };
   }
 
   /*
@@ -26,11 +44,79 @@ export default class api {
     error?: string;
     jobId?: string;
   }> {
+    const result = await this.apiHub("mint_v3", {
+      transactions: [data.uri],
+      developer: "@dfst",
+      name: "mint",
+      task: "mint",
+      arguments: data.privateKey ? [data.privateKey] : [],
+    });
+    return { success: result.success, jobId: result.data, error: result.error };
+  }
+
+  public async proof(data: {
+    transactions: string[];
+    developer: string;
+    name: string;
+    task: string;
+    arguments: string[];
+  }): Promise<{
+    success: boolean;
+    error?: string;
+    jobId?: string;
+  }> {
+    const result = await this.apiHub("proof", data);
+    return { success: result.success, jobId: result.data, error: result.error };
+  }
+
+  public async proofResult(data: { jobId: string }): Promise<{
+    success: boolean;
+    error?: string;
+    result?: any;
+  }> {
+    const result = await this.apiHub("proofResult", data);
+    return {
+      success: result.success,
+      error: result.error,
+      result: result.data,
+    };
+  }
+
+  private async apiHub(
+    command: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<{ success: boolean; data?: any; error?: any }> {
+    const apiData = {
+      auth: MINNFTAPIAUTH,
+      command: command,
+      jwtToken: this.jwt,
+      data: data,
+    };
+
+    try {
+      const response = await axios.post(this.endpoint, apiData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error("catch api", error);
+      return { success: false, error: error };
+    }
+  }
+}
+
+/*
+
+  public async mint(data: { uri: string; privateKey?: string }): Promise<{
+    success: boolean;
+    error?: string;
+    jobId?: string;
+  }> {
     console.log("mint");
     const result = await this.apiHub("mint_v2", data);
     return { success: result.success, error: result.error, jobId: result.data };
   }
-
+  
   public async sum(data: { transactions: string[] }): Promise<{
     success: boolean;
     error?: string;
@@ -116,28 +202,4 @@ export default class api {
   }> {
     return { success: false };
   }
-
-  private async apiHub(
-    command: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ success: boolean; data?: any; error?: any }> {
-    const apiData = {
-      auth: MINNFTAPIAUTH,
-      command: command,
-      jwtToken: this.jwt,
-      data: data,
-    };
-    //console.log("apiHub command", command);
-
-    try {
-      const response = await axios.post(this.endpoint, apiData);
-      //console.log("api result", response.data);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error("catch api", error);
-      return { success: false, error: error };
-    }
-  }
-}
+*/

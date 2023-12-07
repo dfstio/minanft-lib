@@ -163,8 +163,10 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     const minanft = new api(JWT);
     console.log("transactions", transactions.length);
 
-    const apiresult = await minanft.tree({
+    const apiresult = await minanft.proof({
       transactions,
+      developer: "@dfst",
+      name: "tree",
       task: "proof",
       arguments: [height.toString()],
     });
@@ -236,7 +238,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     let ready: boolean = false;
     while (!ready) {
       await sleep(5000);
-      const result = await minanft.tree_result({ jobId });
+      const result = await minanft.proofResult({ jobId });
       if (result.success) {
         if (result.result.result !== undefined) {
           ready = true;

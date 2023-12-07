@@ -78,5 +78,6 @@ export {
   accountBalanceMina,
   formatTime,
 } from "./mina";
+export { BackendPlugin } from "./plugins/backend";
 import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config.json";
 export { NAMES_ORACLE, MINANFT_NAME_SERVICE };
