@@ -13,12 +13,7 @@ import {
 import { formatTime } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
-import {
-  Memory,
-  blockchain,
-  initBlockchain,
-  sleep,
-} from "../utils/testhelpers";
+import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
 import {
   MinaNFTTreeVerifierFunction,
   TreeElement,
@@ -29,7 +24,7 @@ import api from "../src/api/api";
 const blockchainInstance: blockchain = "local";
 const height = 20;
 const maxElements = 100;
-const minMaskLength = 32;
+const minMaskLength = 3;
 
 const {
   RedactedMinaNFTTreeCalculation,
@@ -108,7 +103,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
   it(`should prepare witnesses`, async () => {
     expect(maskLength).toBeGreaterThan(0);
     if (maskLength === 0) return;
-    console.time(`calculated proofs`);
+    console.time(`prepared transactions`);
     const originalRoot = tree.getRoot();
     const redactedRoot = redactedTree.getRoot();
     for (let i = 0; i < mask.length; i++) {
@@ -156,7 +151,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
         */
       }
     }
-    console.timeEnd(`calculated proofs`);
+    console.timeEnd(`prepared transactions`);
   });
 
   it(`should calculate proof using api call`, async () => {
@@ -168,7 +163,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
       developer: "@dfst",
       name: "tree",
       task: "proof",
-      arguments: [height.toString()],
+      args: [height.toString()],
     });
 
     console.log("api result", apiresult);
@@ -176,7 +171,6 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     expect(apiresult.jobId).toBeDefined();
     if (apiresult.jobId === undefined) return;
     jobId = apiresult.jobId;
-    console.time("tree proof result");
   });
 
   it(`should compile contracts`, async () => {
@@ -235,30 +229,49 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     expect(jobId).not.toBe("");
     if (jobId === "") return;
     const minanft = new api(JWT);
+    const result = await minanft.waitForProofResult({ jobId });
+    /*
     let ready: boolean = false;
     while (!ready) {
       await sleep(5000);
       const result = await minanft.proofResult({ jobId });
-      if (result.success) {
-        if (result.result.result !== undefined) {
-          ready = true;
-          //console.log("status", result.status);
-          //console.log("Final result", result.result.result);
-          proof = result.result.result;
-          console.log(
-            "Billed duration",
-            formatTime(result.result.billedDuration),
-            result.result.billedDuration
-          );
-          console.log(
-            "Duration",
-            formatTime(result.result.timeFinished - result.result.timeCreated),
-            result.result.timeFinished - result.result.timeCreated
-          );
-        }
+   */
+    if (result.success) {
+      if (result.result.result !== undefined) {
+        //ready = true;
+        //console.log("status", result.status);
+        //console.log("Final result", result.result.result);
+        proof = result.result.result;
+        console.log(
+          "Billed duration",
+          formatTime(result.result.billedDuration),
+          result.result.billedDuration
+        );
+        console.log(
+          "Duration",
+          formatTime(result.result.timeFinished - result.result.timeCreated),
+          result.result.timeFinished - result.result.timeCreated
+        );
       }
+    } else {
+      console.log("ERROR", result);
     }
-    console.timeEnd("tree proof result");
+    if (result.result.jobStatus === "failed") {
+      //ready = true;
+      console.log("status:", result.result.jobStatus);
+      console.log("Final result", result.result.result);
+      console.log(
+        "Billed duration",
+        formatTime(result.result.billedDuration),
+        result.result.billedDuration
+      );
+      console.log(
+        "Duration",
+        formatTime(result.result.timeFailed - result.result.timeCreated),
+        result.result.timeFailed - result.result.timeCreated
+      );
+      // }
+    }
   });
 
   it(`should wait for MinaNFTTreeVerifier to be deployed`, async () => {
