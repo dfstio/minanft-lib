@@ -41,6 +41,62 @@ export default class api {
     return { success: result.success, error: result.error, jobId: result.data };
   }
 
+  public async sum_v2(data: {
+    transactions: string[];
+    task: string;
+    arguments: string[];
+  }): Promise<{
+    success: boolean;
+    error?: string;
+    jobId?: string;
+  }> {
+    console.log("sum_v2");
+    const result = await this.apiHub("sum_v2", data);
+    return { success: result.success, error: result.error, jobId: result.data };
+  }
+
+  public async sum_v2_result(data: { jobId: string }): Promise<{
+    success: boolean;
+    error?: string;
+    result?: any;
+  }> {
+    //console.log("sum_v2_result", data);
+    const result = await this.apiHub("sum_v2_result", data);
+    return {
+      success: result.success,
+      error: result.error,
+      result: result.data,
+    };
+  }
+
+  public async tree(data: {
+    transactions: string[];
+    task: string;
+    arguments: string[];
+  }): Promise<{
+    success: boolean;
+    error?: string;
+    jobId?: string;
+  }> {
+    //console.log("tree", data);
+    const result = await this.apiHub("tree", data);
+    return { success: result.success, error: result.error, jobId: result.data };
+  }
+
+  public async tree_result(data: { jobId: string }): Promise<{
+    success: boolean;
+    error?: string;
+    result?: any;
+  }> {
+    //console.log("sum_v2_result", data);
+    const result = await this.apiHub("sum_v2_result", data);
+    return {
+      success: result.success,
+      error: result.error,
+      result: result.data,
+    };
+  }
+
   public async computeRecursiveProof(data: {
     contractName: string;
     transactions: string[];
@@ -73,11 +129,11 @@ export default class api {
       jwtToken: this.jwt,
       data: data,
     };
-    console.log("apiHub command", command);
+    //console.log("apiHub command", command);
 
     try {
       const response = await axios.post(this.endpoint, apiData);
-      console.log("api result", response.data);
+      //console.log("api result", response.data);
       return { success: true, data: response.data };
     } catch (error) {
       console.error("catch api", error);

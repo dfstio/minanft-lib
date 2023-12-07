@@ -44,18 +44,16 @@ beforeAll(async () => {
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
   } else {
-    /*
-    const network = Mina.Network({
-        mina: LIGHTNET,
-        lightnetAccountManager: LIGHTNET_ACCOUNTS,
-        archive: LIGHTNET_ARCHIVE
-    });
-    */
     const network = Mina.Network({
       mina: "http://localhost:8080/graphql",
       archive: "http://localhost:8282",
       lightnetAccountManager: "http://localhost:8181",
     });
+    /*
+    const network = Mina.Network({
+      mina: "https://proxy.testworld.minaexplorer.com/graphql",
+    });
+    */
 
     Mina.setActiveInstance(network);
     //deployer = PrivateKey.fromBase58(DEPLOYER);
@@ -116,9 +114,11 @@ describe("Deploy and set initial values", () => {
 
     console.log("Sending the deploy transaction...");
     const tx = await transaction.send();
+    await tx.wait();
     if (!useLocal) await MinaNFT.transactionInfo(tx, "deploy");
 
     await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchAccount({ publicKey: sender });
     const newKey = zkApp.key.get();
     const newValue = zkApp.value.get();
     expect(newKey.toJSON()).toBe(key.toJSON());
@@ -134,11 +134,12 @@ describe("Deploy and set initial values", () => {
     );
 
     await transaction1.prove();
-    transaction1.sign([deployer]);
+    transaction1.sign([deployer, zkAppPrivateKey]);
 
     console.log("Sending the update transaction...");
     const tx1 = await transaction1.send();
-    //if (!useLocal) await MinaNFT.transactionInfo(tx1, "update");
+    await tx1.wait();
+    if (!useLocal) await MinaNFT.transactionInfo(tx1, "update");
 
     await fetchAccount({ publicKey: zkAppPublicKey });
     const newValue1 = zkApp.value.get();

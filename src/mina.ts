@@ -6,6 +6,7 @@ export {
   sleep,
   accountBalance,
   accountBalanceMina,
+  formatTime,
 };
 
 import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount } from "o1js";
@@ -72,43 +73,55 @@ function makeString(length: number): string {
   return outString;
 }
 
+function formatTime(ms: number): string {
+  if (ms === undefined) return "";
+  if (ms < 1000) return ms.toString() + " ms";
+  if (ms < 60 * 1000)
+    return parseInt((ms / 1000).toString()).toString() + " sec";
+  if (ms < 60 * 60 * 1000)
+    return parseInt((ms / 1000 / 60).toString()).toString() + " min";
+  return parseInt((ms / 1000 / 60 / 60).toString()).toString() + " h";
+}
+
 class Memory {
   static rss: number = 0;
   constructor() {
     Memory.rss = 0;
   }
 
-  public static info(description: string = ``) {
+  public static info(description: string = ``, fullInfo: boolean = false) {
     const memoryData = process.memoryUsage();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formatMemoryUsage = (data: any) =>
+    const formatMemoryUsage = (data: number) =>
       `${Math.round(data / 1024 / 1024)} MB`;
     const oldRSS = Memory.rss;
     Memory.rss = Math.round(memoryData.rss / 1024 / 1024);
-    /*
-    const memoryUsage = {
-      rssDelta: `${oldRSS === 0 ? 0 : Memory.rss - oldRSS} MB`,
-      rss: `${formatMemoryUsage(
-        memoryData.rss
-      )} -> Resident Set Size - total memory allocated`,
-      heapTotal: `${formatMemoryUsage(
-        memoryData.heapTotal
-      )} -> total size of the allocated heap`,
-      heapUsed: `${formatMemoryUsage(
-        memoryData.heapUsed
-      )} -> actual memory used during the execution`,
-      external: `${formatMemoryUsage(
-        memoryData.external
-      )} -> V8 external memory`,
-    };
-    */
 
-    console.log(
-      `RSS memory ${description}: ${formatMemoryUsage(memoryData.rss)}${
-        oldRSS === 0
-          ? ``
-          : `, changed by ` + (Memory.rss - oldRSS).toString() + ` MB`
-      }`
-    );
+    const memoryUsage = fullInfo
+      ? {
+          step: `${description}:`,
+          rssDelta: `${(oldRSS === 0
+            ? 0
+            : Memory.rss - oldRSS
+          ).toString()} MB -> Resident Set Size memory change`,
+          rss: `${formatMemoryUsage(
+            memoryData.rss
+          )} -> Resident Set Size - total memory allocated`,
+          heapTotal: `${formatMemoryUsage(
+            memoryData.heapTotal
+          )} -> total size of the allocated heap`,
+          heapUsed: `${formatMemoryUsage(
+            memoryData.heapUsed
+          )} -> actual memory used during the execution`,
+          external: `${formatMemoryUsage(
+            memoryData.external
+          )} -> V8 external memory`,
+        }
+      : `RSS memory ${description}: ${formatMemoryUsage(memoryData.rss)}${
+          oldRSS === 0
+            ? ``
+            : `, changed by ` + (Memory.rss - oldRSS).toString() + ` MB`
+        }`;
+
+    console.log(memoryUsage);
   }
 }
