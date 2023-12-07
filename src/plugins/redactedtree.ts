@@ -18,7 +18,25 @@ class TreeElement extends Struct({
   redactedRoot: Field,
   index: Field,
   value: Field,
-}) {}
+}) {
+  public toJSON() {
+    return {
+      originalRoot: this.originalRoot.toJSON(),
+      redactedRoot: this.redactedRoot.toJSON(),
+      index: this.index.toJSON(),
+      value: this.value.toJSON(),
+    };
+  }
+
+  public static fromJSON(json: any) {
+    return new TreeElement({
+      originalRoot: Field.fromJSON(json.originalRoot),
+      redactedRoot: Field.fromJSON(json.redactedRoot),
+      index: Field.fromJSON(json.index),
+      value: Field.fromJSON(json.value),
+    });
+  }
+}
 
 class BaseRedactedMinaNFTTreeState extends Struct({
   originalRoot: Field, // root of the original Tree

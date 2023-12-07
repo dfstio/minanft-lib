@@ -76,6 +76,7 @@ export {
   sleep,
   accountBalance,
   accountBalanceMina,
+  formatTime,
 } from "./mina";
 import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config.json";
 export { NAMES_ORACLE, MINANFT_NAME_SERVICE };

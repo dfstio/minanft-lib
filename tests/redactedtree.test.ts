@@ -8,6 +8,7 @@ import {
   verify,
   Field,
   MerkleTree,
+  JsonProof,
 } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
@@ -17,10 +18,10 @@ import {
   TreeElement,
 } from "../src/plugins/redactedtree";
 
-const blockchainInstance: blockchain = "testworld2";
-const height = 5;
-const maxElements = 10;
-const minMaskLength = 4;
+const blockchainInstance: blockchain = "local";
+const height = 20;
+const maxElements = 100;
+const minMaskLength = 32;
 
 const {
   RedactedMinaNFTTreeState,
@@ -37,8 +38,10 @@ const leaves: Field[] = [];
 const mask: boolean[] = [];
 let maskLength: number = 0;
 const size = 2 ** (height - 1);
-const proofs: TreeStateProof[] = [];
-let proof: TreeStateProof | undefined = undefined;
+//const proofs: TreeStateProof[] = [];
+//let proof: TreeStateProof | undefined = undefined;
+const proofs: string[] = [];
+let mergedProof: string = "";
 let verificationKey: string | undefined = undefined;
 let tx: Mina.TransactionId | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
@@ -107,20 +110,20 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
   });
 
   it(`should prepare data`, async () => {
-    expect(maxElements).toBeGreaterThan(minMaskLength * 2);
-    if (maxElements <= minMaskLength * 2) return;
-    expect(size).toBeGreaterThan(minMaskLength * 2);
-    if (size <= minMaskLength * 2) return;
+    expect(maxElements).toBeGreaterThan(minMaskLength);
+    if (maxElements <= minMaskLength) return;
+    expect(size).toBeGreaterThan(minMaskLength);
+    if (size <= minMaskLength) return;
     const count = size > maxElements ? maxElements : size;
-    expect(count).toBeGreaterThan(minMaskLength * 2);
-    if (count <= minMaskLength * 2) return;
+    expect(count).toBeGreaterThan(minMaskLength);
+    if (count <= minMaskLength) return;
     console.log(`Generating ${count} elements...`);
     for (let i = 0; i < count; i++) {
       const value = Field.random();
       leaves.push(value);
       tree.setLeaf(BigInt(i), value);
       const use: boolean = Math.random() > 0.5;
-      if (use) {
+      if (use && maskLength < minMaskLength) {
         mask.push(true);
         maskLength++;
         redactedTree.setLeaf(BigInt(i), value);
@@ -169,14 +172,13 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
           originalWitness,
           redactedWitness
         );
-        proofs.push(
-          await RedactedMinaNFTTreeCalculation.create(
-            state,
-            element,
-            originalWitness,
-            redactedWitness
-          )
+        const proof = await RedactedMinaNFTTreeCalculation.create(
+          state,
+          element,
+          originalWitness,
+          redactedWitness
         );
+        proofs.push(JSON.stringify(proof.toJSON(), null, 2));
         Memory.info(`calculated proof ${i}`);
       }
     }
@@ -187,24 +189,34 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     expect(proofs.length).toBeGreaterThan(1);
     if (proofs.length === 0) return;
     console.time(`merged proofs`);
-    proof = proofs[0];
+    let proof: string = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
+      const proof1: TreeStateProof = TreeStateProof.fromJSON(
+        JSON.parse(proof) as JsonProof
+      );
+      const proof2: TreeStateProof = TreeStateProof.fromJSON(
+        JSON.parse(proofs[i]) as JsonProof
+      );
       const state = RedactedMinaNFTTreeState.merge(
-        proof.publicInput,
-        proofs[i].publicInput
+        proof1.publicInput,
+        proof2.publicInput
       );
       const mergedProof = await RedactedMinaNFTTreeCalculation.merge(
         state,
-        proof,
-        proofs[i]
+        proof1,
+        proof2
       );
-      proof = mergedProof;
+      proof = JSON.stringify(mergedProof.toJSON(), null, 2);
       Memory.info(`merged proof ${i}`);
     }
     console.timeEnd(`merged proofs`);
+    mergedProof = proof;
   });
 
   it(`should verify merged proof`, async () => {
+    const proof: TreeStateProof = TreeStateProof.fromJSON(
+      JSON.parse(mergedProof) as JsonProof
+    );
     expect(proof).toBeDefined();
     if (proof === undefined) return;
     expect(verificationKey).toBeDefined();
@@ -227,6 +239,9 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
   });
 
   it(`should verify merged proof on chain`, async () => {
+    const proof: TreeStateProof = TreeStateProof.fromJSON(
+      JSON.parse(mergedProof) as JsonProof
+    );
     expect(proof).toBeDefined();
     if (proof === undefined) return;
     expect(tx).toBeDefined();
