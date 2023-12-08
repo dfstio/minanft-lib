@@ -1,4 +1,8 @@
-export { MinaNFTTreeVerifierFunction, TreeElement };
+export {
+  MinaNFTTreeVerifierFunction,
+  TreeElement,
+  BaseRedactedMinaNFTTreeState,
+};
 
 import {
   Field,
@@ -28,6 +32,7 @@ class TreeElement extends Struct({
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static fromJSON(json: any) {
     return new TreeElement({
       originalRoot: Field.fromJSON(json.originalRoot),
