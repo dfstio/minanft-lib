@@ -56,7 +56,15 @@ export {
 export {
   MinaNFTTreeVerifierFunction,
   TreeElement,
+  BaseRedactedMinaNFTTreeState,
 } from "./plugins/redactedtree";
+export {
+  MerkleTreeWitness20,
+  RedactedMinaNFTTreeState20,
+  RedactedMinaNFTTreeCalculation20,
+  RedactedMinaNFTTreeStateProof20,
+  MinaNFTTreeVerifier20,
+} from "./plugins/redactedtree20";
 export { MinaNFTVerifier } from "./plugins/verifier";
 export { Escrow, EscrowDeposit } from "./plugins/escrow";
 export { IPFS } from "./storage/ipfs";
