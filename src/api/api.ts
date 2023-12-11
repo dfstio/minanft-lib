@@ -83,10 +83,11 @@ export default class api {
   public async proofResult(data: { jobId: string }): Promise<{
     success: boolean;
     error?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result?: any;
   }> {
     const result = await this.apiHub("proofResult", data);
-    if (result.data === "error")
+    if (this.isError(result.data))
       return {
         success: false,
         error: result.error,
@@ -115,13 +116,7 @@ export default class api {
     let attempts = 0;
     while (attempts < maxAttempts) {
       const result = await this.apiHub("proofResult", data);
-      if (result.data === "error")
-        return {
-          success: false,
-          error: result.error,
-          result: result.data,
-        };
-      else if (result.data?.jobStatus === "failed")
+      if (this.isError(result.data))
         return {
           success: false,
           error: result.error,
@@ -164,6 +159,15 @@ export default class api {
       console.error("catch api", error);
       return { success: false, error: error };
     }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private isError(data: any): boolean {
+    if (data === "error") return true;
+    if (data?.jobStatus === "failed") return true;
+    if (typeof data === "string" && data.toLowerCase().startsWith("error"))
+      return true;
+    return false;
   }
 }
 
