@@ -10,7 +10,6 @@ import {
   Account,
   state,
   State,
-  checkZkappTransaction,
   Field,
 } from "o1js";
 
