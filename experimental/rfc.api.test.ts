@@ -7,45 +7,56 @@ import {
   PublicKey,
   Field,
   MerkleTree,
-  JsonProof,
-  verify,
+  Account,
   Cache,
+  SmartContract,
+  method,
+  state,
+  State,
+  MerkleWitness,
+  Types,
 } from "o1js";
+import axios from "axios";
 import { formatTime } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
 import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
-import { TreeElement } from "../src/plugins/redactedtree";
-import {
-  MerkleTreeWitness20,
-  RedactedMinaNFTTreeCalculation20,
-  RedactedMinaNFTTreeStateProof20,
-  MinaNFTTreeVerifier20,
-} from "../src/plugins/redactedtree20";
 import { JWT } from "../env.json";
 import api from "../src/api/api";
 
-const blockchainInstance: blockchain = "local";
-const maxElements = 100;
-const minMaskLength = 32;
+const blockchainInstance: blockchain = "testworld2";
+const maxElements = 128;
 
-//class TreeStateProof extends RedactedMinaNFTTreeStateProof {}
+class MerkleTreeWitness20 extends MerkleWitness(20) {}
+
+class RealTimeVoting extends SmartContract {
+  @state(Field) root = State<Field>();
+
+  @method addVoteToMerkleTree(
+    guaranteedState: Field,
+    newState: Field,
+    witness: MerkleTreeWitness20,
+    value: Field
+  ) {
+    const calculatedRoot = witness.calculateRoot(value);
+    const oldCalculatedRoot = witness.calculateRoot(Field(0));
+    guaranteedState.assertEquals(oldCalculatedRoot);
+    newState.assertEquals(calculatedRoot);
+    this.root.set(newState);
+  }
+}
 
 const tree = new MerkleTree(20);
-const redactedTree = new MerkleTree(20);
 const leaves: Field[] = [];
-const mask: boolean[] = [];
-let maskLength: number = 0;
-const size = 2 ** (20 - 1);
-//const proofs: TreeStateProof[] = [];
-//let proof: TreeStateProof | undefined = undefined;
 const transactions: string[] = [];
-let verificationKey: string | undefined = undefined;
 let tx: Mina.TransactionId | undefined = undefined;
-let verifier: PublicKey | undefined = undefined;
+let votingContract: PublicKey | undefined = undefined;
+let votingPrivateKey: PrivateKey | undefined = undefined;
 let deployer: PrivateKey | undefined = undefined;
 let jobId: string = "";
-let proof: string = "";
+let proofs: string = "";
+let startTime: number = 0;
+let endTime: number = 0;
 
 beforeAll(async () => {
   const data = await initBlockchain(blockchainInstance, 0);
@@ -58,151 +69,63 @@ beforeAll(async () => {
   if (deployer === undefined) return;
 });
 
-describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
+describe(`Parallel SmartContract proofs calculations`, () => {
   it(`should prepare data`, async () => {
-    expect(maxElements).toBeGreaterThan(minMaskLength);
-    if (maxElements <= minMaskLength) return;
-    expect(size).toBeGreaterThan(minMaskLength);
-    if (size <= minMaskLength) return;
-    const count = size > maxElements ? maxElements : size;
-    expect(count).toBeGreaterThan(minMaskLength);
-    if (count <= minMaskLength) return;
-    console.log(`Generating ${count} elements...`);
-    for (let i = 0; i < count; i++) {
+    console.log(`Generating ${maxElements} elements...`);
+    for (let i = 0; i < maxElements; i++) {
+      const oldRoot: Field = tree.getRoot();
       const value = Field.random();
       leaves.push(value);
       tree.setLeaf(BigInt(i), value);
-      const use: boolean = Math.random() > 0.5;
-      if (use && maskLength < minMaskLength) {
-        mask.push(true);
-        maskLength++;
-        redactedTree.setLeaf(BigInt(i), value);
-      } else {
-        mask.push(false);
-      }
+      const newRoot: Field = tree.getRoot();
+      const witness = new MerkleTreeWitness20(tree.getWitness(BigInt(i)));
+      const calculatedRoot = witness.calculateRoot(value);
+      expect(calculatedRoot.toJSON()).toEqual(newRoot.toJSON());
+      const oldCalculatedRoot = witness.calculateRoot(Field(0));
+      expect(oldCalculatedRoot.toJSON()).toEqual(oldRoot.toJSON());
+      const transaction = {
+        id: i.toString(),
+        oldRoot: oldRoot.toJSON(),
+        newRoot: newRoot.toJSON(),
+        witness: witness.toJSON(),
+        value: value.toJSON(),
+      };
+      const tx = JSON.stringify(transaction, null, 2);
+      transactions.push(tx);
     }
-    let iterations = 0;
-    while (maskLength < minMaskLength) {
-      const index = Math.floor(Math.random() * (count - 1));
-      if (mask[index] === false) {
-        mask[index] = true;
-        redactedTree.setLeaf(BigInt(index), leaves[index]);
-        maskLength++;
-      }
-      iterations++;
-      expect(iterations).toBeLessThan(minMaskLength * 100);
-    }
+
+    votingPrivateKey = PrivateKey.fromBase58(
+      "EKFFUsvNekUQwFrvVCHVrSM8BVGEywvPjBBRU7KS2KHcBR6GqUSV"
+    ); //PrivateKey.random();
+    votingContract = votingPrivateKey.toPublicKey();
     Memory.info(`prepared`);
-    console.log(`maskLength: ${maskLength}`);
-    expect(maskLength).toBeGreaterThan(0);
-  });
-
-  it(`should prepare witnesses`, async () => {
-    expect(maskLength).toBeGreaterThan(0);
-    if (maskLength === 0) return;
-    console.time(`prepared transactions`);
-    const originalRoot = tree.getRoot();
-    const redactedRoot = redactedTree.getRoot();
-    for (let i = 0; i < mask.length; i++) {
-      if (mask[i]) {
-        const originalWitness = new MerkleTreeWitness20(
-          tree.getWitness(BigInt(i))
-        );
-        const redactedWitness = new MerkleTreeWitness20(
-          redactedTree.getWitness(BigInt(i))
-        );
-        const element = new TreeElement({
-          originalRoot,
-          redactedRoot,
-          index: Field(i),
-          value: leaves[i],
-        });
-
-        //console.log(originalWitness.toJSON());
-        const transaction = {
-          element: element.toJSON(),
-          originalWitness: originalWitness.toJSON(),
-          redactedWitness: redactedWitness.toJSON(),
-        };
-        const tx = JSON.stringify(transaction, null, 2);
-        transactions.push(tx);
-        /*
-        const args = JSON.parse(tx);
-        //console.log(args.originalWitness);
-        const el = TreeElement.fromJSON(args.element);
-        const ow = MerkleTreeWitness.fromJSON(args.originalWitness);
-        const rw = MerkleTreeWitness.fromJSON(args.redactedWitness);
-
-        const proof = await RedactedMinaNFTTreeCalculation.create(
-          RedactedMinaNFTTreeState.create(el, ow, rw),
-          el,
-          ow,
-          rw
-        );
-
-        expect(proof).toBeDefined();
-        const ok = await verify(proof.toJSON(), verificationKey);
-        expect(ok).toBeTruthy();
-
-        Memory.info(`calculated proof ${i}`);
-        */
-      }
-    }
-    console.timeEnd(`prepared transactions`);
-  });
-
-  it(`should calculate proof using api call`, async () => {
-    const minanft = new api(JWT);
-    console.log("transactions", transactions.length);
-
-    const apiresult = await minanft.proof({
-      transactions,
-      developer: "@dfst",
-      name: "tree20",
-      task: "proof",
-      args: [],
-    });
-
-    console.log("api result", apiresult);
-    expect(apiresult.success).toBe(true);
-    expect(apiresult.jobId).toBeDefined();
-    if (apiresult.jobId === undefined) return;
-    jobId = apiresult.jobId;
   });
 
   it(`should compile contracts`, async () => {
     console.log(`Compiling...`);
-    console.time(`compiled all`);
+    console.time(`compiled`);
     const cache: Cache = Cache.FileSystem("./treecache");
-
-    console.time(`compiled RedactedTreeCalculation`);
-    const { verificationKey: vk } =
-      await RedactedMinaNFTTreeCalculation20.compile({ cache });
-    verificationKey = vk;
-    console.timeEnd(`compiled RedactedTreeCalculation`);
-
-    console.time(`compiled TreeVerifier`);
-    await MinaNFTTreeVerifier20.compile({ cache });
-    console.timeEnd(`compiled TreeVerifier`);
-
-    console.timeEnd(`compiled all`);
+    await RealTimeVoting.compile({ cache });
+    console.timeEnd(`compiled`);
     Memory.info(`compiled`);
   });
-
-  it(`should deploy TreeVerifier`, async () => {
+  /*
+  it(`should deploy RealTimeVoting`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
-    console.time(`deployed MinaNFTTreeVerifier`);
+    expect(votingPrivateKey).toBeDefined();
+    if (votingPrivateKey === undefined) return;
+    console.time(`deployed RealTimeVoting`);
     const sender = deployer.toPublicKey();
-    const zkAppPrivateKey = PrivateKey.random();
+    const zkAppPrivateKey = votingPrivateKey;
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     console.log(
-      `deploying the MinaNFTTreeVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      `deploying the RealTimeVoting contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
 
-    const zkApp = new MinaNFTTreeVerifier20(zkAppPublicKey);
+    const zkApp = new RealTimeVoting(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee() },
       () => {
@@ -215,112 +138,126 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
 
     //console.log("Sending the deploy transaction...");
     tx = await transaction.send();
-    console.timeEnd(`deployed MinaNFTTreeVerifier`);
-    await MinaNFT.transactionInfo(tx, "deployed MinaNFTTreeVerifier", false);
-    verifier = zkAppPublicKey;
+    console.timeEnd(`deployed RealTimeVoting`);
+    await MinaNFT.transactionInfo(tx, "deployed RealTimeVoting", false);
+    votingContract = zkAppPublicKey;
     Memory.info(`deployed`);
   });
 
-  it(`should get merged proof using api call`, async () => {
+  it(`should wait for RealTimeVoting to be deployed`, async () => {
+    expect(tx).toBeDefined();
+    if (tx === undefined) return;
+    console.time(`waited for RealTimeVoting to be deployed`);
+    expect(await MinaNFT.wait(tx)).toBe(true);
+    console.timeEnd(`waited for RealTimeVoting to be deployed`);
+  });
+*/
+  it(`should calculate proof using api call`, async () => {
+    expect(votingPrivateKey).toBeDefined();
+    if (votingPrivateKey === undefined) return;
+    const minanft = new api(JWT);
+    console.log("transactions", transactions.length);
+    expect(deployer).not.toBeUndefined();
+    if (deployer === undefined) return;
+    const sender = deployer.toPublicKey();
+    const account = Account(sender);
+    const nonce: number = Number(account.nonce.get().toBigint());
+    console.log("Nonce:", nonce.toString());
+
+    const apiresult = await minanft.proof({
+      transactions,
+      developer: "@dfst",
+      name: "rfc-voting",
+      task: "proof",
+      args: [votingPrivateKey.toBase58(), nonce.toString()],
+    });
+    startTime = Date.now();
+
+    console.log("api call result", apiresult);
+    expect(apiresult.success).toBe(true);
+    expect(apiresult.jobId).toBeDefined();
+    if (apiresult.jobId === undefined) return;
+    jobId = apiresult.jobId;
+  });
+
+  it(`should get proofs using api call`, async () => {
     expect(jobId).toBeDefined();
     if (jobId === undefined) return;
     expect(jobId).not.toBe("");
     if (jobId === "") return;
     const minanft = new api(JWT);
     const result = await minanft.waitForProofResult({ jobId });
-    /*
-    let ready: boolean = false;
-    while (!ready) {
-      await sleep(5000);
-      const result = await minanft.proofResult({ jobId });
-   */
+    endTime = Date.now();
+    console.log(
+      `Time spent to calculate ${maxElements} proofs: ${endTime - startTime} ms`
+    );
+
     if (result.success) {
       if (result.result.result !== undefined) {
-        //ready = true;
-        //console.log("status", result.status);
-        //console.log("Final result", result.result.result);
-        proof = result.result.result;
-        console.log(
-          "Billed duration",
-          formatTime(result.result.billedDuration),
-          result.result.billedDuration
-        );
+        proofs = result.result.result;
+        console.log("Billed duration", result.result.billedDuration, "ms");
         console.log(
           "Duration",
-          formatTime(result.result.timeFinished - result.result.timeCreated),
-          result.result.timeFinished - result.result.timeCreated
+          result.result.timeFinished - result.result.timeCreated,
+          "ms"
         );
       }
     } else {
       console.log("ERROR", result);
     }
     if (result.result.jobStatus === "failed") {
-      //ready = true;
       console.log("status:", result.result.jobStatus);
       console.log("Final result", result.result.result);
-      console.log(
-        "Billed duration",
-        formatTime(result.result.billedDuration),
-        result.result.billedDuration
-      );
+      console.log("Billed duration", result.result.billedDuration, "ms");
       console.log(
         "Duration",
-        formatTime(result.result.timeFailed - result.result.timeCreated),
-        result.result.timeFailed - result.result.timeCreated
+        result.result.timeFailed - result.result.timeCreated,
+        "ms"
       );
-      // }
     }
   });
 
-  it(`should wait for MinaNFTTreeVerifier to be deployed`, async () => {
-    expect(tx).toBeDefined();
-    if (tx === undefined) return;
-    console.time(`waited for MinaNFTTreeVerifier to be deployed`);
-    expect(await MinaNFT.wait(tx)).toBe(true);
-    console.timeEnd(`waited for MinaNFTTreeVerifier to be deployed`);
-  });
+  it(`should send transaction to chain`, async () => {
+    expect(proofs).toBeDefined();
+    expect(proofs).not.toBe("");
+    expect(deployer).not.toBeUndefined();
+    expect(votingContract).not.toBeUndefined();
+    if (deployer === undefined || votingContract === undefined || proofs === "")
+      return;
 
-  it(`should verify merged proof off chain`, async () => {
-    expect(proof).toBeDefined();
-    expect(proof).not.toBe("");
-    if (proof === "") return;
-    expect(verificationKey).toBeDefined();
-    if (verificationKey === undefined) return;
-    const calculatedProof: RedactedMinaNFTTreeStateProof20 =
-      RedactedMinaNFTTreeStateProof20.fromJSON(JSON.parse(proof) as JsonProof);
-    const ok = await verify(calculatedProof.toJSON(), verificationKey);
-    expect(ok).toBeTruthy();
-  });
-
-  it(`should verify merged proof on chain`, async () => {
-    expect(proof).toBeDefined();
-    expect(proof).not.toBe("");
-    if (proof === "") return;
-    const calculatedProof: RedactedMinaNFTTreeStateProof20 =
-      RedactedMinaNFTTreeStateProof20.fromJSON(JSON.parse(proof) as JsonProof);
-    expect(proof).toBeDefined();
-    if (proof === undefined) return;
-    expect(tx).toBeDefined();
-    if (tx === undefined) return;
-    expect(deployer).toBeDefined();
-    if (deployer === undefined) return;
-    expect(verifier).toBeDefined();
-    if (verifier === undefined) return;
-    console.time(`verified merged proof on chain`);
+    const url: string =
+      "https://minanft-storage.s3.eu-west-1.amazonaws.com/" + proofs;
+    const response: any = await axios.get(url);
+    const txs = response.data.txs;
+    console.log("Downloaded transactions:", txs.length);
     const sender = deployer.toPublicKey();
-    const zkApp = new MinaNFTTreeVerifier20(verifier);
-    const transaction = await Mina.transaction(
-      { sender, fee: await MinaNFT.fee() },
-      () => {
-        zkApp.verifyRedactedTree(calculatedProof);
+    let tx: Mina.TransactionId | undefined = undefined;
+    await fetchAccount({ publicKey: sender });
+    await fetchAccount({ publicKey: votingContract });
+
+    console.log(`Sending ${maxElements} transactions...`);
+
+    for (let i = 0; i < maxElements; i++) {
+      const txData = txs.find((t: any) => t.i.toString() === i.toString());
+      const transaction: Mina.Transaction = Mina.Transaction.fromJSON(
+        JSON.parse(txData.tx) as Types.Json.ZkappCommand
+      ) as Mina.Transaction;
+      tx = await transaction.send();
+      //console.log(`Transaction ${i} sent`); //, transaction.toPretty());
+      if (i === 0) {
+        await MinaNFT.transactionInfo(tx, `first`, false);
+        console.log(
+          "Waiting for a new block to put the remaining transactions in one block..."
+        );
+        expect(await MinaNFT.wait(tx)).toBe(true);
+        console.time(`sent ${maxElements - 1} transactions`);
       }
-    );
-    await transaction.prove();
-    transaction.sign([deployer]);
-    tx = await transaction.send();
-    console.timeEnd(`verified merged proof on chain`);
-    await MinaNFT.transactionInfo(tx, `verified merged proof on chain`, false);
+    }
+    console.timeEnd(`sent ${maxElements - 1} transactions`);
+    expect(tx).toBeDefined();
+    if (tx === undefined) return;
+    await MinaNFT.transactionInfo(tx, `sent last transaction`, false);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    Memory.info(`verified merged proof on chain`);
+    Memory.info(`end`);
   });
 });
