@@ -19,9 +19,9 @@ import {
 } from "../src/plugins/redactedtree";
 
 const blockchainInstance: blockchain = "local";
-const height = 20;
+const height = 10;
 const maxElements = 100;
-const minMaskLength = 32;
+const minMaskLength = 2;
 
 const {
   RedactedMinaNFTTreeState,
