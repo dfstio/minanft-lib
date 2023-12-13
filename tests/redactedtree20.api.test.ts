@@ -25,9 +25,9 @@ import {
 import { JWT } from "../env.json";
 import api from "../src/api/api";
 
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
 const maxElements = 100;
-const minMaskLength = 32;
+const minMaskLength = 4;
 
 //class TreeStateProof extends RedactedMinaNFTTreeStateProof {}
 

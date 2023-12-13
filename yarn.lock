@@ -2292,7 +2292,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.1":
+"axios@npm:^1.6.2":
   version: 1.6.2
   resolution: "axios@npm:1.6.2"
   dependencies:
@@ -4450,12 +4450,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "mime@npm:3.0.0"
+"mime@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "mime@npm:4.0.0"
   bin:
-    mime: cli.js
-  checksum: f43f9b7bfa64534e6b05bd6062961681aeb406a5b53673b53b683f27fcc4e739989941836a355eef831f4478923651ecc739f4a5f6e20a76487b432bfd4db928
+    mime: bin/cli.js
+  checksum: c257e10b9fa6a805ad1fa8e33eafbdf3de7601dd9057ba8fa606416bccee3252457c903c4666638b6f2249d262f1a0951b2faee36c55a18513b31bf0b8b1b431
   languageName: node
   linkType: hard
 
@@ -4480,14 +4480,14 @@ __metadata:
     "@types/mime": ^3.0.4
     "@typescript-eslint/eslint-plugin": ^6.10.0
     "@typescript-eslint/parser": ^6.10.0
-    axios: ^1.6.1
+    axios: ^1.6.2
     babel-jest: ^29.7.0
     cli-progress: ^3.12.0
     eslint: ^8.53.0
     form-data: ^4.0.0
     jest: ^29.7.0
-    mime: ^3.0.0
-    o1js: ^0.14.2
+    mime: ^4.0.0
+    o1js: ^0.15.0
     prettier: 3.0.3
     ts-jest: ^29.1.1
     typedoc: 0.25.3
@@ -4704,9 +4704,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^0.14.2":
-  version: 0.14.2
-  resolution: "o1js@npm:0.14.2"
+"o1js@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "o1js@npm:0.15.0"
   dependencies:
     blakejs: 1.2.1
     cachedir: ^2.4.0
@@ -4717,7 +4717,7 @@ __metadata:
     tslib: ^2.3.0
   bin:
     snarky-run: src/build/run.js
-  checksum: a1f7a03babb9bae2ccdace900bc0d62fbae95b5bccc7768f82b81d41af89e5f7a0361cf8fab4c92e10f18c7d28c22e30bd912d9467aae7a86beb71408b5a387c
+  checksum: 347c7baaefa9467f7a027877843205c6a636a0902f5f205ade14791a42117866191f917e0cd139d72d844e0b1b64c3e768d8bf034c1647b0c9e99993f9876181
   languageName: node
   linkType: hard
 
