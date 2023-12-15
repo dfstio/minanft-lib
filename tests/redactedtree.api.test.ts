@@ -21,10 +21,10 @@ import {
 import { JWT } from "../env.json";
 import api from "../src/api/api";
 
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
 const height = 20;
 const maxElements = 100;
-const minMaskLength = 2;
+const minMaskLength = 5;
 
 const {
   RedactedMinaNFTTreeCalculation,

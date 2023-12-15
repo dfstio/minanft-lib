@@ -43,11 +43,11 @@ class BaseMinaNFT {
   static verificationKey: VerificationKey | undefined;
   static namesVerificationKey: VerificationKey | undefined;
   static updaterVerificationKey: VerificationKey | undefined;
-  static updateVerificationKey: string | undefined;
+  static updateVerificationKey: VerificationKey | undefined;
   static verifierVerificationKey: VerificationKey | undefined;
-  static redactedMapVerificationKey: string | undefined;
+  static redactedMapVerificationKey: VerificationKey | undefined;
   static badgeVerifierVerificationKey: VerificationKey | undefined;
-  static badgeVerificationKey: string | undefined;
+  static badgeVerificationKey: VerificationKey | undefined;
   static escrowVerificationKey: VerificationKey | undefined;
   static cache: Cache | undefined;
 
@@ -311,7 +311,7 @@ class BaseMinaNFT {
    * Compiles RedactedMinaNFTMapCalculation contract
    * @returns verification key
    */
-  public static async compileRedactedMap(): Promise<string> {
+  public static async compileRedactedMap(): Promise<VerificationKey> {
     const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
