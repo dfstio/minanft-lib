@@ -1900,15 +1900,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cli-progress@npm:^3.11.5":
-  version: 3.11.5
-  resolution: "@types/cli-progress@npm:3.11.5"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: bf00f543ee677f61b12e390876df59354943d6c13d96640171528e9b7827f4edb7701cdd4675d6256d13ef9ee542731bd5cae585e1b43502553f69fc210dcb92
-  languageName: node
-  linkType: hard
-
 "@types/graceful-fs@npm:^4.1.3":
   version: 4.1.9
   resolution: "@types/graceful-fs@npm:4.1.9"
@@ -1967,7 +1958,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^20.10.4":
   version: 20.10.4
   resolution: "@types/node@npm:20.10.4"
   dependencies:
@@ -2608,15 +2599,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-progress@npm:^3.12.0":
-  version: 3.12.0
-  resolution: "cli-progress@npm:3.12.0"
-  dependencies:
-    string-width: "npm:^4.2.3"
-  checksum: f464cb19ebde2f3880620a2adfaeeefaec6cb15c8e610c8a659ca1047ee90d69f3bf2fdabbb1fe33ac408678e882e3e0eecdb84ab5df0edf930b269b8a72682d
-  languageName: node
-  linkType: hard
-
 "cliui@npm:^8.0.1":
   version: 8.0.1
   resolution: "cliui@npm:8.0.1"
@@ -2828,9 +2810,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.601":
-  version: 1.4.611
-  resolution: "electron-to-chromium@npm:1.4.611"
-  checksum: 597dcb3f0e73fa6218aab48a2622fc8a5b692d8d72303fe57ac318ae2714b89272567b8b3634245a755ca7afc47d7c8cd3bb53a9b48507aa7d4a17ab20951716
+  version: 1.4.613
+  resolution: "electron-to-chromium@npm:1.4.613"
+  checksum: 34c1f2a244db7f628373a4f9a25bf7b6e4d16755a92aebea7882434683abe550e72bd06fb3b4c673dffebddc5d4cc6a5aef8fb11cb5cceb37a8d0f1801ca802e
   languageName: node
   linkType: hard
 
@@ -4476,19 +4458,18 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.23.3"
     "@jest/globals": "npm:^29.7.0"
     "@mxssfd/typedoc-theme": "npm:^1.1.3"
-    "@types/cli-progress": "npm:^3.11.5"
     "@types/jest": "npm:^29.5.8"
     "@types/mime": "npm:^3.0.4"
+    "@types/node": "npm:^20.10.4"
     "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     axios: "npm:^1.6.2"
     babel-jest: "npm:^29.7.0"
-    cli-progress: "npm:^3.12.0"
     eslint: "npm:^8.53.0"
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"
     mime: "npm:^3.0.0"
-    o1js: "npm:^0.14.2"
+    o1js: "npm:^0.15.0"
     prettier: "npm:3.0.3"
     ts-jest: "npm:^29.1.1"
     typedoc: "npm:0.25.3"
@@ -4705,9 +4686,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^0.14.2":
-  version: 0.14.2
-  resolution: "o1js@npm:0.14.2"
+"o1js@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "o1js@npm:0.15.0"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -4718,7 +4699,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 3621526612dd17df395b73648fed0712b8c1a8103770bb388704bf106ecae324327e4df33c320ff34d475a636efa23d935b08a4cedacc4ec0e2d9175df0f86f7
+  checksum: 5861c7345253349fcd64e8a33a6f5917161bcbc5d48e001239af7461736b5035a6c06378f404e60d477280b12da91b182cb091612efd02c393b523c21977099c
   languageName: node
   linkType: hard
 
@@ -5735,9 +5716,9 @@ __metadata:
   linkType: hard
 
 "whatwg-fetch@npm:^3.4.1":
-  version: 3.6.19
-  resolution: "whatwg-fetch@npm:3.6.19"
-  checksum: 01dd755492d594c8d71d47811bb3886cdb7d566684daff5ec658cf148fa2418de6b562a94ff8cceaf1cf277bfb99fa6b61258cc20de5053f5817a4d419b5d293
+  version: 3.6.20
+  resolution: "whatwg-fetch@npm:3.6.20"
+  checksum: fa972dd14091321d38f36a4d062298df58c2248393ef9e8b154493c347c62e2756e25be29c16277396046d6eaa4b11bd174f34e6403fff6aaca9fb30fa1ff46d
   languageName: node
   linkType: hard
 
