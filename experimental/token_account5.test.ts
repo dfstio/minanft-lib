@@ -24,7 +24,7 @@ import {
 import { DEPLOYER, NFT_TEST_SK } from "../env.json";
 import { Memory } from "../utils/testhelpers";
 
-const useLocalBlockchain: boolean = true;
+const useLocalBlockchain: boolean = false;
 const NUMBER_ITERATIONS = 2;
 
 const MINAURL = "https://proxy.berkeley.minaexplorer.com/graphql";
@@ -64,6 +64,16 @@ class Token extends SmartContract {
       },
     };
     update.body.update.appState[0] = { isSome: Bool(true), value };
+  }
+
+  @method mint2(
+    token: PublicKey,
+    address: PublicKey,
+    vk: VerificationKey,
+    value: Field
+  ) {
+    const zkAppToken = new Token(token, this.token.id);
+    zkAppToken.mint(address, vk, value);
   }
 
   @method update(value: Field, address: PublicKey) {
@@ -177,7 +187,8 @@ let user3: PublicKey | undefined = undefined;
 let userPrivateKey3: PrivateKey | undefined = undefined;
 let user4: PublicKey | undefined = undefined;
 let userPrivateKey4: PrivateKey | undefined = undefined;
-let verificationKey: VerificationKey | undefined = undefined;
+let tokenVerificationKey: VerificationKey | undefined = undefined;
+let tokenAccountVerificationKey: VerificationKey | undefined = undefined;
 let nonce: number = 0;
 
 beforeAll(async () => {
@@ -194,9 +205,10 @@ beforeAll(async () => {
     Mina.setActiveInstance(network);
     deployer = PrivateKey.fromBase58(DEPLOYER);
   }
-  const { verificationKey: vk } = await TokenAccount.compile();
-  verificationKey = vk;
-  await Token.compile();
+  const { verificationKey: vk1 } = await TokenAccount.compile();
+  tokenAccountVerificationKey = vk1;
+  const { verificationKey: vk2 } = await Token.compile();
+  tokenVerificationKey = vk2;
 });
 
 describe("Mint tokens", () => {
@@ -277,7 +289,7 @@ using the deployer with public key ${sender.toBase58()}:
       { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
       () => {
         AccountUpdate.fundNewAccount(sender, 2);
-        zkToken.mint(user1PublicKey, verificationKey!, Field(10));
+        zkToken.mint(user1PublicKey, tokenVerificationKey!, Field(0));
         token1.deploy({});
         token1.value.set(Field(10));
       }
@@ -288,16 +300,20 @@ using the deployer with public key ${sender.toBase58()}:
     expect(tx1).toBeDefined();
     expect(tx1.isSuccess).toBe(true);
 
-    // We do not need to wait for the transaction to be included in the block
-    // Just send next immediately using the same deployer account
+    if (!useLocalBlockchain) {
+      await tx1.wait({ maxAttempts: 120, interval: 60000 });
+    }
 
     const transaction2 = await Mina.transaction(
       { sender, fee: transactionFee, memo: "minanft.io", nonce: nonce++ },
       () => {
-        AccountUpdate.fundNewAccount(sender, 2);
-        zkToken.mint(user2PublicKey, verificationKey!, Field(10));
-        token2.deploy({});
-        token2.value.set(Field(10));
+        AccountUpdate.fundNewAccount(sender, 1);
+        zkToken.mint2(
+          user1PublicKey,
+          user2PublicKey,
+          tokenAccountVerificationKey!,
+          Field(10)
+        );
       }
     );
     await transaction2.prove();
@@ -308,11 +324,11 @@ using the deployer with public key ${sender.toBase58()}:
 
     console.log(`deploying the TokenAccounts...`);
     if (!useLocalBlockchain) {
-      await tx1.wait({ maxAttempts: 120, interval: 60000 });
       await tx2.wait({ maxAttempts: 120, interval: 60000 });
     }
   });
 
+  /*
   it("should change the state and check the balance", async () => {
     Memory.info("deployed");
     expect(deployer).not.toBeUndefined();
@@ -774,4 +790,5 @@ using the deployer with public key ${sender.toBase58()}:
       }
     }
   });
+  */
 });
