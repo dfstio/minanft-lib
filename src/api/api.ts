@@ -52,7 +52,7 @@ export class api {
       developer: "@dfst",
       name: "mint",
       task: "mint",
-      arguments: data.privateKey ? [data.privateKey] : [],
+      args: data.privateKey ? [data.privateKey] : [],
     });
     return { success: result.success, jobId: result.data, error: result.error };
   }
