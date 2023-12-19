@@ -1,6 +1,7 @@
 export { RedactedMinaNFT };
 import { verify, Proof } from "o1js";
-import { BaseMinaNFT, PrivateMetadata } from "./baseminanft";
+import { BaseMinaNFT } from "./baseminanft";
+import { PrivateMetadata } from "./privatemetadata";
 import { MinaNFT } from "./minanft";
 import { Metadata, MetadataWitness } from "./contract/metadata";
 import {

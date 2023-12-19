@@ -1,4 +1,4 @@
-export { BaseMinaNFT, PrivateMetadata };
+export { BaseMinaNFT };
 import {
   Field,
   Cache,

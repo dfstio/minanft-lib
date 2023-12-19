@@ -13,15 +13,19 @@
     "web3",
     "zero knowledge"
   ],
-  "version": "1.2.5",
+  "version": "1.2.33",
   "homepage": "https://docs.minanft.io",
   "repository": "git@dfstio.github.com:dfstio/minanft-lib.git",
   "main": "src/index.ts",
   "author": "dfst.io",
   "license": "Apache-2.0",
+  "type": "module",
   "scripts": {
-    "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.js.json",
+    "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.web.json",
+    "compileweb": "rm -rf dist/lib && tsc --build tsconfig.web.json",
+    "compilenode": "rm -rf dist/lib && tsc",
     "compilets": "rm -rf dist/lib && tsc",
+    "ren": "ren  '*.js' '#1.cjs'",
     "test": "jest",
     "deployers": "ts-node experimental/deployers.ts",
     "tree": "ts-node experimental/treecompile.ts",
@@ -39,7 +43,8 @@
     "axios": "^1.6.2",
     "form-data": "^4.0.0",
     "mime": "^3.0.0",
-    "o1js": "^0.15.0"
+    "o1js": "^0.15.0",
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
@@ -50,8 +55,8 @@
     "@types/jest": "^29.5.8",
     "@types/mime": "^3.0.4",
     "@types/node": "^20.10.4",
-    "@typescript-eslint/eslint-plugin": "^6.10.0",
-    "@typescript-eslint/parser": "^6.10.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
     "babel-jest": "^29.7.0",
     "eslint": "^8.53.0",
     "jest": "^29.7.0",
@@ -60,7 +65,7 @@
     "typedoc": "0.25.3",
     "typedoc-plugin-mermaid": "^1.10.0",
     "typedoc-plugin-missing-exports": "^2.1.0",
-    "typescript": "5.2.2"
+    "typescript": "5.1"
   },
   "eslintConfig": {
     "env": {

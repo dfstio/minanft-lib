@@ -2,7 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { PublicKey, PrivateKey, Poseidon } from "o1js";
-import api from "../src/api/api";
+import { api } from "../src/api/api";
 import {
   Memory,
   blockchain,

@@ -9,7 +9,7 @@ import {
   PublicKey,
   UInt64,
   SmartContract,
-  state,
+  state, 
   State,
   method,
 } from "o1js";

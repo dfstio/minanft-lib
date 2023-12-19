@@ -16,7 +16,8 @@ import {
 } from "o1js";
 import axios from "axios";
 
-import { BaseMinaNFT, PrivateMetadata } from "./baseminanft";
+import { BaseMinaNFT } from "./baseminanft";
+import { PrivateMetadata } from "./privatemetadata";
 import { MinaNFTContract } from "./contract/nft";
 import {
   MinaNFTNameServiceContract,
@@ -51,7 +52,8 @@ import {
 } from "./update";
 import { MapData } from "./storage/map";
 import { blockchain, initBlockchain } from "./mina";
-import { MINAFEE, MINANFT_NAME_SERVICE } from "../src/config.json";
+import config from "./config";
+const { MINAFEE, MINANFT_NAME_SERVICE } = config;
 
 /**
  * MinaNFT is the class for the NFT, wrapper around the MinaNFTContract
