@@ -10,12 +10,8 @@ export {
 };
 
 import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount } from "o1js";
-import {
-  MINAURL,
-  ARCHIVEURL,
-  TESTWORLD2,
-  TESTWORLD2_ARCHIVE,
-} from "../src/config.json";
+import config from "../src/config";
+const { MINAURL, ARCHIVEURL, TESTWORLD2, TESTWORLD2_ARCHIVE } = config;
 
 type blockchain = "local" | "berkeley" | "testworld2" | "mainnet";
 

@@ -87,5 +87,9 @@ export {
   formatTime,
 } from "./mina";
 export { BackendPlugin } from "./plugins/backend";
-import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config.json";
+//import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config";
+const NAMES_ORACLE = "B62qids6rU9iqjvBV4DHxW8z67mgHFws1rPmFoqpcyRq2arYxUw6sZu";
+const MINANFT_NAME_SERVICE =
+  "B62qpiD9ZWPi1JCx7hd4XcRujM1qc5jCADhhJVzTm3zZBWBpyRr3NFT";
 export { NAMES_ORACLE, MINANFT_NAME_SERVICE };
+export { api } from "./api/api";

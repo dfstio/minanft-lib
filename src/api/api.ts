@@ -1,8 +1,10 @@
-import { MINNFTAPIAUTH, MINNFTAPI } from "../config.json";
 import axios from "axios";
 import { sleep } from "../mina";
 
-export default class api {
+import config from "../config";
+const { MINNFTAPIAUTH, MINNFTAPI } = config;
+
+export class api {
   jwt: string;
   endpoint: string;
 
