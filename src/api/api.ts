@@ -33,7 +33,7 @@ export class api {
       error: result.error,
       price: result.data?.price,
       isReserved:
-        result.data?.isReserved === undefined ? false : result.data.isReserved,
+        result.data?.success === undefined ? false : result.data.success,
       signature: result.data?.signature,
       reason: result.data?.reason,
     };
@@ -44,7 +44,11 @@ export class api {
    * @param uri the uri of the metadata
    * @param privateKey the private key of the address where NFT should be minted
    */
-  public async mint(data: { uri: string; privateKey?: string }): Promise<{
+  public async mint(data: {
+    uri: string;
+    signature: string;
+    privateKey: string;
+  }): Promise<{
     success: boolean;
     error?: string;
     jobId?: string;
@@ -54,7 +58,7 @@ export class api {
       developer: "@dfst",
       name: "mint",
       task: "mint",
-      args: data.privateKey ? [data.privateKey] : [],
+      args: [data.signature, data.privateKey],
     });
     return { success: result.success, jobId: result.data, error: result.error };
   }
