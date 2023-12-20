@@ -4485,7 +4485,7 @@ __metadata:
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"
     mime: "npm:^3.0.0"
-    o1js: "npm:^0.15.0"
+    o1js: "npm:^0.15.1"
     prettier: "npm:3.0.3"
     ts-jest: "npm:^29.1.1"
     tslib: "npm:^2.6.2"
@@ -4710,9 +4710,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^0.15.0":
-  version: 0.15.0
-  resolution: "o1js@npm:0.15.0"
+"o1js@npm:^0.15.1":
+  version: 0.15.1
+  resolution: "o1js@npm:0.15.1"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -4723,7 +4723,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 5861c7345253349fcd64e8a33a6f5917161bcbc5d48e001239af7461736b5035a6c06378f404e60d477280b12da91b182cb091612efd02c393b523c21977099c
+  checksum: e8f6a7c99802f7986003ff4d24a22835795a1b24d58bbf186350a896921908d74096a13915611599883f25fa3a8ca227ab3a7e45667b5ef11562671d98cea1eb
   languageName: node
   linkType: hard
 

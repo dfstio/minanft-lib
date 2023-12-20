@@ -18,6 +18,7 @@ export class api {
     error?: string;
     price?: string;
     isReserved: boolean;
+    signature?: string;
     reason?: string;
   }> {
     const result = await this.apiHub("reserveName", {
@@ -33,6 +34,7 @@ export class api {
       price: result.data?.price,
       isReserved:
         result.data?.isReserved === undefined ? false : result.data.isReserved,
+      signature: result.data?.signature,
       reason: result.data?.reason,
     };
   }

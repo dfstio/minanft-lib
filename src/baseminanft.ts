@@ -215,9 +215,10 @@ class BaseMinaNFT {
    */
   public static async compile(): Promise<VerificationKey> {
     const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
+
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
-      await Key.compile(options);
+      //await Key.compile(options);
       const { verificationKey } = await MinaNFTMetadataUpdate.compile(options);
       console.timeEnd("MinaNFTMetadataUpdate compiled");
       MinaNFT.updateVerificationKey = verificationKey;
