@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 export { MinaNFT };
 
 import {
@@ -1115,6 +1116,7 @@ class MinaNFT extends BaseMinaNFT {
       privateKey,
       escrow: escrowArg,
       nonce: nonceArg,
+      signature: signatureArg,
     } = minaData;
     if (nameService === undefined)
       throw new Error("Names service is undefined");
@@ -1170,10 +1172,9 @@ class MinaNFT extends BaseMinaNFT {
       ],
       verifier: nameService.address,
     });
-    const signature = await nameService.issueNameSignature(
-      nft,
-      verificationKey.hash
-    );
+    const signature =
+      signatureArg ??
+      (await nameService.issueNameSignature(nft, verificationKey.hash));
     const mintData: MintData = new MintData({
       nft,
       verificationKey,

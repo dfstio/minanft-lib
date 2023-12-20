@@ -101,6 +101,7 @@ interface MinaNFTMint {
   privateKey?: PrivateKey;
   escrow?: Field;
   nameService?: MinaNFTNameService;
+  signature?: Signature;
   nonce?: number;
 }
 
