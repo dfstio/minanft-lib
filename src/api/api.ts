@@ -30,14 +30,14 @@ export class api {
     });
     const reserved =
       result.data === undefined ? { success: false } : result.data;
-    const price: object = reserved.price ?? {};
+    const price: object = reserved.price ? JSON.parse(reserved.price) : {};
     return {
       success: result.success,
       error: result.error,
       price: price,
-      isReserved: reserved.success,
+      isReserved: reserved.success ?? false,
       signature: reserved.signature,
-      reason: reserved.reason,
+      reason: reserved.reason ?? reserved.toString(),
     };
   }
 
@@ -132,10 +132,11 @@ export class api {
       };
   }
 
-  public async waitForProofResult(data: {
+  public async waitForJobResult(data: {
     jobId: string;
     maxAttempts?: number;
     interval?: number;
+    maxErrors?: number;
   }): Promise<{
     success: boolean;
     error?: string;
@@ -144,23 +145,38 @@ export class api {
   }> {
     const maxAttempts = data?.maxAttempts ?? 360; // 2 hours
     const interval = data?.interval ?? 20000;
+    const maxErrors = data?.maxErrors ?? 10;
+    const errorDelay = 30000; // 30 seconds
     let attempts = 0;
+    let errors = 0;
     while (attempts < maxAttempts) {
       const result = await this.apiHub("proofResult", data);
-      if (this.isError(result.data))
-        return {
-          success: false,
-          error: result.error,
-          result: result.data,
-        };
-      else if (result.data?.result !== undefined) {
-        return {
-          success: result.success,
-          error: result.error,
-          result: result.data,
-        };
+      if (result.success === false) {
+        errors++;
+        if (errors > maxErrors) {
+          return {
+            success: false,
+            error: "Too many network errors",
+            result: undefined,
+          };
+        }
+        await sleep(errorDelay * errors);
+      } else {
+        if (this.isError(result.data))
+          return {
+            success: false,
+            error: result.error,
+            result: result.data,
+          };
+        else if (result.data?.result !== undefined) {
+          return {
+            success: result.success,
+            error: result.error,
+            result: result.data,
+          };
+        }
+        await sleep(interval);
       }
-      await sleep(interval);
       attempts++;
     }
     return {
