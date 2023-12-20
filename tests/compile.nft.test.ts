@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 import { Mina } from "o1js";
 import { MinaNFT } from "../src/minanft";
-import { Memory } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import fs from "fs/promises";
 
 const cacheDir = "./nftcache";

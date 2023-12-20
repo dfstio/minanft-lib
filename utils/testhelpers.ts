@@ -3,14 +3,14 @@ export {
   accountBalanceMina,
   sleep,
   makeString,
-  Memory,
   blockchain,
   initBlockchain,
 };
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
+import config from "../src/config";
 
-import { MINAURL, ARCHIVEURL, TESTWORLD2 } from "../src/config.json";
+const { MINAURL, ARCHIVEURL, TESTWORLD2 } = config;
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
 type blockchain = "local" | "berkeley" | "testworld2" | "mainnet";
@@ -100,44 +100,4 @@ function makeString(length: number): string {
   }
 
   return outString;
-}
-
-class Memory {
-  static rss: number = 0;
-  constructor() {
-    Memory.rss = 0;
-  }
-
-  public static info(description: string = ``) {
-    const memoryData = process.memoryUsage();
-    const formatMemoryUsage = (data: any) =>
-      `${Math.round(data / 1024 / 1024)} MB`;
-    const oldRSS = Memory.rss;
-    Memory.rss = Math.round(memoryData.rss / 1024 / 1024);
-    /*
-    const memoryUsage = {
-      rssDelta: `${oldRSS === 0 ? 0 : Memory.rss - oldRSS} MB`,
-      rss: `${formatMemoryUsage(
-        memoryData.rss
-      )} -> Resident Set Size - total memory allocated`,
-      heapTotal: `${formatMemoryUsage(
-        memoryData.heapTotal
-      )} -> total size of the allocated heap`,
-      heapUsed: `${formatMemoryUsage(
-        memoryData.heapUsed
-      )} -> actual memory used during the execution`,
-      external: `${formatMemoryUsage(
-        memoryData.external
-      )} -> V8 external memory`,
-    };
-    */
-
-    console.log(
-      `RSS memory ${description}: ${formatMemoryUsage(memoryData.rss)}${
-        oldRSS === 0
-          ? ``
-          : `, changed by ` + (Memory.rss - oldRSS).toString() + ` MB`
-      }`
-    );
-  }
 }
