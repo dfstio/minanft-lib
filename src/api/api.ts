@@ -16,7 +16,7 @@ export class api {
   public async reserveName(data: { name: string; publicKey: string }): Promise<{
     success: boolean;
     error?: string;
-    price?: string;
+    price: object;
     isReserved: boolean;
     signature?: string;
     reason?: string;
@@ -26,16 +26,39 @@ export class api {
       developer: "@dfst",
       name: "reserveName",
       task: "reserveName",
-      arguments: [data.name, data.publicKey],
+      args: [data.name, data.publicKey],
     });
+    const reserved =
+      result.data === undefined ? { success: false } : result.data;
+    const price: object = reserved.price ?? {};
     return {
       success: result.success,
       error: result.error,
-      price: result.data?.price,
-      isReserved:
-        result.data?.success === undefined ? false : result.data.success,
-      signature: result.data?.signature,
-      reason: result.data?.reason,
+      price: price,
+      isReserved: reserved.success,
+      signature: reserved.signature,
+      reason: reserved.reason,
+    };
+  }
+
+  public async indexName(data: { name: string }): Promise<{
+    success: boolean;
+    error?: string;
+    reason?: string;
+  }> {
+    const result = await this.apiHub("indexName", {
+      transactions: [],
+      developer: "@dfst",
+      name: "indexName",
+      task: "indexName",
+      args: [data.name],
+    });
+    const indexed =
+      result.data === undefined ? { success: false } : result.data;
+    return {
+      success: result.success,
+      error: result.error,
+      reason: indexed.reason,
     };
   }
 
