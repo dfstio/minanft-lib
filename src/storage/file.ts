@@ -59,7 +59,10 @@ class FileData extends BaseMinaNFTObject {
         `FileData: Filename string is too long, should be less than 32 bytes`
       );
     fields.push(filenameFields[0]);
-    const storageFields = Encoding.stringToFields(this.storage);
+    const storageFields: Field[] =
+      this.storage === ""
+        ? [Field(0), Field(0)]
+        : Encoding.stringToFields(this.storage);
     if (storageFields.length !== 2)
       throw new Error(`Storage string has wrong encoding`);
     fields.push(...storageFields);
@@ -121,7 +124,7 @@ class FileData extends BaseMinaNFTObject {
 
 class File {
   filename: string;
-  storage?: string;
+  storage: string;
   sha3_512_hash?: string;
   size?: number;
   mimeType?: string;
@@ -130,6 +133,7 @@ class File {
   leavesNumber?: number;
   constructor(filename: string) {
     this.filename = filename;
+    this.storage = "";
   }
   public async metadata(): Promise<{
     size: number;
@@ -207,7 +211,11 @@ class File {
   }
 
   public async data(): Promise<FileData> {
-    if (this.storage === undefined) throw new Error(`File: storage not set`);
+    if (this.storage === "") {
+      const metadata = await this.metadata();
+      this.size = metadata.size;
+      this.mimeType = metadata.mimeType;
+    }
     if (this.sha3_512_hash === undefined)
       throw new Error(`File: SHA3-512 hash not set`);
     if (this.size === undefined) throw new Error(`File: size not set`);
@@ -223,9 +231,9 @@ class File {
       fileRoot: this.root,
       height: this.height,
       size: this.size,
-      mimeType: this.mimeType.slice(0, 31),
+      mimeType: this.mimeType.slice(0, 30),
       sha3_512: this.sha3_512_hash,
-      filename: path.basename(this.filename).slice(0, 31),
+      filename: path.basename(this.filename).slice(0, 30),
       storage: this.storage,
     });
   }

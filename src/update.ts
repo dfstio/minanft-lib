@@ -17,7 +17,7 @@ import { Field, PrivateKey, PublicKey, Signature } from "o1js";
 /**
  * MinaNFTStringUpdate is the data for the update of the metadata to be written to the NFT state
  * with string value
- * String can be maximum 31 characters long
+ * String can be maximum 30 characters long
  * @property key The key of the metadata
  * @property value The value of the metadata
  * @property kind The kind of the metadata, default is "string"
