@@ -1,10 +1,9 @@
 export { File, FileData };
-import { MerkleTree, Field } from "o1js";
+import { MerkleTree, Field, Encoding } from "o1js";
 import fs from "fs/promises";
 import { createHash } from "crypto";
 import path from "path";
 import mime from "mime";
-import { Encoding } from "o1js";
 import { BaseMinaNFTObject } from "../baseminanftobject";
 import { IPFS } from "./ipfs";
 
