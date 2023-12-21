@@ -58,20 +58,20 @@ class MinaNFTBadge {
    * @param zkAppPublicKey Public key of the deployed NFT zkApp
    */
   constructor(args: MinaNFTBadgeConstructor) {
-    if (args.name.length > 31)
-      throw new Error("Badge name too long, must be maximum 31 character");
+    if (args.name.length > 30)
+      throw new Error("Badge name too long, must be maximum 30 character");
     this.name = args.name;
-    if (args.owner.length > 31)
-      throw new Error("Badge owner too long, must be maximum 31 character");
+    if (args.owner.length > 30)
+      throw new Error("Badge owner too long, must be maximum 30 character");
     this.owner = args.owner;
-    if (args.verifiedKey.length > 31)
+    if (args.verifiedKey.length > 30)
       throw new Error(
-        "Badge verifiedKey too long, must be maximum 31 character"
+        "Badge verifiedKey too long, must be maximum 30 character"
       );
     this.verifiedKey = args.verifiedKey;
-    if (args.verifiedKind.length > 31)
+    if (args.verifiedKind.length > 30)
       throw new Error(
-        "Badge verifiedKind too long, must be maximum 31 character"
+        "Badge verifiedKind too long, must be maximum 30 character"
       );
     this.verifiedKind = args.verifiedKind;
     this.oracle = args.oracle;

@@ -25,7 +25,8 @@ import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
 import { PrivateMetadata } from "./privatemetadata";
 
-// Dummy class to ovecome o1js compile bug
+// Dummy class to ovecome o1js compile bug - fixed now
+/*
 class Key extends SmartContract {
   @state(Field) key = State<Field>();
 
@@ -34,6 +35,7 @@ class Key extends SmartContract {
     this.key.set(key);
   }
 }
+*/
 
 /**
  * Base class for MinaNFT

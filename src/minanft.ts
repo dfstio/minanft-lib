@@ -85,7 +85,7 @@ class MinaNFT extends BaseMinaNFT {
   escrow: Field;
   version: UInt64;
   isMinted: boolean;
-  address: PublicKey | undefined;
+  address: PublicKey;
   tokenId: Field | undefined;
   nameService: PublicKey | undefined;
 
@@ -99,7 +99,7 @@ class MinaNFT extends BaseMinaNFT {
    */
   constructor(params: {
     name: string;
-    address?: PublicKey;
+    address: PublicKey;
     creator?: string;
     storage?: string;
     owner?: Field;
@@ -326,6 +326,8 @@ class MinaNFT extends BaseMinaNFT {
       name: uri.name,
       nameService: params.nameServiceAddress,
       creator: uri.creator,
+      owner: Field.fromJSON(uri.owner),
+      address: PublicKey.fromBase58(uri.address),
     });
     nft.version = UInt64.from(uri.version);
     nft.metadataRoot = new Metadata({
@@ -510,6 +512,7 @@ class MinaNFT extends BaseMinaNFT {
       version,
       time: Date.now(),
       creator: this.creator,
+      address: this.address.toBase58(),
       owner: this.owner.toJSON(),
       escrow: this.escrow.toJSON(),
       metadata: { data: root.data.toJSON(), kind: root.kind.toJSON() },
@@ -641,8 +644,10 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename);
-    console.log("Pinning file to IPFS...");
-    await file.pin(data.pinataJWT);
+    if (data.isPrivate !== true) {
+      console.log("Pinning file to IPFS...");
+      await file.pin(data.pinataJWT);
+    }
     console.log("Calculating file Merkle tree root...");
     console.time("File Merkle tree root calculated");
     await file.treeData();
