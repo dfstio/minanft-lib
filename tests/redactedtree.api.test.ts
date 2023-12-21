@@ -229,7 +229,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     expect(jobId).not.toBe("");
     if (jobId === "") return;
     const minanft = new api(JWT);
-    const result = await minanft.waitForProofResult({ jobId });
+    const result = await minanft.waitForJobResult({ jobId });
     /*
     let ready: boolean = false;
     while (!ready) {

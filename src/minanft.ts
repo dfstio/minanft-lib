@@ -616,7 +616,12 @@ class MinaNFT extends BaseMinaNFT {
     await file.sha3_512();
     console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
-    this.updateFileData("image", "image", fileData, false);
+    this.updateFileData({
+      key: "image",
+      type: "image",
+      data: fileData,
+      isPrivate: false,
+    });
     /*
     this.updateMetadata(
       "image",
@@ -646,7 +651,12 @@ class MinaNFT extends BaseMinaNFT {
     await file.sha3_512();
     console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
-    this.updateFileData(data.key, "file", fileData, data.isPrivate ?? false);
+    this.updateFileData({
+      key: data.key,
+      type: "file",
+      data: fileData,
+      isPrivate: data.isPrivate ?? false,
+    });
     /*
     this.updateMetadata(
       data.key,
@@ -667,18 +677,19 @@ class MinaNFT extends BaseMinaNFT {
    * @param data {@link FileData} file data
    * @param isPrivate is metadata private
    */
-  public updateFileData(
-    key: string,
-    type: string,
-    data: FileData,
-    isPrivate: boolean
-  ): void {
+  public updateFileData(params: {
+    key: string;
+    type?: string;
+    data: FileData;
+    isPrivate?: boolean;
+  }): void {
+    const { key, type, data, isPrivate } = params;
     this.updateMetadata(
       key,
       new PrivateMetadata({
         data: data.root,
-        kind: MinaNFT.stringToField(type),
-        isPrivate: isPrivate,
+        kind: MinaNFT.stringToField(type ?? "file"),
+        isPrivate: isPrivate ?? false,
         linkedObject: data,
       })
     );
