@@ -111,13 +111,34 @@ export class api {
       };
   }
 
-  public async proofResult(data: { jobId: string }): Promise<{
+  public async jobResult(data: { jobId: string }): Promise<{
     success: boolean;
     error?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result?: any;
   }> {
-    const result = await this.apiHub("proofResult", data);
+    const result = await this.apiHub("jobResult", data);
+    if (this.isError(result.data))
+      return {
+        success: false,
+        error: result.error,
+        result: result.data,
+      };
+    else
+      return {
+        success: result.success,
+        error: result.error,
+        result: result.data,
+      };
+  }
+
+  public async queryBilling(): Promise<{
+    success: boolean;
+    error?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    result?: any;
+  }> {
+    const result = await this.apiHub("queryBilling", {});
     if (this.isError(result.data))
       return {
         success: false,
@@ -150,7 +171,7 @@ export class api {
     let attempts = 0;
     let errors = 0;
     while (attempts < maxAttempts) {
-      const result = await this.apiHub("proofResult", data);
+      const result = await this.apiHub("jobResult", data);
       if (result.success === false) {
         errors++;
         if (errors > maxErrors) {

@@ -11,7 +11,8 @@
     "composite": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
   },
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],

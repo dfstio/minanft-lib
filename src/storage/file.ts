@@ -43,20 +43,24 @@ class FileData extends BaseMinaNFTObject {
     fields.push(this.root);
     fields.push(Field.from(this.height));
     fields.push(Field.from(this.size));
-    const mimeTypeFields = Encoding.stringToFields(this.mimeType);
+    const mimeTypeFields = Encoding.stringToFields(
+      this.mimeType.substring(0, 30)
+    );
     if (mimeTypeFields.length !== 1)
       throw new Error(
-        `FileData: MIME type string is too long, should be less than 32 bytes`
+        `FileData: MIME type string is too long, should be less than 30 bytes`
       );
     fields.push(mimeTypeFields[0]);
     const sha512Fields = Encoding.stringToFields(this.sha3_512);
     if (sha512Fields.length !== 3)
       throw new Error(`SHA512 has wrong encoding, should be base64`);
     fields.push(...sha512Fields);
-    const filenameFields = Encoding.stringToFields(this.filename);
+    const filenameFields = Encoding.stringToFields(
+      this.filename.substring(0, 30)
+    );
     if (filenameFields.length !== 1)
       throw new Error(
-        `FileData: Filename string is too long, should be less than 32 bytes`
+        `FileData: Filename string is too long, should be less than 30 bytes`
       );
     fields.push(filenameFields[0]);
     const storageFields: Field[] =
