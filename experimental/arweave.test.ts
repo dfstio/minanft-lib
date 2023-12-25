@@ -29,30 +29,23 @@ describe("Arewave", () => {
     const address2 = await arweave.wallets.getAddress(key2);
     expect(address2).toBe(ARWEAVE_ADDRESS);
 
-    const balance = await arweave.wallets.getBalance(
-      "1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY"
-    );
+    const balance = await arweave.wallets.getBalance(address);
     console.log("Balance:", balance);
     const ar = arweave.ar.winstonToAr(balance);
-    console.log("Ar:", ar);
-    const balance1 = await arweave.wallets.getBalance(address);
-    console.log("Balance1:", balance1);
-    const ar1 = arweave.ar.winstonToAr(balance1);
-    console.log("Ar1:", ar1);
-    const transactionId = await arweave.wallets.getLastTransactionID(
-      "1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY"
-    );
+    console.log("Ar balance:", ar);
+    console.log("Ar balance change: USD", 1 - parseFloat(ar));
+    const transactionId = await arweave.wallets.getLastTransactionID(address);
     console.log("transactionId", transactionId);
     const transaction = await arweave.createTransaction(
       {
-        data: Buffer.from("Some data", "utf8"),
+        data: Buffer.from("Some data 123", "utf8"),
       },
       key
     );
     transaction.addTag("Content-Type", "text/html");
     transaction.addTag("key2", "value2");
     await arweave.transactions.sign(transaction, key);
-    console.log("transaction", transaction);
+    //console.log("transaction", transaction);
     const hash = transaction.id;
     const storage = `a:${hash}`;
     console.log("storage", storage);
@@ -84,17 +77,27 @@ describe("Arewave", () => {
         `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
       );
     }
-
-    const status = await arweave.transactions.getStatus(transaction.id);
+    */
+    const txId = "CtQFMSLwvvWDkl5b2epJAroxXVbr1ISlAl1quCaxrOc";
+    const status = await arweave.transactions.getStatus(txId);
     console.log("status", status);
 
-    const tx = await arweave.transactions.get(
-      "hKMMPNh_emBf8v_at1tFzNYACisyMQNcKzeeE1QE9p8"
-    );
+    const tx = await arweave.transactions.get(txId);
     console.log("tx", tx);
-
+    /*
      https://arweave.net/[transaction_id]
      https://arweave.net/bNbA3TEQVL60xlgCcqdz4ZPHFZ711cZ3hmkpGttDt_U
+     https://scar.arweave.dev/#/tx/CtQFMSLwvvWDkl5b2epJAroxXVbr1ISlAl1quCaxrOc
+
+      status {
+  status: 200,
+  confirmed: {
+    block_height: 1329591,
+    block_indep_hash: 'TLVzut5TI_Z_HLfJDh_vuRfClBVGVI2N5wdU9vqf_yF6EfDRz4iWRR5GK9BPlIG2',
+    number_of_confirmations: 2
+  }
+}
+
     */
   });
 });

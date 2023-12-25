@@ -162,7 +162,7 @@ class MapData extends BaseMinaNFTObject {
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename);
     console.log("Pinning file to IPFS...");
-    await file.pin(data.pinataJWT);
+    await file.pin(data.pinataJWT, data.arweaveKey);
     console.log("Calculating file Merkle tree root...");
     console.time("File Merkle tree root calculated");
     await file.treeData();

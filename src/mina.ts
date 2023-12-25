@@ -59,7 +59,9 @@ function sleep(ms: number) {
 }
 
 function makeString(length: number): string {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   let outString: string = ``;
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   const inOptions: string = `abcdefghijklmnopqrstuvwxyz0123456789`;
 
   for (let i = 0; i < length; i++) {
@@ -80,11 +82,13 @@ function formatTime(ms: number): string {
 }
 
 class Memory {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   static rss: number = 0;
   constructor() {
     Memory.rss = 0;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   public static info(description: string = ``, fullInfo: boolean = false) {
     const memoryData = process.memoryUsage();
     const formatMemoryUsage = (data: number) =>

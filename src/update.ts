@@ -52,7 +52,8 @@ interface MinaNFTTextUpdate {
  */
 interface MinaNFTImageUpdate {
   filename: string;
-  pinataJWT: string;
+  pinataJWT?: string;
+  arweaveKey?: string;
 }
 
 /**
@@ -65,7 +66,8 @@ interface MinaNFTImageUpdate {
 interface MinaNFTFileUpdate {
   key: string;
   filename: string;
-  pinataJWT: string;
+  pinataJWT?: string;
+  arweaveKey?: string;
   isPrivate?: boolean;
 }
 
@@ -88,7 +90,8 @@ interface MinaNFTFieldUpdate {
  * MinaNFTMint is the data for the minting of the NFT
  * @property deployer The deployer of the contract
  * @property owner The owner of the NFT - Poseidon hash of owner's public key
- * @property pinataJWT Pinata JWT token for uploading to the IPFS
+ * @property pinataJWT Pinata JWT token for uploading to the IPFS - used first if provided
+ * @property arweaveKey Arweave key for uploading to the Arweave - used if pinataJWT is not provided
  * @property privateKey The private key of the owner, if not provided, will be generated
  * @property escrow The escrow of the NFT - Poseidon hash of three escrow's public keys
  * @property nameService The names service that will mint the NFT
@@ -97,7 +100,8 @@ interface MinaNFTFieldUpdate {
 interface MinaNFTMint {
   deployer: PrivateKey;
   owner?: Field;
-  pinataJWT: string;
+  pinataJWT?: string;
+  arweaveKey?: string;
   privateKey?: PrivateKey;
   escrow?: Field;
   nameService?: MinaNFTNameService;
@@ -160,7 +164,8 @@ interface MinaNFTApproval {
 interface MinaNFTCommit {
   deployer: PrivateKey;
   ownerPrivateKey: PrivateKey;
-  pinataJWT: string;
+  pinataJWT?: string;
+  arweaveKey?: string;
   nameService?: MinaNFTNameService;
   nonce?: number;
 }
