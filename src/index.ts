@@ -68,6 +68,7 @@ export {
 export { MinaNFTVerifier } from "./plugins/verifier";
 export { Escrow, EscrowDeposit } from "./plugins/escrow";
 export { IPFS } from "./storage/ipfs";
+export { ARWEAVE } from "./storage/arweave";
 export { File, FileData } from "./storage/file";
 export {
   MapData,

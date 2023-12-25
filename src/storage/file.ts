@@ -6,6 +6,7 @@ import path from "path";
 import mime from "mime";
 import { BaseMinaNFTObject } from "../baseminanftobject";
 import { IPFS } from "./ipfs";
+import { ARWEAVE } from "./arweave";
 
 class FileData extends BaseMinaNFTObject {
   fileRoot: Field;
@@ -163,22 +164,42 @@ class File {
     return this.sha3_512_hash;
   }
 
-  public async pin(pinataJWT: string) {
+  public async pin(
+    pinataJWT: string | undefined,
+    arweaveKey: string | undefined
+  ): Promise<void> {
+    if (pinataJWT === undefined && arweaveKey === undefined)
+      throw new Error(`Pin failed: no pinataJWT or arweaveKey`);
     const metadata = await this.metadata();
-    const file: fs.FileHandle = await fs.open(this.filename);
-    const stream = file.createReadStream();
-    const ipfs = new IPFS(pinataJWT);
-    const hash = await ipfs.pinFile(
-      stream,
-      path.basename(this.filename),
-      metadata.size,
-      metadata.mimeType
-    );
-    stream.close();
-    if (hash === undefined) throw new Error(`IPFS pin failed`);
-    this.storage = `i:${hash}`;
-    this.size = metadata.size;
-    this.mimeType = metadata.mimeType;
+    if (pinataJWT !== undefined) {
+      const file: fs.FileHandle = await fs.open(this.filename);
+      const stream = file.createReadStream();
+      const ipfs = new IPFS(pinataJWT);
+      const hash = await ipfs.pinFile(
+        stream,
+        path.basename(this.filename),
+        metadata.size,
+        metadata.mimeType
+      );
+      stream.close();
+      if (hash === undefined) throw new Error(`IPFS pin failed`);
+      this.storage = `i:${hash}`;
+      this.size = metadata.size;
+      this.mimeType = metadata.mimeType;
+    } else if (arweaveKey !== undefined) {
+      const arweave = new ARWEAVE(arweaveKey);
+      const data = await fs.readFile(this.filename);
+      const hash = await arweave.pinFile(
+        data,
+        path.basename(this.filename),
+        metadata.size,
+        metadata.mimeType
+      );
+      if (hash === undefined) throw new Error(`Arweave pin failed`);
+      this.storage = `a:${hash}`;
+      this.size = metadata.size;
+      this.mimeType = metadata.mimeType;
+    }
   }
 
   public async treeData(): Promise<{

@@ -9,6 +9,7 @@ export {
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
 import config from "../src/config";
+import { Memory } from "../src/mina";
 
 const { MINAURL, ARCHIVEURL, TESTWORLD2 } = config;
 import { DEPLOYER, DEPLOYERS } from "../env.json";

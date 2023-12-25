@@ -40,6 +40,7 @@ import { TextData } from "./storage/text";
 import { File, FileData } from "./storage/file";
 import { MinaNFTMapUpdate } from "./storage/map";
 import { IPFS } from "./storage/ipfs";
+import { ARWEAVE } from "./storage/arweave";
 import {
   MinaNFTStringUpdate,
   MinaNFTFieldUpdate,
@@ -609,8 +610,8 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
     const file = new File(data.filename);
-    console.log("Pinning image to IPFS...");
-    await file.pin(data.pinataJWT);
+    console.log("Pinning image...");
+    await file.pin(data.pinataJWT, data.arweaveKey);
     console.log("Calculating image Merkle tree root...");
     console.time("Image Merkle tree root calculated");
     await file.treeData();
@@ -645,8 +646,8 @@ class MinaNFT extends BaseMinaNFT {
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename);
     if (data.isPrivate !== true) {
-      console.log("Pinning file to IPFS...");
-      await file.pin(data.pinataJWT);
+      console.log("Pinning file...");
+      await file.pin(data.pinataJWT, data.arweaveKey);
     }
     console.log("Calculating file Merkle tree root...");
     console.time("File Merkle tree root calculated");
@@ -799,6 +800,7 @@ class MinaNFT extends BaseMinaNFT {
       deployer,
       ownerPrivateKey,
       pinataJWT,
+      arweaveKey,
       nameService,
       nonce: nonceArg,
     } = commitData;
@@ -879,7 +881,7 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("Proof verification error");
     }
 
-    const storage = await this.pinToStorage(pinataJWT);
+    const storage = await this.pinToStorage(pinataJWT, arweaveKey);
     if (storage === undefined) {
       throw new Error("IPFS Storage error");
     }
@@ -925,6 +927,7 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
@@ -942,6 +945,7 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("Transaction error");
     }
     await MinaNFT.transactionInfo(sentTx, "update", false);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newRoot = proof!.publicInput.newRoot;
     proof = null;
     if (sentTx.isSuccess) {
@@ -1000,21 +1004,50 @@ class MinaNFT extends BaseMinaNFT {
   }
 */
   private async pinToStorage(
-    pinataJWT: string
+    pinataJWT: string | undefined,
+    arweaveKey: string | undefined
   ): Promise<{ hash: Storage; hashStr: string } | undefined> {
-    console.log("Pinning to IPFS...");
-    const ipfs = new IPFS(pinataJWT);
-    const hash = await ipfs.pinString(
-      this.exportToString({ increaseVersion: true, includePrivateData: false })
-    );
-    if (hash === undefined) return undefined;
-    const hashStr = "i:" + hash;
-    const ipfs_fields = MinaNFT.stringToFields(hashStr);
-    if (ipfs_fields.length !== 2) throw new Error("IPFS hash encoding error");
-    return {
-      hash: new Storage({ hashString: ipfs_fields as [Field, Field] }),
-      hashStr,
-    };
+    if (pinataJWT === undefined && arweaveKey === undefined) {
+      throw new Error(
+        "No storage service key provided. Provide pinateJWT or arweaveKey"
+      );
+    }
+    if (pinataJWT !== undefined) {
+      console.log("Pinning to IPFS...");
+      const ipfs = new IPFS(pinataJWT);
+      const hash = await ipfs.pinString(
+        this.exportToString({
+          increaseVersion: true,
+          includePrivateData: false,
+        })
+      );
+      if (hash === undefined) return undefined;
+      const hashStr = "i:" + hash;
+      const ipfs_fields = MinaNFT.stringToFields(hashStr);
+      if (ipfs_fields.length !== 2) throw new Error("IPFS hash encoding error");
+      return {
+        hash: new Storage({ hashString: ipfs_fields as [Field, Field] }),
+        hashStr,
+      };
+    } else if (arweaveKey !== undefined) {
+      console.log("Pinning to Arweave...");
+      const arweave = new ARWEAVE(arweaveKey);
+      const hash = await arweave.pinString(
+        this.exportToString({
+          increaseVersion: true,
+          includePrivateData: false,
+        })
+      );
+      if (hash === undefined) return undefined;
+      const hashStr = "a:" + hash;
+      const arweave_fields = MinaNFT.stringToFields(hashStr);
+      if (arweave_fields.length !== 2)
+        throw new Error("Arweave hash encoding error");
+      return {
+        hash: new Storage({ hashString: arweave_fields as [Field, Field] }),
+        hashStr,
+      };
+    } else return undefined;
   }
 
   /*
@@ -1129,6 +1162,7 @@ class MinaNFT extends BaseMinaNFT {
       deployer,
       owner: ownerArg,
       pinataJWT,
+      arweaveKey,
       privateKey,
       escrow: escrowArg,
       nonce: nonceArg,
@@ -1155,9 +1189,9 @@ class MinaNFT extends BaseMinaNFT {
     const root = skipCalculatingMetadataRoot
       ? this.metadataRoot
       : this.getMetadataRootAndMap().root;
-    const storage = await this.pinToStorage(pinataJWT);
+    const storage = await this.pinToStorage(pinataJWT, arweaveKey);
     if (storage === undefined) {
-      console.error("IPFS Storage error");
+      console.error("IPFS/Arweave Storage error");
       return undefined;
     }
     const storageHash: Storage = storage.hash;

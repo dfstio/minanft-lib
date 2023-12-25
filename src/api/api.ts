@@ -71,6 +71,7 @@ export class api {
     uri: string;
     signature: string;
     privateKey: string;
+    useArweave?: boolean;
   }): Promise<{
     success: boolean;
     error?: string;
@@ -81,7 +82,11 @@ export class api {
       developer: "@dfst",
       name: "mint",
       task: "mint",
-      args: [data.signature, data.privateKey],
+      args: [
+        data.signature,
+        data.privateKey,
+        (data.useArweave ?? false).toString(),
+      ],
     });
     return { success: result.success, jobId: result.data, error: result.error };
   }
