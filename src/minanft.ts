@@ -187,9 +187,19 @@ class MinaNFT extends BaseMinaNFT {
     this.nameService = nameService.address;
 
     //try {
+    if (
+      storageStr.length < 2 ||
+      (storageStr[0] !== "i" && storageStr[0] !== "a")
+    ) {
+      throw new Error("Invalid storage string");
+    }
+    const uriURL =
+      storageStr[0] === "i"
+        ? "https://gateway.pinata.cloud/ipfs/" + storageStr.slice(2)
+        : "https://arweave.net/" + storageStr.slice(2);
     const uri =
       metadataURI === undefined
-        ? (await axios.get("https://ipfs.io/ipfs/" + storageStr.slice(2))).data
+        ? (await axios.get(uriURL)).data
         : JSON.parse(metadataURI);
     //const image = data.data.properties.image;
     //console.log("IPFS uri:", JSON.stringify(uri, null, 2));
@@ -485,10 +495,15 @@ class MinaNFT extends BaseMinaNFT {
     if (
       imageObject !== undefined &&
       imageObject.linkedObject !== undefined &&
-      imageObject.linkedObject instanceof FileData
+      imageObject.linkedObject instanceof FileData &&
+      imageObject.linkedObject.storage !== undefined &&
+      imageObject.linkedObject.storage.length > 2
     )
       image =
-        "https://ipfs.io/ipfs/" + imageObject.linkedObject.storage.slice(2);
+        imageObject.linkedObject.storage[0] === "i"
+          ? "https://gateway.pinata.cloud/ipfs/" +
+            imageObject.linkedObject.storage.slice(2)
+          : "https://arweave.net/" + imageObject.linkedObject.storage.slice(2);
 
     const { root } = this.getMetadataRootAndMap();
     const version = increaseVersion
