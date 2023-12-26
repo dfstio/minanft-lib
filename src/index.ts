@@ -10,6 +10,8 @@ export {
   MinaNFTTransfer,
   MinaNFTApproval,
   MinaNFTCommit,
+  MinaNFTPrepareCommit,
+  MinaNFTCommitData,
 } from "./update";
 export { MinaNFTBadge, MinaNFTBadgeConstructor } from "./minanftbadge";
 export { MinaNFTEscrow, EscrowTransferData } from "./escrow";

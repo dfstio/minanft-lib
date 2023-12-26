@@ -1,4 +1,5 @@
 export { Update, Metadata, MetadataWitness, Storage };
+import { from } from "form-data";
 import { PublicKey, Struct, Field, UInt64, MerkleMapWitness } from "o1js";
 /**
  * Metadata is the metadata of the NFT written to the Merkle Map
@@ -19,6 +20,17 @@ class Metadata extends Struct({
     state1.data.assertEquals(state2.data);
     state1.kind.assertEquals(state2.kind);
   }
+
+  toFields(): Field[] {
+    return [this.data, this.kind];
+  }
+
+  static fromFields(fields: Field[]): Metadata {
+    return new Metadata({
+      data: fields[0],
+      kind: fields[1],
+    });
+  }
 }
 
 /**
@@ -38,6 +50,17 @@ class MetadataWitness extends Struct({
   static assertEquals(state1: Metadata, state2: Metadata) {
     state1.data.assertEquals(state2.data);
     state1.kind.assertEquals(state2.kind);
+  }
+
+  toFields(): Field[] {
+    return [...this.data.toFields(), ...this.kind.toFields()];
+  }
+
+  static fromFields(fields: Field[]): MetadataWitness {
+    return new MetadataWitness({
+      data: MerkleMapWitness.fromFields(fields.slice(0, fields.length / 2)),
+      kind: MerkleMapWitness.fromFields(fields.slice(fields.length / 2)),
+    });
   }
 }
 
@@ -103,5 +126,26 @@ class Update extends Struct({
       verifier[0],
       verifier[1],
     ];
+  }
+
+  static fromFields(fields: Field[]): Update {
+    const verifier = PublicKey.fromFields(fields.slice(fields.length - 2));
+    return new Update({
+      oldRoot: new Metadata({
+        data: fields[0],
+        kind: fields[1],
+      }),
+      newRoot: new Metadata({
+        data: fields[2],
+        kind: fields[3],
+      }),
+      storage: new Storage({
+        hashString: [fields[4], fields[5]],
+      }),
+      name: fields[6],
+      owner: fields[7],
+      version: new UInt64(fields[8]),
+      verifier,
+    });
   }
 }

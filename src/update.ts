@@ -8,6 +8,8 @@ export {
   MinaNFTTransfer,
   MinaNFTApproval,
   MinaNFTCommit,
+  MinaNFTPrepareCommit,
+  MinaNFTCommitData,
 };
 
 import { MinaNFTNameService } from "./minanftnames";
@@ -168,4 +170,32 @@ interface MinaNFTCommit {
   arweaveKey?: string;
   nameService?: MinaNFTNameService;
   nonce?: number;
+}
+
+/**
+ * MinaNFTPrepareCommit is the data for the commit of the NFT
+ * @property ownerPrivateKey The private key of the owner
+ * @property nameServiceAddress The names service address that will commit the NFT
+ * @property pinataJWT Pinata JWT token for uploading to the IPFS
+ * @property arweaveKey Arweave key for uploading to the Arweave
+ */
+interface MinaNFTPrepareCommit {
+  ownerPrivateKey: PrivateKey;
+  nameServiceAddress: PublicKey;
+  pinataJWT?: string;
+  arweaveKey?: string;
+}
+
+/**
+ * MinaNFTCommitData is the data for the commit of the NFT
+ * @property signature The signature of the owner
+ * @property address The address of the NFT
+ * @property update The update of the NFT
+ * @property transactions The transactions of the NFT to make an update
+ */
+interface MinaNFTCommitData {
+  signature: string;
+  address: string;
+  update: string;
+  transactions: string[];
 }

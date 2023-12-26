@@ -85,14 +85,14 @@ class BaseMinaNFT {
     map.set(key, new Metadata({ data: newValue.data, kind: newValue.kind }));
     const newRoot: Metadata = map.getRoot();
 
-    return {
+    return new MetadataUpdate({
       oldRoot: root,
       newRoot,
       key,
       oldValue,
-      newValue,
+      newValue: new Metadata({ data: newValue.data, kind: newValue.kind }),
       witness,
-    } as MetadataUpdate;
+    });
   }
 
   /**
@@ -108,12 +108,12 @@ class BaseMinaNFT {
    * @param data Map to calculate root and MerkleMap
    * @returns Root and MerkleMap of the Map
    */
-  protected getMapRootAndMap(data: Map<string, Metadata>): {
+  protected getMapRootAndMap(data: Map<string, PrivateMetadata>): {
     root: Metadata;
     map: MetadataMap;
   } {
     const map: MetadataMap = new MetadataMap();
-    data.forEach((value: Metadata, key: string) => {
+    data.forEach((value: PrivateMetadata, key: string) => {
       const keyField = MinaNFT.stringToField(key);
       map.data.set(keyField, value.data);
       map.kind.set(keyField, value.kind);

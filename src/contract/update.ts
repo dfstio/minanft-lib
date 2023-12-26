@@ -75,7 +75,29 @@ class MetadataUpdate extends Struct({
   oldValue: Metadata,
   newValue: Metadata,
   witness: MetadataWitness,
-}) {}
+}) {
+  toFields(): Field[] {
+    return [
+      ...this.oldRoot.toFields(),
+      ...this.newRoot.toFields(),
+      this.key,
+      ...this.oldValue.toFields(),
+      ...this.newValue.toFields(),
+      ...this.witness.toFields(),
+    ];
+  }
+
+  static fromFields(fields: Field[]): MetadataUpdate {
+    return new MetadataUpdate({
+      oldRoot: Metadata.fromFields(fields.slice(0, 2)),
+      newRoot: Metadata.fromFields(fields.slice(2, 4)),
+      key: fields[4],
+      oldValue: Metadata.fromFields(fields.slice(5, 7)),
+      newValue: Metadata.fromFields(fields.slice(7, 9)),
+      witness: MetadataWitness.fromFields(fields.slice(9)),
+    });
+  }
+}
 
 class MetadataTransition extends Struct({
   oldRoot: Metadata,
@@ -122,6 +144,17 @@ class MetadataTransition extends Struct({
   ) {
     Metadata.assertEquals(transition1.oldRoot, transition2.oldRoot);
     Metadata.assertEquals(transition1.newRoot, transition2.newRoot);
+  }
+
+  toFields(): Field[] {
+    return [...this.oldRoot.toFields(), ...this.newRoot.toFields()];
+  }
+
+  static fromFields(fields: Field[]): MetadataTransition {
+    return new MetadataTransition({
+      oldRoot: Metadata.fromFields(fields.slice(0, fields.length / 2)),
+      newRoot: Metadata.fromFields(fields.slice(fields.length / 2)),
+    });
   }
 }
 
