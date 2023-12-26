@@ -180,7 +180,8 @@ interface MinaNFTCommit {
  * @property arweaveKey Arweave key for uploading to the Arweave
  */
 interface MinaNFTPrepareCommit {
-  ownerPrivateKey: PrivateKey;
+  ownerPrivateKey?: PrivateKey;
+  ownerPublicKey: PublicKey;
   nameServiceAddress: PublicKey;
   pinataJWT?: string;
   arweaveKey?: string;

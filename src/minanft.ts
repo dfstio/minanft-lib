@@ -983,8 +983,13 @@ class MinaNFT extends BaseMinaNFT {
   public async prepareCommitData(
     commitData: MinaNFTPrepareCommit
   ): Promise<MinaNFTCommitData | undefined> {
-    const { ownerPrivateKey, nameServiceAddress, pinataJWT, arweaveKey } =
-      commitData;
+    const {
+      ownerPrivateKey,
+      ownerPublicKey,
+      nameServiceAddress,
+      pinataJWT,
+      arweaveKey,
+    } = commitData;
 
     if (this.address === undefined) {
       console.error("NFT contract is not deployed");
@@ -1029,7 +1034,7 @@ class MinaNFT extends BaseMinaNFT {
     }
 
     const newVersion: UInt64 = this.version.add(UInt64.from(1));
-    const ownerPublicKey = ownerPrivateKey.toPublicKey();
+
     const owner = Poseidon.hash(ownerPublicKey.toFields());
 
     const update: Update = new Update({
@@ -1041,8 +1046,16 @@ class MinaNFT extends BaseMinaNFT {
       name: MinaNFT.stringToField(this.name),
       owner,
     });
-    const signature = Signature.create(ownerPrivateKey, update.toFields());
-    const signatureStr: string = signature.toBase58();
+
+    let signatureStr: string = "";
+    if (ownerPrivateKey !== undefined) {
+      if (
+        ownerPrivateKey.toPublicKey().toBase58() !== ownerPublicKey.toBase58()
+      )
+        throw new Error("Owner privateKey mismatch");
+      const signature = Signature.create(ownerPrivateKey, update.toFields());
+      signatureStr = signature.toBase58();
+    }
 
     const transactionsStr: string[] = transactions.map((t) =>
       JSON.stringify({
