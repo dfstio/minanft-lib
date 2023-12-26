@@ -2,6 +2,7 @@ import axios from "axios";
 import { sleep } from "../mina";
 
 import config from "../config";
+import { MinaNFTCommitData } from "../update";
 const { MINNFTAPIAUTH, MINNFTAPI } = config;
 
 export class api {
@@ -86,6 +87,38 @@ export class api {
         data.signature,
         data.privateKey,
         (data.useArweave ?? false).toString(),
+      ],
+    });
+    return { success: result.success, jobId: result.data, error: result.error };
+  }
+
+  /*
+   * Creates a new post for existing NFT using serverless api call
+   * @param uri the uri of the metadata
+   * @param privateKey the private key of the address where NFT should be minted
+   */
+  public async post(data: {
+    commitData: MinaNFTCommitData;
+    ownerPublicKey: string;
+    nftName: string;
+    postName: string;
+  }): Promise<{
+    success: boolean;
+    error?: string;
+    jobId?: string;
+  }> {
+    const result = await this.apiHub("post_v3", {
+      transactions: data.commitData.transactions,
+      developer: "@dfst",
+      name: "post",
+      task: "post",
+      args: [
+        data.commitData.signature,
+        data.commitData.address,
+        data.commitData.update,
+        data.ownerPublicKey,
+        data.nftName,
+        data.postName,
       ],
     });
     return { success: result.success, jobId: result.data, error: result.error };

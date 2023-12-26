@@ -44,7 +44,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
     const elements: MapElement[] = [];
     let originalWitnesses: MetadataWitness[] = [];
     let redactedWitnesses: MetadataWitness[] = [];
-    this.metadata.forEach((value: Metadata, key: string) => {
+    this.metadata.forEach((value: PrivateMetadata, key: string) => {
       const keyField = MinaNFT.stringToField(key);
       const redactedWitness = map.getWitness(keyField);
       const originalWitness = originalMap.getWitness(keyField);
@@ -52,7 +52,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
         originalRoot: originalRoot,
         redactedRoot: root,
         key: keyField,
-        value,
+        value: new Metadata({ data: value.data, kind: value.kind }),
       };
       elements.push(element);
       originalWitnesses.push(originalWitness);

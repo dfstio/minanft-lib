@@ -51,10 +51,13 @@ import {
   MinaNFTTransfer,
   MinaNFTApproval,
   MinaNFTCommit,
+  MinaNFTPrepareCommit,
+  MinaNFTCommitData,
 } from "./update";
 import { MapData } from "./storage/map";
 import { blockchain, initBlockchain } from "./mina";
 import config from "./config";
+import { MinaNFTNameService } from "./minanftnames";
 const { MINAFEE, MINANFT_NAME_SERVICE } = config;
 
 /**
@@ -968,6 +971,226 @@ class MinaNFT extends BaseMinaNFT {
       this.updates = [];
       this.version = newVersion;
       this.storage = storage.hashStr;
+      return sentTx;
+    } else return undefined;
+  }
+
+  /**
+   * Prepare commit updates of the MinaNFT to blockchain
+   *
+   * @param deployer Private key of the account that will commit the updates
+   */
+  public async prepareCommitData(
+    commitData: MinaNFTPrepareCommit
+  ): Promise<MinaNFTCommitData | undefined> {
+    const { ownerPrivateKey, nameServiceAddress, pinataJWT, arweaveKey } =
+      commitData;
+
+    if (this.address === undefined) {
+      console.error("NFT contract is not deployed");
+      return undefined;
+    }
+    const address: PublicKey = this.address;
+
+    if (this.updates.length === 0) {
+      console.error("No updates to commit");
+      return undefined;
+    }
+
+    if (this.isMinted === false) {
+      console.error("NFT is not minted");
+      return undefined;
+    }
+
+    const transactions = [];
+    for (const update of this.updates) {
+      const state: MetadataTransition = MetadataTransition.create(update);
+      transactions.push({ state, update });
+    }
+
+    //console.log("Merging states...");
+    let mergedState = transactions[0].state;
+    for (let i = 1; i < transactions.length; i++) {
+      const state: MetadataTransition = MetadataTransition.merge(
+        mergedState,
+        transactions[i].state
+      );
+      mergedState = state;
+    }
+
+    const storage = await this.pinToStorage(pinataJWT, arweaveKey);
+    if (storage === undefined) {
+      throw new Error("Storage error");
+    }
+    const storageHash: Storage = storage.hash;
+
+    if (false === (await this.checkState("commit"))) {
+      throw new Error("State verification error");
+    }
+
+    const newVersion: UInt64 = this.version.add(UInt64.from(1));
+    const ownerPublicKey = ownerPrivateKey.toPublicKey();
+    const owner = Poseidon.hash(ownerPublicKey.toFields());
+
+    const update: Update = new Update({
+      oldRoot: mergedState.oldRoot,
+      newRoot: mergedState.newRoot,
+      storage: storageHash,
+      verifier: nameServiceAddress,
+      version: newVersion,
+      name: MinaNFT.stringToField(this.name),
+      owner,
+    });
+    const signature = Signature.create(ownerPrivateKey, update.toFields());
+    const signatureStr: string = signature.toBase58();
+
+    const transactionsStr: string[] = transactions.map((t) =>
+      JSON.stringify({
+        state: t.state.toFields().map((f) => f.toJSON()),
+        update: t.update.toFields().map((f) => f.toJSON()),
+      })
+    );
+    const updateStr: string = JSON.stringify({
+      update: update.toFields().map((f) => f.toJSON()),
+    });
+
+    const addressStr: string = address.toBase58();
+
+    return {
+      signature: signatureStr,
+      update: updateStr,
+      transactions: transactionsStr,
+      address: addressStr,
+    };
+  }
+
+  /**
+   * Commit updates of the MinaNFT to blockchain using prepared data
+   * Generates recursive proofs for all updates,
+   * than verify the proof locally and send the transaction to the blockchain
+   *
+   * @param deployer Private key of the account that will commit the updates
+   */
+  public static async commitPreparedData(commitData: {
+    deployer: PrivateKey;
+    preparedCommitData: MinaNFTCommitData;
+    ownerPublicKey: string;
+    nameService: MinaNFTNameService;
+    nonce?: number;
+  }): Promise<Mina.TransactionId | undefined> {
+    const {
+      deployer,
+      preparedCommitData,
+      nameService,
+      ownerPublicKey: ownerPublicKeyStr,
+      nonce: nonceArg,
+    } = commitData;
+    const {
+      address: addressStr,
+      signature: signatureStr,
+      update: updateStr,
+      transactions: transactionsStr,
+    } = preparedCommitData;
+
+    if (nameService.address === undefined)
+      throw new Error("Names service address is undefined");
+
+    const transactions = transactionsStr.map((t) => {
+      const obj = JSON.parse(t);
+      const state = MetadataTransition.fromFields(
+        obj.state.map((f: string) => Field.fromJSON(f))
+      );
+      const update = MetadataUpdate.fromFields(
+        obj.update.map((f: string) => Field.fromJSON(f))
+      );
+      return { state, update };
+    });
+
+    const address = PublicKey.fromBase58(addressStr);
+    const ownerPublicKey = PublicKey.fromBase58(ownerPublicKeyStr);
+    const signature = Signature.fromBase58(signatureStr);
+    const update = Update.fromFields(
+      JSON.parse(updateStr).update.map((f: string) => Field.fromJSON(f))
+    );
+
+    if (MinaNFT.updateVerificationKey === undefined) {
+      console.error("Update verification key is undefined");
+      return undefined;
+    }
+
+    console.log("Creating proofs...");
+    const logMsg = `Update proofs created`;
+    console.time(logMsg);
+    let proofs: MinaNFTMetadataUpdateProof[] = [];
+    for (const transaction of transactions) {
+      const proof: MinaNFTMetadataUpdateProof =
+        await MinaNFTMetadataUpdate.update(
+          transaction.state,
+          transaction.update
+        );
+      proofs.push(proof);
+    }
+
+    console.log("Merging proofs...");
+    let proof: MinaNFTMetadataUpdateProof = proofs[0];
+    for (let i = 1; i < proofs.length; i++) {
+      const state: MetadataTransition = MetadataTransition.merge(
+        proof.publicInput,
+        proofs[i].publicInput
+      );
+      const mergedProof: MinaNFTMetadataUpdateProof =
+        await MinaNFTMetadataUpdate.merge(state, proof, proofs[i]);
+      proof = mergedProof;
+    }
+    proofs = [];
+
+    console.time("Update proof verified");
+    const verificationResult: boolean = await verify(
+      proof.toJSON(),
+      MinaNFT.updateVerificationKey
+    );
+    console.timeEnd("Update proof verified");
+    console.timeEnd(logMsg);
+    console.log("Proof verification result:", verificationResult);
+    if (verificationResult === false) {
+      throw new Error("Proof verification error");
+    }
+
+    console.log("Commiting updates to blockchain...");
+    const sender = deployer.toPublicKey();
+    const zkApp = new MinaNFTNameServiceContract(nameService.address);
+    const tokenId = zkApp.token.id;
+    await fetchAccount({ publicKey: address, tokenId });
+    await fetchAccount({ publicKey: nameService.address });
+    await fetchAccount({ publicKey: sender });
+    const hasAccount = Mina.hasAccount(address, tokenId);
+    if (!hasAccount) throw new Error("NFT is not deployed, no account");
+    const account = Account(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+
+    //console.log("Sending update...");
+    const tx = await Mina.transaction(
+      { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
+      () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        zkApp.update(address, update, signature, ownerPublicKey, proof!);
+      }
+    );
+    let sentTx: Mina.TransactionId | undefined = undefined;
+    try {
+      await tx.prove();
+      tx.sign([deployer]);
+      console.time("Update transaction sent");
+      sentTx = await tx.send();
+      console.timeEnd("Update transaction sent");
+    } catch (error) {
+      throw new Error("Prooving error");
+    }
+    if (sentTx === undefined) {
+      throw new Error("Transaction error");
+    }
+    await MinaNFT.transactionInfo(sentTx, "update", false);
+    if (sentTx.isSuccess) {
       return sentTx;
     } else return undefined;
   }
