@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { PrivateKey, PublicKey, Poseidon } from "o1js";
+import { PrivateKey, PublicKey, Poseidon, Signature, Field } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
@@ -180,10 +180,18 @@ describe(`MinaNFT contract`, () => {
     */
     nft.updateMap({ key: `postname`, map });
     commitData = await nft.prepareCommitData({
-      ownerPrivateKey,
+      ownerPublicKey: ownerPrivateKey.toPublicKey(),
       pinataJWT,
       nameServiceAddress: nameService.address,
     });
+    expect(commitData).toBeDefined();
+    if (commitData === undefined) return;
+
+    const update: Field[] = JSON.parse(commitData.update).update.map(
+      (f: string) => Field.fromJSON(f)
+    );
+    const signature = Signature.create(ownerPrivateKey, update);
+    commitData.signature = signature.toBase58();
 
     Memory.info(`prepared commit data`);
     expect(await nft.checkState()).toBe(true);
