@@ -32,6 +32,7 @@ class TextData extends BaseMinaNFTObject {
     };
   }
   public static fromJSON(json: object): TextData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const obj = json as any;
     const data = obj.data;
     const kind = obj.kind;

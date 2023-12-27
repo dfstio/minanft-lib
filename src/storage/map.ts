@@ -207,6 +207,7 @@ class MapData extends BaseMinaNFTObject {
   }
   public static fromJSON(
     json: object,
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
     skipCalculatingMetadataRoot: boolean = false
   ): MapData {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

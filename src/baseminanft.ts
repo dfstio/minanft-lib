@@ -1,14 +1,5 @@
 export { BaseMinaNFT };
-import {
-  Field,
-  Cache,
-  VerificationKey,
-  Encoding,
-  state,
-  State,
-  SmartContract,
-  method,
-} from "o1js";
+import { Field, Cache, VerificationKey, Encoding } from "o1js";
 import { MinaNFT } from "./minanft";
 import { MinaNFTContract } from "./contract/nft";
 import { MinaNFTNameServiceContract } from "./contract/names";
@@ -196,6 +187,36 @@ class BaseMinaNFT {
   }
 
   /**
+   * Converts a string "i:..." or "a:..." to a storage url string
+   * @param str string to convert
+   * @returns string
+   */
+  public static urlFromStorageString(storageStr: string): string {
+    if (
+      storageStr.length < 2 ||
+      (storageStr[0] !== "i" && storageStr[0] !== "a")
+    ) {
+      throw new Error("Invalid storage string");
+    }
+    const url: string =
+      storageStr[0] === "i"
+        ? "https://gateway.pinata.cloud/ipfs/" + storageStr.slice(2)
+        : "https://arweave.net/" + storageStr.slice(2);
+    return url;
+  }
+
+  /**
+   * Converts a Storage to a storage url string
+   * @param stirage Storage to convert
+   * @returns string
+   */
+  public static urlFromStorage(storage: Storage): string {
+    return BaseMinaNFT.urlFromStorageString(
+      Encoding.stringFromFields(storage.hashString)
+    );
+  }
+
+  /**
    * Sets a cache for prover keys
    */
   public static setCache(cache: Cache): void {
@@ -207,6 +228,7 @@ class BaseMinaNFT {
    * @param folder folder for prover keys
    * default is "./nftcache"
    */
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   public static setCacheFolder(folder: string = "./nftcache"): void {
     MinaNFT.cache = Cache.FileSystem(folder);
   }
@@ -216,7 +238,7 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compile(): Promise<VerificationKey> {
-    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
 
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
@@ -249,7 +271,7 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileVerifier(): Promise<VerificationKey> {
-    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
       const { verificationKey } =
@@ -271,7 +293,7 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileBadge(): Promise<VerificationKey> {
-    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
       const { verificationKey } =
@@ -300,7 +322,7 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileEscrow(): Promise<VerificationKey> {
-    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.escrowVerificationKey === undefined) {
       console.time("Escrow compiled");
       const { verificationKey } = await Escrow.compile(options);
@@ -315,7 +337,7 @@ class BaseMinaNFT {
    * @returns verification key
    */
   public static async compileRedactedMap(): Promise<VerificationKey> {
-    const options = MinaNFT.cache ? { cache: MinaNFT.cache! } : undefined;
+    const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
       const { verificationKey } =

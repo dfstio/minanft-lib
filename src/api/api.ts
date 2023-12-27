@@ -14,6 +14,27 @@ export class api {
     this.endpoint = MINNFTAPI;
   }
 
+  public async lookupName(name: string): Promise<{
+    success: boolean;
+    error?: string;
+    address?: string;
+    reason?: string;
+  }> {
+    const result = await this.apiHub("lookupName", {
+      transactions: [],
+      developer: "@dfst",
+      name: "lookupName",
+      task: "lookupName",
+      args: [name],
+    });
+    return {
+      success: result.success,
+      error: result.error,
+      address: result.data === "error" ? undefined : result.data,
+      reason: result.data === "error" ? "not found" : undefined,
+    };
+  }
+
   public async reserveName(data: { name: string; publicKey: string }): Promise<{
     success: boolean;
     error?: string;

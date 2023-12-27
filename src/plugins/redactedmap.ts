@@ -12,7 +12,36 @@ class MapElement extends Struct({
   redactedRoot: Metadata,
   key: Field,
   value: Metadata,
-}) {}
+}) {
+  public toFields(): Field[] {
+    return [
+      this.originalRoot.data,
+      this.originalRoot.kind,
+      this.redactedRoot.data,
+      this.redactedRoot.kind,
+      this.key,
+      this.value.data,
+      this.value.kind,
+    ];
+  }
+  static fromFields(fields: Field[]): MapElement {
+    return new MapElement({
+      originalRoot: new Metadata({
+        data: fields[0],
+        kind: fields[1],
+      }),
+      redactedRoot: new Metadata({
+        data: fields[2],
+        kind: fields[3],
+      }),
+      key: fields[4],
+      value: new Metadata({
+        data: fields[5],
+        kind: fields[6],
+      }),
+    });
+  }
+}
 
 class RedactedMinaNFTMapState extends Struct({
   originalRoot: Metadata, // root of the original Map
