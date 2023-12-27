@@ -1715,13 +1715,14 @@ class MinaNFT extends BaseMinaNFT {
    * @param deployer Private key of the account that will commit the updates
    * @param proof Redacted MinaNFT proof
    */
-  public static async verify(
-    deployer: PrivateKey,
-    verifier: PublicKey,
-    nft: PublicKey,
-    tokenId: Field,
-    proof: RedactedMinaNFTMapStateProof
-  ) {
+  public static async verify(params: {
+    deployer: PrivateKey;
+    verifier: PublicKey;
+    nft: PublicKey;
+    nameServiceAddress: PublicKey;
+    proof: RedactedMinaNFTMapStateProof;
+  }): Promise<Mina.TransactionId> {
+    const { deployer, verifier, nft, nameServiceAddress, proof } = params;
     const address = nft;
     await MinaNFT.compileVerifier();
 
@@ -1730,6 +1731,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: address });
     const zkApp = new MinaNFTVerifier(verifier);
+    const zkAppNFT = new MinaNFTNameServiceContract(nameServiceAddress);
+    const tokenId = zkAppNFT.token.id;
 
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
@@ -1740,6 +1743,7 @@ class MinaNFT extends BaseMinaNFT {
     await tx.prove();
     tx.sign([deployer]);
     const res = await tx.send();
-    await MinaNFT.transactionInfo(res);
+    await MinaNFT.transactionInfo(res, "verify", false);
+    return res;
   }
 }

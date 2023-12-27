@@ -92,6 +92,7 @@ class MinaNFTBadge {
     const verifiedKey = zkApp.verifiedKey.get();
     const verifiedKind = zkApp.verifiedKind.get();
     const oracle = zkApp.oracle.get();
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
     const tokenSymbol: string = "BADGE";
     return new MinaNFTBadge({
       name: MinaNFT.stringFromField(name),
