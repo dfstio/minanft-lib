@@ -196,6 +196,36 @@ class BaseMinaNFT {
   }
 
   /**
+   * Converts a string "i:..." or "a:..." to a storage url string
+   * @param str string to convert
+   * @returns string
+   */
+  public static urlFromStorageString(storageStr: string): string {
+    if (
+      storageStr.length < 2 ||
+      (storageStr[0] !== "i" && storageStr[0] !== "a")
+    ) {
+      throw new Error("Invalid storage string");
+    }
+    const url: string =
+      storageStr[0] === "i"
+        ? "https://gateway.pinata.cloud/ipfs/" + storageStr.slice(2)
+        : "https://arweave.net/" + storageStr.slice(2);
+    return url;
+  }
+
+  /**
+   * Converts a Storage to a storage url string
+   * @param stirage Storage to convert
+   * @returns string
+   */
+  public static urlFromStorage(storage: Storage): string {
+    return BaseMinaNFT.urlFromStorageString(
+      Encoding.stringFromFields(storage.hashString)
+    );
+  }
+
+  /**
    * Sets a cache for prover keys
    */
   public static setCache(cache: Cache): void {
