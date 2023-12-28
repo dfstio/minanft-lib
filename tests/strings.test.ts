@@ -56,4 +56,12 @@ describe("Convert string to Fields and back", () => {
       expect(recoveredString).toEqual(str);
     });
   }
+
+  it(`should convert Ethereum address to Field`, async () => {
+    const address = "0xb3Edf83eA590F44f5c400077EBd94CCFE10E4Bb0";
+    const field = Field.from(address);
+    const recoveredAddress = "0x" + field.toBigInt().toString(16);
+    console.log(recoveredAddress);
+    expect(recoveredAddress.toLowerCase()).toEqual(address.toLowerCase());
+  });
 });
