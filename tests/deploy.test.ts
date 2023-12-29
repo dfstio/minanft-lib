@@ -4,7 +4,8 @@ import { PrivateKey, PublicKey } from "o1js";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTEscrow } from "../src/escrow";
 import { MinaNFTBadge } from "../src/minanftbadge";
-import { Memory, initBlockchain, accountBalance } from "../utils/testhelpers";
+import { initBlockchain, accountBalance } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import {
   CONTRACT_DEPLOYER_SK,
   MINANFT_NFT_ADDRESS_SK,
@@ -40,6 +41,7 @@ import {
   MINANFT_NAME_SERVICE,
 } from "../src/config.json";
 
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;

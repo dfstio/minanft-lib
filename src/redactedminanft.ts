@@ -141,9 +141,9 @@ class RedactedMinaNFT extends BaseMinaNFT {
       });
       transactions.push(
         JSON.stringify({
-          el: element.toFields().map((f) => f.toJSON()),
-          ow: originalWitness.toFields().map((f) => f.toJSON()),
-          rw: redactedWitness.toFields().map((f) => f.toJSON()),
+          element: element.toFields().map((f) => f.toJSON()),
+          originalWitness: originalWitness.toFields().map((f) => f.toJSON()),
+          redactedWitness: redactedWitness.toFields().map((f) => f.toJSON()),
         })
       );
     });
