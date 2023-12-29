@@ -16,10 +16,7 @@ abstract class BackendPlugin {
   abstract compile(cache: Cache): Promise<void>;
   abstract create(transaction: string): Promise<string | undefined>;
   abstract merge(proof1: string, proof2: string): Promise<string | undefined>;
-  needFinalStep(): boolean {
-    return false;
-  }
-  public async final(proof: string): Promise<string | undefined> {
-    return proof;
-  }
+
+  abstract mint(): Promise<string | undefined>;
+  abstract verify(proof: string): Promise<string | undefined>;
 }
