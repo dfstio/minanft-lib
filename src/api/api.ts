@@ -102,7 +102,7 @@ export class api {
     const result = await this.apiHub("mint_v3", {
       transactions: [data.uri],
       developer: "@dfst",
-      name: "mint",
+      name: "nft",
       task: "mint",
       args: [
         data.signature,
@@ -132,7 +132,7 @@ export class api {
       transactions: data.commitData.transactions,
       developer: "@dfst",
       name: "post",
-      task: "post",
+      task: "mint",
       args: [
         data.commitData.signature,
         data.commitData.address,

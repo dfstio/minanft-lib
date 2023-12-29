@@ -23,7 +23,7 @@ import {
   MinaNFTTreeVerifier20,
 } from "../src/plugins/redactedtree20";
 import { JWT } from "../env.json";
-import api from "../src/api/api";
+import { api } from "../src/api/api";
 
 const blockchainInstance: blockchain = "testworld2";
 const maxElements = 100;
