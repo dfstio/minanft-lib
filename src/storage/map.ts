@@ -165,7 +165,7 @@ class MapData extends BaseMinaNFTObject {
     await file.pin(data.pinataJWT, data.arweaveKey);
     console.log("Calculating file Merkle tree root...");
     console.time("File Merkle tree root calculated");
-    await file.treeData();
+    await file.treeData(data.calculateRoot ?? true);
     console.timeEnd("File Merkle tree root calculated");
     console.time("Calculated SHA-3 512");
     await file.sha3_512();
