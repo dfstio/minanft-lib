@@ -56,6 +56,9 @@ interface MinaNFTImageUpdate {
   filename: string;
   pinataJWT?: string;
   arweaveKey?: string;
+  calculateRoot?: boolean;
+  IPFSHash?: string;
+  ArweaveHash?: string;
 }
 
 /**
@@ -71,6 +74,9 @@ interface MinaNFTFileUpdate {
   pinataJWT?: string;
   arweaveKey?: string;
   isPrivate?: boolean;
+  calculateRoot?: boolean;
+  IPFSHash?: string;
+  ArweaveHash?: string;
 }
 
 /**

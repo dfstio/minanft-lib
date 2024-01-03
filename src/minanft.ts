@@ -628,12 +628,22 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
     const file = new File(data.filename);
-    console.log("Pinning image...");
-    await file.pin(data.pinataJWT, data.arweaveKey);
-    console.log("Calculating image Merkle tree root...");
-    console.time("Image Merkle tree root calculated");
-    await file.treeData();
-    console.timeEnd("Image Merkle tree root calculated");
+    if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
+      console.log("Pinning image...");
+      await file.pin(data.pinataJWT, data.arweaveKey);
+    } else if (data.IPFSHash !== undefined) {
+      file.storage = "i:" + data.IPFSHash;
+      await file.setMetadata();
+    } else if (data.ArweaveHash !== undefined) {
+      file.storage = "a:" + data.ArweaveHash;
+      await file.setMetadata();
+    }
+    if (data.calculateRoot !== false) {
+      console.log("Calculating image Merkle tree root...");
+      console.time("Image Merkle tree root calculated");
+      await file.treeData(data.calculateRoot ?? true);
+      console.timeEnd("Image Merkle tree root calculated");
+    } else await file.treeData(false);
     console.time("Calculated SHA-3 512");
     await file.sha3_512();
     console.timeEnd("Calculated SHA-3 512");
@@ -663,14 +673,26 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename);
-    if (data.isPrivate !== true) {
-      console.log("Pinning file...");
-      await file.pin(data.pinataJWT, data.arweaveKey);
+
+    if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
+      if (data.isPrivate !== true) {
+        console.log("Pinning file...");
+        await file.pin(data.pinataJWT, data.arweaveKey);
+      }
+    } else if (data.IPFSHash !== undefined) {
+      file.storage = "i:" + data.IPFSHash;
+      await file.setMetadata();
+    } else if (data.ArweaveHash !== undefined) {
+      file.storage = "a:" + data.ArweaveHash;
+      await file.setMetadata();
     }
-    console.log("Calculating file Merkle tree root...");
-    console.time("File Merkle tree root calculated");
-    await file.treeData();
-    console.timeEnd("File Merkle tree root calculated");
+    if (data.calculateRoot !== false) {
+      console.log("Calculating file Merkle tree root...");
+      console.time("File Merkle tree root calculated");
+      await file.treeData(data.calculateRoot ?? true);
+      console.timeEnd("File Merkle tree root calculated");
+    } else await file.treeData(false);
+
     console.time("Calculated SHA-3 512");
     await file.sha3_512();
     console.timeEnd("Calculated SHA-3 512");

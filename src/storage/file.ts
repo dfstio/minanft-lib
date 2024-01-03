@@ -202,11 +202,27 @@ class File {
     }
   }
 
-  public async treeData(): Promise<{
+  public async setMetadata(): Promise<void> {
+    const metadata = await this.metadata();
+    this.size = metadata.size;
+    this.mimeType = metadata.mimeType;
+  }
+
+  public async treeData(calculateRoot: boolean): Promise<{
     root: Field;
     height: number;
     leavesNumber: number;
   }> {
+    if (calculateRoot === false) {
+      this.root = Field(0);
+      this.height = 0;
+      this.leavesNumber = 0;
+      return {
+        root: this.root,
+        height: this.height,
+        leavesNumber: this.leavesNumber,
+      };
+    }
     const fields: Field[] = [];
     let remainder: Uint8Array = new Uint8Array(0);
 
