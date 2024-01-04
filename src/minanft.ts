@@ -135,7 +135,8 @@ class MinaNFT extends BaseMinaNFT {
    * @param metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
    */
   public async loadMetadata(
-    metadataURI: string | undefined = undefined
+    metadataURI: string | undefined = undefined,
+    skipCalculatingMetadataRoot: boolean = false
   ): Promise<void> {
     if (this.address === undefined) {
       throw new Error("address is undefined");
@@ -286,7 +287,7 @@ class MinaNFT extends BaseMinaNFT {
               data: Field.fromJSON(data),
               kind: MinaNFT.stringToField(kind),
               isPrivate: isPrivate,
-              linkedObject: MapData.fromJSON(obj),
+              linkedObject: MapData.fromJSON(obj, skipCalculatingMetadataRoot),
             })
           );
           break;
@@ -309,11 +310,13 @@ class MinaNFT extends BaseMinaNFT {
     */
     if (!(await this.checkState("load metadata")))
       throw new Error("State verification error after loading metadata");
-    const { root } = this.getMetadataRootAndMap();
-    if (root.data.toJSON() !== this.metadataRoot.data.toJSON())
-      throw new Error("Metadata root data mismatch");
-    if (root.kind.toJSON() !== this.metadataRoot.kind.toJSON())
-      throw new Error("Metadata root kind mismatch");
+    if (skipCalculatingMetadataRoot === false) {
+      const { root } = this.getMetadataRootAndMap();
+      if (root.data.toJSON() !== this.metadataRoot.data.toJSON())
+        throw new Error("Metadata root data mismatch");
+      if (root.kind.toJSON() !== this.metadataRoot.kind.toJSON())
+        throw new Error("Metadata root kind mismatch");
+    }
   }
 
   /**
@@ -364,7 +367,7 @@ class MinaNFT extends BaseMinaNFT {
       const isPrivate: boolean = obj.isPrivate ?? false;
       if (data === undefined)
         throw new Error(
-          `uri: NFT metadata: data should present: ${key} : ${value} kind: ${kind} daya: ${data} isPrivate: ${isPrivate}`
+          `uri: NFT metadata: data should present: ${key} : ${value} kind: ${kind} data: ${data} isPrivate: ${isPrivate}`
         );
 
       if (kind === undefined || typeof kind !== "string")

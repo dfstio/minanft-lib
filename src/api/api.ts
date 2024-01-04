@@ -65,6 +65,7 @@ export class api {
 
   public async indexName(data: { name: string }): Promise<{
     success: boolean;
+    isIndexed: boolean;
     error?: string;
     reason?: string;
   }> {
@@ -75,12 +76,12 @@ export class api {
       task: "indexName",
       args: [data.name],
     });
-    const indexed =
-      result.data === undefined ? { success: false } : result.data;
+    const isIndexed = result?.data?.success ?? false;
     return {
       success: result.success,
-      error: result.error,
-      reason: indexed.reason,
+      isIndexed,
+      error: result.error ?? "",
+      reason: result?.data?.reason ?? "",
     };
   }
 
