@@ -16,6 +16,7 @@ export {
 export { MinaNFTBadge, MinaNFTBadgeConstructor } from "./minanftbadge";
 export { MinaNFTEscrow, EscrowTransferData } from "./escrow";
 export { RedactedMinaNFT } from "./redactedminanft";
+export { RedactedTree } from "./redactedtree";
 export { BaseMinaNFT } from "./baseminanft";
 export { PrivateMetadata } from "./privatemetadata";
 export { BaseMinaNFTObject } from "./baseminanftobject";
@@ -71,7 +72,12 @@ export { MinaNFTVerifier } from "./plugins/verifier";
 export { Escrow, EscrowDeposit } from "./plugins/escrow";
 export { IPFS } from "./storage/ipfs";
 export { ARWEAVE } from "./storage/arweave";
-export { File, FileData } from "./storage/file";
+export {
+  File,
+  FileData,
+  FILE_TREE_HEIGHT,
+  FILE_TREE_ELEMENTS,
+} from "./storage/file";
 export {
   MapData,
   MinaNFTMapUpdate,
