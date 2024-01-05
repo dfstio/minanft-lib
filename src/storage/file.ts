@@ -1,12 +1,16 @@
-export { File, FileData };
+export { File, FileData, FILE_TREE_HEIGHT, FILE_TREE_ELEMENTS };
 import { MerkleTree, Field, Encoding } from "o1js";
 import fs from "fs/promises";
 import { createHash } from "crypto";
 import path from "path";
 import mime from "mime";
 import { BaseMinaNFTObject } from "../baseminanftobject";
+import { RedactedTree } from "../redactedtree";
 import { IPFS } from "./ipfs";
 import { ARWEAVE } from "./arweave";
+
+const FILE_TREE_HEIGHT = 5;
+const FILE_TREE_ELEMENTS = 12;
 
 class FileData extends BaseMinaNFTObject {
   fileRoot: Field;
@@ -34,16 +38,24 @@ class FileData extends BaseMinaNFTObject {
     this.sha3_512 = value.sha3_512;
     this.filename = value.filename;
     this.storage = value.storage;
-    const treeHeight = 5;
-    const tree = new MerkleTree(treeHeight);
+    const tree = this.buildTree().tree;
+    this.root = tree.getRoot();
+  }
+
+  public buildTree(): { tree: MerkleTree; fields: Field[] } {
+    const tree = new MerkleTree(FILE_TREE_HEIGHT);
+    if (Number(tree.leafCount) < FILE_TREE_ELEMENTS)
+      throw new Error(
+        `FileData has wrong encoding, should be at least FILE_TREE_ELEMENTS (12) leaves`
+      );
     const fields: Field[] = [];
     // First field is the height, second number is the number of fields
-    fields.push(Field.from(treeHeight));
-    fields.push(Field.from(10)); // Number of data fields
+    fields.push(Field.from(FILE_TREE_HEIGHT)); // 0
+    fields.push(Field.from(FILE_TREE_ELEMENTS)); // Number of data fields // 1
 
-    fields.push(this.root);
-    fields.push(Field.from(this.height));
-    fields.push(Field.from(this.size));
+    fields.push(this.fileRoot); //2
+    fields.push(Field.from(this.height)); //3
+    fields.push(Field.from(this.size)); //4
     const mimeTypeFields = Encoding.stringToFields(
       this.mimeType.substring(0, 30)
     );
@@ -51,11 +63,11 @@ class FileData extends BaseMinaNFTObject {
       throw new Error(
         `FileData: MIME type string is too long, should be less than 30 bytes`
       );
-    fields.push(mimeTypeFields[0]);
+    fields.push(mimeTypeFields[0]); //5
     const sha512Fields = Encoding.stringToFields(this.sha3_512);
     if (sha512Fields.length !== 3)
       throw new Error(`SHA512 has wrong encoding, should be base64`);
-    fields.push(...sha512Fields);
+    fields.push(...sha512Fields); // 6,7,8
     const filenameFields = Encoding.stringToFields(
       this.filename.substring(0, 30)
     );
@@ -63,19 +75,23 @@ class FileData extends BaseMinaNFTObject {
       throw new Error(
         `FileData: Filename string is too long, should be less than 30 bytes`
       );
-    fields.push(filenameFields[0]);
+    fields.push(filenameFields[0]); // 9
     const storageFields: Field[] =
       this.storage === ""
         ? [Field(0), Field(0)]
         : Encoding.stringToFields(this.storage);
     if (storageFields.length !== 2)
       throw new Error(`Storage string has wrong encoding`);
-    fields.push(...storageFields);
-    if (fields.length !== 12)
-      throw new Error(`FileData has wrong encoding, should be 12 fields`);
+    fields.push(...storageFields); // 10, 11
+    if (fields.length !== FILE_TREE_ELEMENTS)
+      throw new Error(
+        `FileData has wrong encoding, should be FILE_TREE_ELEMENTS (12) fields`
+      );
+
     tree.fill(fields);
-    this.root = tree.getRoot();
+    return { tree, fields };
   }
+
   public toJSON(): object {
     return {
       type: this.type,
@@ -124,6 +140,18 @@ class FileData extends BaseMinaNFTObject {
       filename: data.filename,
       storage: data.storage,
     });
+  }
+
+  public async proof() {
+    const { tree, fields } = this.buildTree();
+    if (fields.length !== FILE_TREE_ELEMENTS)
+      throw new Error(`FileData: proof: wrong number of fields`);
+    const redactedTree = new RedactedTree(FILE_TREE_HEIGHT, tree);
+    for (let i = 0; i < fields.length; i++) {
+      redactedTree.set(i, fields[i]);
+    }
+    const proof = await redactedTree.proof();
+    return proof;
   }
 }
 
@@ -228,20 +256,38 @@ class File {
 
     const file: fs.FileHandle = await fs.open(this.filename);
     const stream = file.createReadStream();
+
+    function fillFields(bytes: Uint8Array): void {
+      let currentBigInt = BigInt(0);
+      let bitPosition = BigInt(0);
+      for (const byte of bytes) {
+        currentBigInt += BigInt(byte) << bitPosition;
+        bitPosition += BigInt(8);
+        if (bitPosition === BigInt(248)) {
+          fields.push(Field(currentBigInt.toString()));
+          currentBigInt = BigInt(0);
+          bitPosition = BigInt(0);
+        }
+      }
+    }
     for await (const chunk of stream) {
       const bytes: Uint8Array = new Uint8Array(remainder.length + chunk.length);
       if (remainder.length > 0) bytes.set(remainder);
       bytes.set(chunk as Buffer, remainder.length);
-      const chunkSize = Math.floor(bytes.length / 31) * 31;
-      fields.push(...Encoding.bytesToFields(bytes.slice(0, chunkSize)));
+      const fieldsNumber = Math.floor(bytes.length / 31);
+      const chunkSize = fieldsNumber * 31;
+      //const chunkFields = Encoding.bytesToFields(bytes.slice(0, chunkSize));
+      //fields.push(...chunkFields);
+      fillFields(bytes.slice(0, chunkSize));
       remainder = bytes.slice(chunkSize);
     }
-    if (remainder.length > 0) fields.push(...Encoding.bytesToFields(remainder));
+    if (remainder.length > 0) fillFields(remainder);
 
     const height = Math.ceil(Math.log2(fields.length + 2)) + 1;
     const tree = new MerkleTree(height);
     if (fields.length > tree.leafCount)
       throw new Error(`File is too big for this Merkle tree`);
+
     // First field is the height, second number is the number of fields
     tree.fill([Field.from(height), Field.from(fields.length), ...fields]);
     this.root = tree.getRoot();
@@ -265,6 +311,13 @@ class File {
     if (this.height === undefined) throw new Error(`File: height not set`);
     if (this.leavesNumber === undefined)
       throw new Error(`File: leavesNumber not set`);
+    if (
+      this.leavesNumber !== 0 &&
+      this.leavesNumber !== Math.ceil(this.size / 31)
+    ) {
+      console.log(`File: leavesNumber: ${this.leavesNumber}`);
+      console.log(`File: size: ${this.size}`);
+    }
     //const metadata = await this.metadata();
     //const sha3_512 = await this.sha3_512();
     //const treeData = await this.treeData();
