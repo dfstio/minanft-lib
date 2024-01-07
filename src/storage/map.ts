@@ -131,7 +131,7 @@ class MapData extends BaseMinaNFTObject {
       data.key,
       new PrivateMetadata({
         data: data.fileData.root,
-        kind: MinaNFT.stringToField("file"),
+        kind: MinaNFT.stringToField(data.fileData.type),
         isPrivate: data.isPrivate ?? false,
         linkedObject: data.fileData,
       })
@@ -160,7 +160,7 @@ class MapData extends BaseMinaNFTObject {
    * @param data {@link MinaNFTFileUpdate} update data
    */
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
-    const file = new File(data.filename);
+    const file = new File(data.filename, data.type ?? "file");
     console.log("Pinning file to IPFS...");
     await file.pin(data.pinataJWT, data.arweaveKey);
     console.log("Calculating file Merkle tree root...");
@@ -267,15 +267,13 @@ class MapData extends BaseMinaNFTObject {
             isPrivate,
           });
           break;
-        case "file":
+        default:
           map.updateFileData({
             key,
             fileData: FileData.fromJSON(value),
             isPrivate,
           });
           break;
-        default:
-          throw new Error("uri: NFT metadata: map json mismatch");
       }
     }
 
