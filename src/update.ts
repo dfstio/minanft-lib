@@ -77,6 +77,7 @@ interface MinaNFTFileUpdate {
   calculateRoot?: boolean;
   IPFSHash?: string;
   ArweaveHash?: string;
+  type?: string;
 }
 
 /**

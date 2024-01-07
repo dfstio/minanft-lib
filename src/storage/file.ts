@@ -8,6 +8,7 @@ import { BaseMinaNFTObject } from "../baseminanftobject";
 import { RedactedTree } from "../redactedtree";
 import { IPFS } from "./ipfs";
 import { ARWEAVE } from "./arweave";
+import Jimp from "jimp";
 
 const FILE_TREE_HEIGHT = 5;
 const FILE_TREE_ELEMENTS = 12;
@@ -29,8 +30,15 @@ class FileData extends BaseMinaNFTObject {
     sha3_512: string;
     filename: string;
     storage: string;
+    type?: string;
   }) {
-    super("file");
+    if (
+      value.type === "map" ||
+      value.type === "text" ||
+      value.type === "string"
+    )
+      throw new Error(`FileData: wrong type: ${value.type}`);
+    super(value.type ?? "file");
     this.fileRoot = value.fileRoot;
     this.height = value.height;
     this.size = value.size;
@@ -110,8 +118,6 @@ class FileData extends BaseMinaNFTObject {
     const data = obj.linkedObject;
     if (data === undefined)
       throw new Error(`uri: NFT metadata: data should be present: ${json}`);
-    if (data.type !== "file")
-      throw new Error(`uri: NFT metadata: type mismatch: ${json}`);
     if (data.fileMerkleTreeRoot === undefined)
       throw new Error(
         `uri: NFT metadata: fileMerkleTreeRoot should be present: ${json}`
@@ -139,10 +145,11 @@ class FileData extends BaseMinaNFTObject {
       sha3_512: data.SHA3_512,
       filename: data.filename,
       storage: data.storage,
+      type: data.type,
     });
   }
 
-  public async proof() {
+  public async proof(verbose?: boolean) {
     const { tree, fields } = this.buildTree();
     if (fields.length !== FILE_TREE_ELEMENTS)
       throw new Error(`FileData: proof: wrong number of fields`);
@@ -150,7 +157,7 @@ class FileData extends BaseMinaNFTObject {
     for (let i = 0; i < fields.length; i++) {
       redactedTree.set(i, fields[i]);
     }
-    const proof = await redactedTree.proof();
+    const proof = await redactedTree.proof(verbose);
     return proof;
   }
 }
@@ -164,9 +171,13 @@ class File {
   root?: Field;
   height?: number;
   leavesNumber?: number;
-  constructor(filename: string) {
+  type: string;
+  constructor(filename: string, type: string) {
     this.filename = filename;
     this.storage = "";
+    if (type === "map" || type === "text" || type === "string")
+      throw new Error(`File: wrong type: ${type}`);
+    this.type = type;
   }
   public async metadata(): Promise<{
     size: number;
@@ -236,21 +247,7 @@ class File {
     this.mimeType = metadata.mimeType;
   }
 
-  public async treeData(calculateRoot: boolean): Promise<{
-    root: Field;
-    height: number;
-    leavesNumber: number;
-  }> {
-    if (calculateRoot === false) {
-      this.root = Field(0);
-      this.height = 0;
-      this.leavesNumber = 0;
-      return {
-        root: this.root,
-        height: this.height,
-        leavesNumber: this.leavesNumber,
-      };
-    }
+  public async binaryFields(): Promise<Field[]> {
     const fields: Field[] = [];
     let remainder: Uint8Array = new Uint8Array(0);
 
@@ -269,6 +266,7 @@ class File {
           bitPosition = BigInt(0);
         }
       }
+      if (Number(bitPosition) > 0) fields.push(Field(currentBigInt.toString()));
     }
     for await (const chunk of stream) {
       const bytes: Uint8Array = new Uint8Array(remainder.length + chunk.length);
@@ -282,6 +280,45 @@ class File {
       remainder = bytes.slice(chunkSize);
     }
     if (remainder.length > 0) fillFields(remainder);
+    stream.close();
+    return fields;
+  }
+
+  public async pngFields(): Promise<Field[]> {
+    const fields: Field[] = [];
+    const file = await fs.readFile(this.filename);
+    const png = await Jimp.read(file);
+    fields.push(Field(png.bitmap.width));
+    fields.push(Field(png.bitmap.height));
+    fields.push(Field(png.bitmap.data.length));
+    for (let i = 0; i < png.bitmap.data.length; i += 4) {
+      const value =
+        BigInt(png.bitmap.data[i]) +
+        (BigInt(png.bitmap.data[i + 1]) << BigInt(8)) +
+        (BigInt(png.bitmap.data[i + 2]) << BigInt(16)) +
+        (BigInt(png.bitmap.data[i + 3]) << BigInt(24));
+      fields.push(Field(value));
+    }
+    return fields;
+  }
+
+  public async treeData(calculateRoot: boolean): Promise<{
+    root: Field;
+    height: number;
+    leavesNumber: number;
+  }> {
+    if (calculateRoot === false) {
+      this.root = Field(0);
+      this.height = 0;
+      this.leavesNumber = 0;
+      return {
+        root: this.root,
+        height: this.height,
+        leavesNumber: this.leavesNumber,
+      };
+    }
+    const fields: Field[] =
+      this.type === "png" ? await this.binaryFields() : await this.pngFields();
 
     const height = Math.ceil(Math.log2(fields.length + 2)) + 1;
     const tree = new MerkleTree(height);
@@ -293,7 +330,6 @@ class File {
     this.root = tree.getRoot();
     this.height = height;
     this.leavesNumber = fields.length;
-    stream.close();
     return { root: this.root, height, leavesNumber: this.leavesNumber };
   }
 
@@ -329,6 +365,7 @@ class File {
       sha3_512: this.sha3_512_hash,
       filename: path.basename(this.filename).slice(0, 30),
       storage: this.storage,
+      type: this.type,
     });
   }
 }
