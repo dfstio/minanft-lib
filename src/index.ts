@@ -19,7 +19,7 @@ export { RedactedMinaNFT } from "./redactedminanft";
 export { RedactedTree } from "./redactedtree";
 export { BaseMinaNFT } from "./baseminanft";
 export { PrivateMetadata } from "./privatemetadata";
-export { BaseMinaNFTObject } from "./baseminanftobject";
+export { BaseMinaNFTObject, MinaNFTObjectType } from "./baseminanftobject";
 export { MinaNFTContract } from "./contract/nft";
 export {
   MinaNFTNameServiceContract,
@@ -75,6 +75,7 @@ export { ARWEAVE } from "./storage/arweave";
 export {
   File,
   FileData,
+  FileDataType,
   FILE_TREE_HEIGHT,
   FILE_TREE_ELEMENTS,
 } from "./storage/file";

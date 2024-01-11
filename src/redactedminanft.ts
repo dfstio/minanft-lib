@@ -19,6 +19,7 @@ import {
   MapElement,
 } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
+import { Memory } from "./mina";
 
 class RedactedMinaNFT extends BaseMinaNFT {
   nft: MinaNFT;
@@ -42,7 +43,10 @@ class RedactedMinaNFT extends BaseMinaNFT {
    *
    * @returns proof
    */
-  public async proof(): Promise<RedactedMinaNFTMapStateProof> {
+  public async proof(
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    verbose: boolean = false
+  ): Promise<RedactedMinaNFTMapStateProof> {
     await MinaNFT.compileRedactedMap();
 
     //console.log("Creating proof for redacted maps...");
@@ -82,6 +86,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
         redactedWitnesses[i]
       );
       proofs.push(proof);
+      if (verbose) Memory.info(`Proof ${i + 1}/${elements.length} created`);
     }
     originalWitnesses = [];
     redactedWitnesses = [];
@@ -97,6 +102,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
         await RedactedMinaNFTMapCalculation.merge(state, proof, proofs[i]);
       proof = mergedProof;
       mergedProof = null;
+      if (verbose) Memory.info(`Proof ${i}/${proofs.length - 1} merged`);
     }
     proofs = [];
 

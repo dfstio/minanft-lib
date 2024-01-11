@@ -631,7 +631,7 @@ class MinaNFT extends BaseMinaNFT {
    * @param data {@link MinaNFTImageUpdate} update data
    */
   public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
-    const file = new File(data.filename, "image");
+    const file = new File(data.filename, data.fileType, data.fileMetadata);
     if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
       console.log("Pinning image...");
       await file.pin(data.pinataJWT, data.arweaveKey);
@@ -676,7 +676,7 @@ class MinaNFT extends BaseMinaNFT {
    * @param data {@link MinaNFTFileUpdate} update data
    */
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
-    const file = new File(data.filename, data.type ?? "file");
+    const file = new File(data.filename, data.fileType, data.fileMetadata);
 
     if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
       if (data.isPrivate !== true) {
