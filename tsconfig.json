@@ -17,8 +17,7 @@
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
     "out": "docs",
-    "plugin": [
-      ],
+    "plugin": [],
     "excludeExternals": true,
     "sourceLinkTemplate": "https://github.com/dfstio/minanft-lib/blob/master/{path}#L{line}"
   },
