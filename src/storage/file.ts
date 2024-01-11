@@ -1,4 +1,4 @@
-export { File, FileData, FILE_TREE_HEIGHT, FILE_TREE_ELEMENTS };
+export { File, FileData, FileDataType, FILE_TREE_HEIGHT, FILE_TREE_ELEMENTS };
 import { MerkleTree, Field, Encoding } from "o1js";
 import fs from "fs/promises";
 import { createHash } from "crypto";
@@ -11,7 +11,8 @@ import { ARWEAVE } from "./arweave";
 import Jimp from "jimp";
 
 const FILE_TREE_HEIGHT = 5;
-const FILE_TREE_ELEMENTS = 12;
+const FILE_TREE_ELEMENTS = 14;
+type FileDataType = "binary" | "png" | "word";
 
 class FileData extends BaseMinaNFTObject {
   fileRoot: Field;
@@ -21,6 +22,8 @@ class FileData extends BaseMinaNFTObject {
   sha3_512: string;
   filename: string;
   storage: string;
+  fileType?: FileDataType;
+  metadata?: Field;
 
   constructor(value: {
     fileRoot: Field;
@@ -30,15 +33,10 @@ class FileData extends BaseMinaNFTObject {
     sha3_512: string;
     filename: string;
     storage: string;
-    type?: string;
+    fileType?: FileDataType;
+    metadata?: Field;
   }) {
-    if (
-      value.type === "map" ||
-      value.type === "text" ||
-      value.type === "string"
-    )
-      throw new Error(`FileData: wrong type: ${value.type}`);
-    super(value.type ?? "file");
+    super("file");
     this.fileRoot = value.fileRoot;
     this.height = value.height;
     this.size = value.size;
@@ -46,6 +44,8 @@ class FileData extends BaseMinaNFTObject {
     this.sha3_512 = value.sha3_512;
     this.filename = value.filename;
     this.storage = value.storage;
+    this.fileType = value.fileType ?? "binary";
+    this.metadata = value.metadata ?? Field(0);
     const tree = this.buildTree().tree;
     this.root = tree.getRoot();
   }
@@ -91,9 +91,18 @@ class FileData extends BaseMinaNFTObject {
     if (storageFields.length !== 2)
       throw new Error(`Storage string has wrong encoding`);
     fields.push(...storageFields); // 10, 11
+    const fileType = this.fileType ?? "binary";
+    const fileTypeFields = Encoding.stringToFields(fileType.substring(0, 30));
+    if (fileTypeFields.length !== 1)
+      throw new Error(
+        `FileData: fileType string is too long, should be less than 30 bytes`
+      );
+    fields.push(...fileTypeFields); // 12
+    const metadata: Field = this.metadata ?? Field(0);
+    fields.push(metadata); // 13
     if (fields.length !== FILE_TREE_ELEMENTS)
       throw new Error(
-        `FileData has wrong encoding, should be FILE_TREE_ELEMENTS (12) fields`
+        `FileData has wrong encoding, should be FILE_TREE_ELEMENTS (14) fields`
       );
 
     tree.fill(fields);
@@ -101,8 +110,8 @@ class FileData extends BaseMinaNFTObject {
   }
 
   public toJSON(): object {
+    const metadata: Field = this.metadata ?? Field(0);
     return {
-      type: this.type,
       fileMerkleTreeRoot: this.fileRoot.toJSON(),
       MerkleTreeHeight: this.height,
       size: this.size,
@@ -110,6 +119,8 @@ class FileData extends BaseMinaNFTObject {
       SHA3_512: this.sha3_512,
       filename: this.filename,
       storage: this.storage,
+      fileType: this.fileType ?? "binary",
+      metadata: metadata.toJSON(),
     };
   }
   public static fromJSON(json: object): FileData {
@@ -145,7 +156,8 @@ class FileData extends BaseMinaNFTObject {
       sha3_512: data.SHA3_512,
       filename: data.filename,
       storage: data.storage,
-      type: data.type,
+      fileType: data.fileType ?? "binary",
+      metadata: data.metadata ? Field.fromJSON(data.metadata) : Field(0),
     });
   }
 
@@ -171,13 +183,13 @@ class File {
   root?: Field;
   height?: number;
   leavesNumber?: number;
-  type: string;
-  constructor(filename: string, type: string) {
+  fileType: FileDataType;
+  fileMetadata: Field;
+  constructor(filename: string, fileType?: FileDataType, fileMetadata?: Field) {
     this.filename = filename;
     this.storage = "";
-    if (type === "map" || type === "text" || type === "string")
-      throw new Error(`File: wrong type: ${type}`);
-    this.type = type;
+    this.fileType = fileType ?? "binary";
+    this.fileMetadata = fileMetadata ?? Field(0);
   }
   public async metadata(): Promise<{
     size: number;
@@ -318,7 +330,9 @@ class File {
       };
     }
     const fields: Field[] =
-      this.type === "png" ? await this.binaryFields() : await this.pngFields();
+      this.fileType === "png"
+        ? await this.pngFields()
+        : await this.binaryFields();
 
     const height = Math.ceil(Math.log2(fields.length + 2)) + 1;
     const tree = new MerkleTree(height);
@@ -365,7 +379,8 @@ class File {
       sha3_512: this.sha3_512_hash,
       filename: path.basename(this.filename).slice(0, 30),
       storage: this.storage,
-      type: this.type,
+      fileType: this.fileType,
+      metadata: this.fileMetadata,
     });
   }
 }

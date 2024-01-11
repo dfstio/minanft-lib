@@ -15,6 +15,7 @@ export {
 import { MinaNFTNameService } from "./minanftnames";
 import { EscrowTransfer, EscrowApproval } from "./contract/escrow";
 import { Field, PrivateKey, PublicKey, Signature } from "o1js";
+import { FileDataType } from "./storage/file";
 
 /**
  * MinaNFTStringUpdate is the data for the update of the metadata to be written to the NFT state
@@ -59,6 +60,8 @@ interface MinaNFTImageUpdate {
   calculateRoot?: boolean;
   IPFSHash?: string;
   ArweaveHash?: string;
+  fileType?: FileDataType;
+  fileMetadata?: Field;
 }
 
 /**
@@ -77,7 +80,8 @@ interface MinaNFTFileUpdate {
   calculateRoot?: boolean;
   IPFSHash?: string;
   ArweaveHash?: string;
-  type?: string;
+  fileType?: FileDataType;
+  fileMetadata?: Field;
 }
 
 /**
