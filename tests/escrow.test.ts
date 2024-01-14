@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, it } from "@jest/globals";
 import {
   Field,
@@ -16,14 +17,15 @@ import { EscrowTransfer } from "../src/contract/escrow";
 import { MinaNFTEscrow } from "../src/escrow";
 import { EscrowDeposit } from "../src/plugins/escrow";
 import {
-  Memory,
   accountBalance,
   blockchain,
   initBlockchain,
 } from "../utils/testhelpers";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PINATA_JWT } from "../env.json";
+import { Memory } from "../src/mina";
 
-const pinataJWT = PINATA_JWT;
+const pinataJWT = ""; //PINATA_JWT;
 const blockchainInstance: blockchain = 'local';
 
 let deployer: PrivateKey | undefined = undefined;
@@ -114,9 +116,11 @@ describe(`MinaNFT contract`, () => {
 
   let sellerDeposited: EscrowDeposit | undefined = undefined;
   let buyerDeposited: EscrowDeposit | undefined = undefined;
+  const nftPrivateKey = PrivateKey.random();
+  const nftPublicKey = nftPrivateKey.toPublicKey();
 
   const escrow = new MinaNFTEscrow();
-  const nft = new MinaNFT({ name: `@test`});
+  const nft = new MinaNFT({ name: `@test`, address: nftPublicKey});
 
   it(`should deploy Escrow contract`, async () => {
     expect(escrowPrivateKey).toBeDefined();
