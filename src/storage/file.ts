@@ -296,6 +296,23 @@ class File {
     return fields;
   }
 
+  public static fillFields( bytes: Uint8Array ): Field[] {
+    const fields: Field[] = [];
+    let currentBigInt = BigInt(0);
+      let bitPosition = BigInt(0);
+      for (const byte of bytes) {
+        currentBigInt += BigInt(byte) << bitPosition;
+        bitPosition += BigInt(8);
+        if (bitPosition === BigInt(248)) {
+          fields.push(Field(currentBigInt.toString()));
+          currentBigInt = BigInt(0);
+          bitPosition = BigInt(0);
+        }
+      }
+      if (Number(bitPosition) > 0) fields.push(Field(currentBigInt.toString()));
+    return fields;
+  }
+
   public async pngFields(): Promise<Field[]> {
     const fields: Field[] = [];
     const file = await fs.readFile(this.filename);

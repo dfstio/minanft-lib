@@ -56,7 +56,7 @@ class Escrow extends SmartContract {
   @method approveSale(deposited: EscrowDeposit, seller: PublicKey) {
     deposited.data.oldOwner.assertEquals(Poseidon.hash(seller.toFields()));
     deposited.data.tokenId.assertEquals(Field(0)); // should be MINA
-    this.emitEvent("deposit", deposited.data);
+    this.emitEvent("approveSale", deposited.data);
   }
 
   @method transfer(
