@@ -63,12 +63,15 @@ const { MINAFEE, MINANFT_NAME_SERVICE } = config;
 /**
  * MinaNFT is the class for the NFT, wrapper around the MinaNFTContract
  * @property name Name of the NFT
+ * @property creator Creator of the NFT
  * @property storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
  * @property owner Owner of the NFT - Poseidon hash of owner's public key
  * @property escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
  * @property version Version of the NFT, increases by one with the changing of the metadata or owner
  * @property isMinted True if the NFT is minted
  * @property address Public key of the deployed NFT zkApp
+ * @property tokenId Token ID of the NFT Name Service
+ * @property nameService Public key of the NFT Name Service
  * @property updates Array of the metadata updates
  * @property metadataRoot Root of the Merkle Map of the metadata
  */
@@ -100,6 +103,11 @@ class MinaNFT extends BaseMinaNFT {
    * Create MinaNFT object
    * @param name Name of NFT
    * @param address Public key of the deployed NFT zkApp
+   * @param creator Creator of the NFT
+   * @param storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
+   * @param owner Owner of the NFT - Poseidon hash of owner's public key
+   * @param escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
+   * @param nameService Public key of the NFT Name Service
    */
   constructor(params: {
     name: string;
@@ -133,7 +141,8 @@ class MinaNFT extends BaseMinaNFT {
   /**
    * Load metadata from blockchain and IPFS/Arweave
    * @param metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
-   */
+   * @param skipCalculatingMetadataRoot Skip calculating metadata root in case metadataURI is not provided and NFT contains private data
+  */
   public async loadMetadata(
     metadataURI: string | undefined = undefined,
     skipCalculatingMetadataRoot: boolean = false
@@ -323,7 +332,7 @@ class MinaNFT extends BaseMinaNFT {
    * Load metadata from blockchain and IPFS/Arweave
    * @param metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
    * @param nameServiceAddress Public key of the Name Service
-   * @param skipCalculatingMetadataRoot Skip calculating metadata root in case metadataURI does not contains private data
+   * @param skipCalculatingMetadataRoot Skip calculating metadata root
    * @returns MinaNFT object
    */
   public static fromJSON(params: {
@@ -447,7 +456,7 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Creates a Map from JSON
-   * @param map map to convert
+   * @param json json with map data
    * @returns map as JSON object
    */
   public static mapFromJSON(json: object): Map<string, string> {
@@ -458,7 +467,7 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Converts a NFT to JSON
-   * @returns map as JSON object
+   * @returns JSON object
    */
   public toJSON(): object {
     return this.exportToJSON();
@@ -484,9 +493,9 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
-   * Converts a Map to JSON
+   * Converts to JSON
    * @param increaseVersion increase version by one
-   * @returns map as JSON object
+   * @returns JSON object
    */
   public exportToJSON(increaseVersion: boolean = false): object {
     let description: string | undefined = undefined;
@@ -545,7 +554,7 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Initialize Mina o1js library
-   * @param local Choose Mina network to use. Default is local network
+   * @param chain blockchain to initialize
    */
   public static minaInit(chain: blockchain):
     | {
@@ -759,7 +768,7 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Checks that on-chain state is equal to off-chain state
-   *
+   * @param info additional info for logging
    * @returns true if on-chain state is equal to off-chain state
    */
   public async checkState(info: string = ""): Promise<boolean> {
@@ -835,7 +844,7 @@ class MinaNFT extends BaseMinaNFT {
    * Generates recursive proofs for all updates,
    * than verify the proof locally and send the transaction to the blockchain
    *
-   * @param deployer Private key of the account that will commit the updates
+   * @param commitData {@link MinaNFTCommit} commit data
    */
   public async commit(
     commitData: MinaNFTCommit
@@ -1004,7 +1013,7 @@ class MinaNFT extends BaseMinaNFT {
   /**
    * Prepare commit updates of the MinaNFT to blockchain
    *
-   * @param deployer Private key of the account that will commit the updates
+   * @param commitData {@link MinaNFTPrepareCommit} commit data
    */
   public async prepareCommitData(
     commitData: MinaNFTPrepareCommit
@@ -1108,7 +1117,7 @@ class MinaNFT extends BaseMinaNFT {
    * Generates recursive proofs for all updates,
    * than verify the proof locally and send the transaction to the blockchain
    *
-   * @param deployer Private key of the account that will commit the updates
+   * @param commitData {@link MinaNFTCommit} commit data
    */
   public static async commitPreparedData(commitData: {
     deployer: PrivateKey;
@@ -1280,6 +1289,13 @@ class MinaNFT extends BaseMinaNFT {
     return proof;
   }
 */
+
+/*
+* Pins NFT to IPFS or Arweave
+* @param pinataJWT Pinata JWT
+* @param arweaveKey Arweave key
+* @returns NFT's storage hash and hash string
+*/
   private async pinToStorage(
     pinataJWT: string | undefined,
     arweaveKey: string | undefined
@@ -1373,6 +1389,12 @@ class MinaNFT extends BaseMinaNFT {
   }
   */
 
+  /*
+  * Logs transaction info
+  * @param tx transaction
+  * @param description description
+  * @param wait wait for transaction to be included in the block
+  */
   public static async transactionInfo(
     tx: Mina.TransactionId,
     description: string = "",
@@ -1406,6 +1428,10 @@ class MinaNFT extends BaseMinaNFT {
     }
   }
 
+  /*
+  * Wait for transaction to be included in the block
+  * @param tx transaction
+  */
   public static async wait(tx: Mina.TransactionId): Promise<boolean> {
     try {
       Mina.getNetworkState();
@@ -1426,7 +1452,7 @@ class MinaNFT extends BaseMinaNFT {
   }
 
   /**
-   * Mints an NFT. Deploys and compiles the MinaNFT contract if needed. Takes a long time.
+   * Mints an NFT. Deploys and compiles the MinaNFT contract if needed.
    * @param minaData: {@link MinaNFTMint} mint data
    * @param skipCalculatingMetadataRoot: skip calculating metadata root in case the NFT is imported from the JSON that do not contains private metadata and therefore the root cannot be calculated
    */
@@ -1435,7 +1461,7 @@ class MinaNFT extends BaseMinaNFT {
     skipCalculatingMetadataRoot: boolean = false
   ): Promise<Mina.TransactionId | undefined> {
     const {
-      nameService,
+      nameService : nameServiceArg,
       deployer,
       owner: ownerArg,
       pinataJWT,
@@ -1445,8 +1471,9 @@ class MinaNFT extends BaseMinaNFT {
       nonce: nonceArg,
       signature: signatureArg,
     } = minaData;
-    if (nameService === undefined)
-      throw new Error("Names service is undefined");
+    const nameService = nameServiceArg ?? new MinaNFTNameService({
+      address: PublicKey.fromBase58(MINANFT_NAME_SERVICE),
+    });
     const escrow: Field = escrowArg ?? Field(0);
     const owner: Field = ownerArg ?? this.owner;
     if (owner.toJSON() === Field(0).toJSON())
@@ -1586,6 +1613,8 @@ class MinaNFT extends BaseMinaNFT {
    * @param escrow1 Public key of the first escrow
    * @param escrow2 Public key of the second escrow
    * @param escrow3 Public key of the third escrow
+   * @param nameService Name service
+   * @param nonce Nonce
    */
   public async transfer(
     transferData: MinaNFTTransfer
@@ -1667,13 +1696,10 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Approve the escrow for the NFT. Compiles the contract if needed.
-   *
-   * @param deployer Private key of the account that will commit the updates
-   * @param data Escrow approval data
-   * @param signature Signature of the owner
+   * @param approvalData {@link MinaNFTApproval} approval data
    */
   public async approve(
-    aprovalData: MinaNFTApproval
+    approvalData: MinaNFTApproval
   ): Promise<Mina.TransactionId | undefined> {
     const {
       deployer,
@@ -1682,7 +1708,7 @@ class MinaNFT extends BaseMinaNFT {
       ownerPublicKey,
       nameService,
       nonce: nonceArg,
-    } = aprovalData;
+    } = approvalData;
     if (this.address === undefined) {
       throw new Error("NFT contract is not deployed");
       return;
@@ -1739,6 +1765,9 @@ class MinaNFT extends BaseMinaNFT {
    * Verify Redacted MinaNFT proof
    *
    * @param deployer Private key of the account that will commit the updates
+   * @param verifier Public key of the Verifier contract that will verify the proof
+   * @param nft Public key of the NFT contract
+   * @param nameServiceAddress Public key of the Name Service contract
    * @param proof Redacted MinaNFT proof
    */
   public static async verify(params: {

@@ -5,15 +5,28 @@ import config from "../config";
 import { MinaNFTCommitData } from "../update";
 const { MINNFTAPIAUTH, MINNFTAPI } = config;
 
+/*
+* API class for interacting with the serverless api
+* @property jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
+* @property endpoint The endpoint of the serverless api
+*/
 export class api {
   jwt: string;
   endpoint: string;
 
+  /*
+    * Constructor for the API class
+    * @param jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
+    */
   constructor(jwt: string) {
     this.jwt = jwt;
     this.endpoint = MINNFTAPI;
   }
 
+  /*
+    * Gets the address (publicKey) of the NFT using serverless api call
+    * @param name The name of the NFT
+    */
   public async lookupName(name: string): Promise<{
     success: boolean;
     error?: string;
@@ -35,6 +48,11 @@ export class api {
     };
   }
 
+  /*
+    * Reserves the name of the NFT using serverless api call
+    * @param name The name of the NFT
+    * @param publicKey The public key of the NFT
+    */
   public async reserveName(data: { name: string; publicKey: string }): Promise<{
     success: boolean;
     error?: string;
@@ -63,6 +81,12 @@ export class api {
     };
   }
 
+  /*
+    * Index the NFT using serverless api call
+    * The NFT mint transaction should be included in the block before calling this function
+    * otherwise it will fail and return isIndexed : false
+    * @param name The name of the NFT
+    */
   public async indexName(data: { name: string }): Promise<{
     success: boolean;
     isIndexed: boolean;
@@ -88,7 +112,11 @@ export class api {
   /*
    * Mints a new NFT using serverless api call
    * @param uri the uri of the metadata
+   * @param signature the signature returned by the reserveName call
    * @param privateKey the private key of the address where NFT should be minted
+   * @param useArweave true if the metadata should be uploaded to the Arweave, default is IPFS
+   * @returns { success: boolean, error?: string, jobId?: string }
+   * where jonId is the jobId of the minting transaction
    */
   public async mint(data: {
     uri: string;
@@ -116,8 +144,12 @@ export class api {
 
   /*
    * Creates a new post for existing NFT using serverless api call
-   * @param uri the uri of the metadata
-   * @param privateKey the private key of the address where NFT should be minted
+   * @param commitData the commit data
+   * @param ownerPublicKey the owner's public key
+   * @param nftName the name of the NFT
+   * @param postName the name of the post
+   * @returns { success: boolean, error?: string, jobId?: string }
+   * where jonId is the jobId of the minting transaction
    */
   public async post(data: {
     commitData: MinaNFTCommitData;
@@ -146,6 +178,18 @@ export class api {
     return { success: result.success, jobId: result.data, error: result.error };
   }
 
+  /*
+    * Starts a new job for the proof calculation using serverless api call
+    * The developer and name should correspond to the BackupPlugin of the API
+    * All other parameters should correspond to the parameters of the BackupPlugin
+    * @param transactions the transactions
+    * @param developer the developer
+    * @param name the name of the job
+    * @param task the task of the job
+    * @param args the arguments of the job
+    * @returns { success: boolean, error?: string, jobId?: string }
+    * where jonId is the jobId of the job
+    */
   public async proof(data: {
     transactions: string[];
     developer: string;
@@ -171,6 +215,16 @@ export class api {
       };
   }
 
+  /*
+    * Gets the result of the job using serverless api call
+    * @param jobId the jobId of the job
+    * @returns { success: boolean, error?: string, result?: any }
+    * where result is the result of the job
+    * if the job is not finished yet, the result will be undefined
+    * if the job failed, the result will be undefined and error will be set
+    * if the job is finished, the result will be set and error will be undefined
+    * if the job is not found, the result will be undefined and error will be set
+    */
   public async jobResult(data: { jobId: string }): Promise<{
     success: boolean;
     error?: string;
@@ -192,6 +246,11 @@ export class api {
       };
   }
 
+  /*
+    * Gets the billing report for the jobs sent using JWT
+    * @returns { success: boolean, error?: string, result?: any }
+    * where result is the billing report
+    */
   public async queryBilling(): Promise<{
     success: boolean;
     error?: string;
@@ -213,6 +272,15 @@ export class api {
       };
   }
 
+  /*
+    * Waits for the job to finish
+    * @param jobId the jobId of the job
+    * @param maxAttempts the maximum number of attempts, default is 360 (2 hours)
+    * @param interval the interval between attempts, default is 20000 (20 seconds)
+    * @param maxErrors the maximum number of network errors, default is 10
+    * @returns { success: boolean, error?: string, result?: any }
+    * where result is the result of the job
+    */
   public async waitForJobResult(data: {
     jobId: string;
     maxAttempts?: number;
@@ -267,6 +335,11 @@ export class api {
     };
   }
 
+  /*
+    * Calls the serverless API
+    * @param command the command of the API
+    * @param data the data of the API
+    * */
   private async apiHub(
     command: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -299,101 +372,3 @@ export class api {
   }
 }
 
-/*
-
-  public async mint(data: { uri: string; privateKey?: string }): Promise<{
-    success: boolean;
-    error?: string;
-    jobId?: string;
-  }> {
-    console.log("mint");
-    const result = await this.apiHub("mint_v2", data);
-    return { success: result.success, error: result.error, jobId: result.data };
-  }
-  
-  public async sum(data: { transactions: string[] }): Promise<{
-    success: boolean;
-    error?: string;
-    jobId?: string;
-  }> {
-    console.log("sum");
-    const result = await this.apiHub("sum", data);
-    return { success: result.success, error: result.error, jobId: result.data };
-  }
-
-  public async sum_v2(data: {
-    transactions: string[];
-    task: string;
-    arguments: string[];
-  }): Promise<{
-    success: boolean;
-    error?: string;
-    jobId?: string;
-  }> {
-    console.log("sum_v2");
-    const result = await this.apiHub("sum_v2", data);
-    return { success: result.success, error: result.error, jobId: result.data };
-  }
-
-  public async sum_v2_result(data: { jobId: string }): Promise<{
-    success: boolean;
-    error?: string;
-    result?: any;
-  }> {
-    //console.log("sum_v2_result", data);
-    const result = await this.apiHub("sum_v2_result", data);
-    return {
-      success: result.success,
-      error: result.error,
-      result: result.data,
-    };
-  }
-
-  public async tree(data: {
-    transactions: string[];
-    task: string;
-    arguments: string[];
-  }): Promise<{
-    success: boolean;
-    error?: string;
-    jobId?: string;
-  }> {
-    //console.log("tree", data);
-    const result = await this.apiHub("tree", data);
-    return { success: result.success, error: result.error, jobId: result.data };
-  }
-
-  public async tree_result(data: { jobId: string }): Promise<{
-    success: boolean;
-    error?: string;
-    result?: any;
-  }> {
-    //console.log("sum_v2_result", data);
-    const result = await this.apiHub("sum_v2_result", data);
-    return {
-      success: result.success,
-      error: result.error,
-      result: result.data,
-    };
-  }
-
-  public async computeRecursiveProof(data: {
-    contractName: string;
-    transactions: string[];
-  }): Promise<{
-    success: boolean;
-    error?: string;
-    jobId?: string;
-  }> {
-    const result = await this.apiHub("computeRecursiveProof", data);
-    return { success: result.success, error: result.error, jobId: result.data };
-  }
-
-  public async retreiveProof(jobId: string): Promise<{
-    success: boolean;
-    error?: string;
-    proof?: string;
-  }> {
-    return { success: false };
-  }
-*/
