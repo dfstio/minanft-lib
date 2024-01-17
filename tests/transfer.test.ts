@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { describe, expect, it } from "@jest/globals";
 import {
   Field,
@@ -12,7 +14,8 @@ import {
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import {  blockchain, initBlockchain } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import { PINATA_JWT } from "../env.json";
 
 const CONTRACTS_NUMBER = 2;
@@ -82,11 +85,14 @@ describe(`MinaNFT contract`, () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     for (let i = 0; i < CONTRACTS_NUMBER; i++) {
-      nft.push(new MinaNFT({ name: `@test`}));
-      nft[i].update({ key: `description`, value: `my nft @test` });
-      nft[i].update({ key: `twitter`, value: `@builder` });
+      const nftPrivateKey = PrivateKey.random();
+      const nftPublicKey = nftPrivateKey.toPublicKey();
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
+      nft.push(new MinaNFT({ name: `@test`, address: nftPublicKey, owner: ownerHash}));
+      nft[i].update({ key: `description`, value: `my nft @test` });
+      nft[i].update({ key: `twitter`, value: `@builder` });
+
 
       const tx = await nft[i].mint({
         deployer,

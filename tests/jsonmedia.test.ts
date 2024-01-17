@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it } from "@jest/globals";
 import fs from "fs/promises";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let json: any = undefined;
 
 describe(`MinaNFT json media`, () => {
@@ -29,6 +29,7 @@ describe(`MinaNFT json media`, () => {
     //kind: text string image file map
     //name: description image
 
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
     function iterateProperties(properties: any, level: number = 0) {
       for (const key in properties) {
         console.log(`key:`, key, properties[key]);
@@ -91,6 +92,7 @@ describe(`MinaNFT json media`, () => {
     }
 
     iterateProperties(properties);
+    /*
     const metadata = {
       media,
       audio,
@@ -99,6 +101,7 @@ describe(`MinaNFT json media`, () => {
       strings,
     };
     //console.log(`metadata:`, metadata);
+    */
     expect(attachments.length).toBe(1);
     expect(media.length).toBe(3);
     expect(audio.length).toBe(1);

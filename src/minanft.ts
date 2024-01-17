@@ -1290,7 +1290,7 @@ class MinaNFT extends BaseMinaNFT {
   }
 */
 
-/*
+/**
 * Pins NFT to IPFS or Arweave
 * @param pinataJWT Pinata JWT
 * @param arweaveKey Arweave key
@@ -1389,7 +1389,7 @@ class MinaNFT extends BaseMinaNFT {
   }
   */
 
-  /*
+  /**
   * Logs transaction info
   * @param tx transaction
   * @param description description

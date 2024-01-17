@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { describe, expect, it } from "@jest/globals";
 import {
   Mina,
@@ -10,11 +11,13 @@ import {
   JsonProof,
   verify,
   Cache,
+  VerificationKey,
 } from "o1js";
 import { formatTime } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import {  blockchain, initBlockchain } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import { TreeElement } from "../src/plugins/redactedtree";
 import {
   MerkleTreeWitness20,
@@ -25,7 +28,7 @@ import {
 import { JWT } from "../env.json";
 import { api } from "../src/api/api";
 
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 const maxElements = 100;
 const minMaskLength = 4;
 
@@ -40,7 +43,7 @@ const size = 2 ** (20 - 1);
 //const proofs: TreeStateProof[] = [];
 //let proof: TreeStateProof | undefined = undefined;
 const transactions: string[] = [];
-let verificationKey: string | undefined = undefined;
+let verificationKey: VerificationKey | undefined = undefined;
 let tx: Mina.TransactionId | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
 let deployer: PrivateKey | undefined = undefined;

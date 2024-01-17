@@ -9,7 +9,7 @@ import { CONTRACT_DEPLOYER_SK, VERIFIER_SK } from "../env.json";
 import { CONTRACT_DEPLOYER, VERIFIER } from "../src/config.json";
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = false;
+const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;
 

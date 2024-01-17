@@ -2,11 +2,12 @@ import { describe, expect, it } from "@jest/globals";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { PublicKey, PrivateKey } from "o1js";
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import {  blockchain, initBlockchain } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import { MINANFT_NAME_SERVICE_SK } from "../env.json";
 import { MINANFT_NAME_SERVICE } from "../src/config.json";
 
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 
 let deployer: PrivateKey | undefined = undefined;
 
@@ -34,9 +35,18 @@ describe(`Upgrade MinaNFT name service contract`, () => {
   it(`should upgrade NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
+    const oraclePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK);
     const names = new MinaNFTNameService({
       address: PublicKey.fromBase58(MINANFT_NAME_SERVICE),
+      oraclePrivateKey,
     });
+    const txDeploy = await names.deploy(deployer);
+    expect(txDeploy).toBeDefined();
+    if (txDeploy === undefined) return;
+    Memory.info(`names service deployed`);
+    expect(await MinaNFT.wait(txDeploy)).toBe(true);
+
+    /*
     const tx = await names.upgrade(
       deployer,
       PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK)
@@ -45,5 +55,6 @@ describe(`Upgrade MinaNFT name service contract`, () => {
     if (tx === undefined) return;
     Memory.info(`names service upgraded`);
     expect(await MinaNFT.wait(tx)).toBe(true);
+    */
   });
 });

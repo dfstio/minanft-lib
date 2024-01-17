@@ -5,12 +5,12 @@ import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
-import { PINATA_JWT, JWT, NAMES_ORACLE_SK } from "../env.json";
+import { PINATA_JWT, NAMES_ORACLE_SK } from "../env.json";
 import { MINANFT_NAME_SERVICE } from "../src/config.json";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 const includeFiles = false;
 const includeImage = true;
 
@@ -39,7 +39,7 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`compiled`);
   });
 
-  /*
+  
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -54,7 +54,8 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
   });
-*/
+
+  /*
   it(`should use existing NameService`, async () => {
     oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
     const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
@@ -63,6 +64,7 @@ describe(`MinaNFT contract`, () => {
       address: nameServiceAddress,
     });
   });
+  */
 
   it(`should mint NFT`, async () => {
     expect(deployer).toBeDefined();
@@ -88,12 +90,14 @@ describe(`MinaNFT contract`, () => {
       await nft.updateImage({
         filename: "./images/navigator.jpg",
         pinataJWT,
+        calculateRoot : false
       });
     if (includeFiles) {
       await nft.updateFile({
         key: "sea",
         filename: "./images/sea.png",
         pinataJWT,
+        calculateRoot: false
       });
     }
     const map = new MapData();
@@ -108,6 +112,7 @@ describe(`MinaNFT contract`, () => {
         key: "woman",
         filename: "./images/woman.png",
         pinataJWT,
+        calculateRoot: false
       });
     const mapLevel3 = new MapData();
     mapLevel3.update({ key: `level3-1`, value: `value31` });

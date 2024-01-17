@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { describe, expect, it } from "@jest/globals";
 import { Account, PrivateKey, PublicKey, Mina, Poseidon } from "o1js";
 
@@ -6,16 +7,16 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { MinaNFTBadge } from "../src/minanftbadge";
 import {
   makeString,
-  Memory,
   blockchain,
   initBlockchain,
 } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import { PINATA_JWT } from "../env.json";
 
 const CONTRACTS_NUMBER = 1;
 const ITERATIONS_NUMBER = 2;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
@@ -96,14 +97,17 @@ describe(`MinaNFT contract - load metadata from blockchain`, () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     for (let i = 0; i < CONTRACTS_NUMBER; i++) {
-      const nft = new MinaNFT({ name: `@test${i}` });
+      const nftPrivateKey = PrivateKey.random();
+      const nftPublicKey = nftPrivateKey.toPublicKey();
+      const owner: PrivateKey = PrivateKey.random();
+      const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
+      const nft = new MinaNFT({ name: `@test${i}`, address: nftPublicKey, owner: ownerHash});
       nft.update({ key: `twitter`, value: `@builder${i}` });
       nft.updateText({
         key: `description`,
         text: `This is my long description of the NFT ${i}. Can be of any length, supports **markdown**.`,
       });
-      const owner: PrivateKey = PrivateKey.random();
-      const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
+
 
       const tx = await nft.mint({
         deployer,
