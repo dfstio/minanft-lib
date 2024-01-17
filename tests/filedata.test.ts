@@ -1,5 +1,4 @@
 import { describe, expect, it } from "@jest/globals";
-import { MinaNFT } from "../src/minanft";
 import { Memory } from "../src/mina";
 import { FileData } from "../src/storage/file";
 

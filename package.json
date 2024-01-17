@@ -95,8 +95,7 @@
     "testTimeout": 10800000,
     "verbose": true,
     "roots": [
-      "tests",
-      "experimental"
+      "tests"
     ],
     "setupFilesAfterEnv": [
       "./jest-config.ts"

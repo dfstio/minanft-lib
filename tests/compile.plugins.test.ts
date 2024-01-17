@@ -1,7 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { describe, expect, it } from "@jest/globals";
 import { Mina } from "o1js";
 import { MinaNFT } from "../src/minanft";
-import { Memory } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 
 beforeAll(async () => {
   const Local = Mina.LocalBlockchain({ proofsEnabled: true });

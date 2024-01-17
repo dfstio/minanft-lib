@@ -5,7 +5,7 @@ import config from "../config";
 import { MinaNFTCommitData } from "../update";
 const { MINNFTAPIAUTH, MINNFTAPI } = config;
 
-/*
+/**
 * API class for interacting with the serverless api
 * @property jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
 * @property endpoint The endpoint of the serverless api
@@ -14,7 +14,7 @@ export class api {
   jwt: string;
   endpoint: string;
 
-  /*
+  /**
     * Constructor for the API class
     * @param jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
     */
@@ -23,7 +23,7 @@ export class api {
     this.endpoint = MINNFTAPI;
   }
 
-  /*
+  /**
     * Gets the address (publicKey) of the NFT using serverless api call
     * @param name The name of the NFT
     */
@@ -48,7 +48,7 @@ export class api {
     };
   }
 
-  /*
+  /**
     * Reserves the name of the NFT using serverless api call
     * @param name The name of the NFT
     * @param publicKey The public key of the NFT
@@ -81,7 +81,7 @@ export class api {
     };
   }
 
-  /*
+  /**
     * Index the NFT using serverless api call
     * The NFT mint transaction should be included in the block before calling this function
     * otherwise it will fail and return isIndexed : false
@@ -109,7 +109,7 @@ export class api {
     };
   }
 
-  /*
+  /**
    * Mints a new NFT using serverless api call
    * @param uri the uri of the metadata
    * @param signature the signature returned by the reserveName call
@@ -142,7 +142,7 @@ export class api {
     return { success: result.success, jobId: result.data, error: result.error };
   }
 
-  /*
+  /**
    * Creates a new post for existing NFT using serverless api call
    * @param commitData the commit data
    * @param ownerPublicKey the owner's public key
@@ -178,7 +178,7 @@ export class api {
     return { success: result.success, jobId: result.data, error: result.error };
   }
 
-  /*
+  /** 
     * Starts a new job for the proof calculation using serverless api call
     * The developer and name should correspond to the BackupPlugin of the API
     * All other parameters should correspond to the parameters of the BackupPlugin
@@ -215,7 +215,7 @@ export class api {
       };
   }
 
-  /*
+  /** 
     * Gets the result of the job using serverless api call
     * @param jobId the jobId of the job
     * @returns { success: boolean, error?: string, result?: any }
@@ -246,7 +246,7 @@ export class api {
       };
   }
 
-  /*
+  /**
     * Gets the billing report for the jobs sent using JWT
     * @returns { success: boolean, error?: string, result?: any }
     * where result is the billing report
@@ -272,7 +272,7 @@ export class api {
       };
   }
 
-  /*
+  /**
     * Waits for the job to finish
     * @param jobId the jobId of the job
     * @param maxAttempts the maximum number of attempts, default is 360 (2 hours)
@@ -335,7 +335,7 @@ export class api {
     };
   }
 
-  /*
+  /** 
     * Calls the serverless API
     * @param command the command of the API
     * @param data the data of the API

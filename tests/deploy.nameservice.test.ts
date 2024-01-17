@@ -3,7 +3,8 @@ import { PrivateKey, PublicKey, fetchAccount } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
-import { Memory, initBlockchain, accountBalance } from "../utils/testhelpers";
+import { initBlockchain, accountBalance } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import {
   CONTRACT_DEPLOYER_SK,
   MINANFT_NAME_SERVICE_SK,
@@ -12,6 +13,7 @@ import {
 import { MINANFT_NAME_SERVICE, NAMES_ORACLE } from "../src/config.json";
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;

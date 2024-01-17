@@ -3,18 +3,20 @@ import { PrivateKey, PublicKey, Poseidon } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { PINATA_JWT } from "../env.json";
 import { MapData } from "../src/storage/map";
+import { Memory } from "../src/mina";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 let nftPublicKey: PublicKey | undefined = undefined;
 const nftName = `@test`;
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 let metadataURI: string = "";
 
 beforeAll(async () => {
@@ -60,11 +62,13 @@ describe(`MinaNFT contract`, () => {
     if (nameService === undefined) return;
     expect(oraclePrivateKey).toBeDefined();
     if (oraclePrivateKey === undefined) return;
+    const nftPrivateKey = PrivateKey.random();
+    nftPublicKey = nftPrivateKey.toPublicKey();
     const ownerPrivateKey = PrivateKey.random();
     const ownerPublicKey = ownerPrivateKey.toPublicKey();
     const owner = Poseidon.hash(ownerPublicKey.toFields());
 
-    const nft = new MinaNFT({ name: nftName });
+    const nft = new MinaNFT({ name: nftName, address: nftPublicKey, owner });
     nft.updateText({
       key: `description`,
       text: "This is my long description of the NFT. Can be of any length, supports markdown.",
@@ -75,6 +79,7 @@ describe(`MinaNFT contract`, () => {
     await nft.updateImage({
       filename: "./images/navigator.jpg",
       pinataJWT,
+      calculateRoot: false,
     });
 
     await nft.updateFile({
@@ -82,6 +87,7 @@ describe(`MinaNFT contract`, () => {
       filename: "./images/image.jpg",
       pinataJWT,
       isPrivate: true,
+      calculateRoot: false,
     });
 
     const map = new MapData();
@@ -98,6 +104,7 @@ describe(`MinaNFT contract`, () => {
       filename: "./images/woman.png",
       pinataJWT,
       isPrivate: true,
+      calculateRoot: false,
     });
 
     const mapLevel3 = new MapData();

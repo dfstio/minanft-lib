@@ -9,19 +9,21 @@ import {
   MerkleTree,
   JsonProof,
   verify,
+  VerificationKey,
 } from "o1js";
 import { formatTime } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import {  blockchain, initBlockchain } from "../utils/testhelpers";
+import { Memory } from "../src/mina";
 import {
   MinaNFTTreeVerifierFunction,
   TreeElement,
 } from "../src/plugins/redactedtree";
 import { JWT } from "../env.json";
-import api from "../src/api/api";
+import { api } from "../src/api/api";
 
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 const height = 20;
 const maxElements = 100;
 const minMaskLength = 5;
@@ -38,16 +40,19 @@ const tree = new MerkleTree(height);
 const redactedTree = new MerkleTree(height);
 const leaves: Field[] = [];
 const mask: boolean[] = [];
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 let maskLength: number = 0;
 const size = 2 ** (height - 1);
 //const proofs: TreeStateProof[] = [];
 //let proof: TreeStateProof | undefined = undefined;
 const transactions: string[] = [];
-let verificationKey: string | undefined = undefined;
+let verificationKey: VerificationKey | undefined = undefined;
 let tx: Mina.TransactionId | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
 let deployer: PrivateKey | undefined = undefined;
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 let jobId: string = "";
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 let proof: string = "";
 
 beforeAll(async () => {

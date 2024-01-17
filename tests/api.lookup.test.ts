@@ -1,8 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
-import { MinaNFT } from "../src/minanft";
 import { PublicKey } from "o1js";
 import { api } from "../src/api/api";
-import { Memory } from "../src/mina";
 import { JWT } from "../env.json";
 
 describe(`MinaNFT mint using api`, () => {

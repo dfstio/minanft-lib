@@ -5,13 +5,13 @@ import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
-import { ARWEAVE_KEY_STRING, JWT, NAMES_ORACLE_SK } from "../env.json";
+import { ARWEAVE_KEY_STRING, NAMES_ORACLE_SK } from "../env.json";
 import { MINANFT_NAME_SERVICE } from "../src/config.json";
 import { MapData } from "../src/storage/map";
 import { ARWEAVE } from "../src/storage/arweave";
 
 const arweaveKey = ARWEAVE_KEY_STRING;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 const includeFiles = true;
 
 let deployer: PrivateKey | undefined = undefined;
@@ -39,7 +39,7 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`compiled`);
   });
 
-  /*
+
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -54,7 +54,8 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
   });
-*/
+
+  /*
   it(`should use existing NameService`, async () => {
     oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
     const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
@@ -63,6 +64,7 @@ describe(`MinaNFT contract`, () => {
       address: nameServiceAddress,
     });
   });
+  */
 
   it(`should mint NFT`, async () => {
     const arweave = new ARWEAVE(arweaveKey);
@@ -94,6 +96,7 @@ describe(`MinaNFT contract`, () => {
       await nft.updateImage({
         filename: "./images/navigator.jpg",
         arweaveKey,
+        calculateRoot: false
       });
 
     const map = new MapData();
@@ -108,6 +111,7 @@ describe(`MinaNFT contract`, () => {
         key: "woman",
         filename: "./images/woman.png",
         arweaveKey,
+        calculateRoot: false
       });
     const mapLevel3 = new MapData();
     mapLevel3.update({ key: `level3-1`, value: `value31` });

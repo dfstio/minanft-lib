@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, expect, it } from "@jest/globals";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
-import { PublicKey, PrivateKey, Poseidon } from "o1js";
+import { PublicKey, PrivateKey, Poseidon, Signature } from "o1js";
 import { api } from "../src/api/api";
 import { blockchain, initBlockchain, makeString } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
@@ -138,13 +139,32 @@ describe(`MinaNFT mint using api`, () => {
   it(`should mint NFT using api call`, async () => {
     expect(nft).toBeDefined();
     if (nft === undefined) return;
+    expect(nftPrivateKey).toBeDefined();
+    if (nftPrivateKey === undefined) return;
     const minanft = new api(JWT);
     const uri = nft.exportToString({
       increaseVersion: true,
       includePrivateData: false,
     });
     //console.log("uri", uri);
-    const result = await minanft.mint({ uri });
+
+    const reserved = await minanft.reserveName({
+      name: nft.name,
+      publicKey: nft.address.toBase58(),
+    });
+    console.log("Reserved:", reserved);
+    if (
+      !reserved.success ||
+      !reserved.isReserved ||
+      reserved.signature === undefined
+    ) {
+      throw new Error("Name not reserved");
+    }
+
+    console.log("Minting...");
+    const result = await minanft.mint({ uri,
+      signature: reserved.signature,
+      privateKey: nftPrivateKey.toBase58(), });
     console.log("mint result", result);
     expect(result.success).toBe(true);
   });

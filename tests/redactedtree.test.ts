@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { describe, expect, it } from "@jest/globals";
 import {
   Mina,
@@ -9,16 +10,18 @@ import {
   Field,
   MerkleTree,
   JsonProof,
+  VerificationKey,
 } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import { blockchain, initBlockchain } from "../utils/testhelpers";
 import {
   MinaNFTTreeVerifierFunction,
   TreeElement,
 } from "../src/plugins/redactedtree";
+import { Memory } from "../src/mina";
 
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 const height = 16;
 const maxElements = 100;
 const minMaskLength = 5;
@@ -42,7 +45,7 @@ const size = 2 ** (height - 1);
 //let proof: TreeStateProof | undefined = undefined;
 const proofs: string[] = [];
 let mergedProof: string = "";
-let verificationKey: string | undefined = undefined;
+let verificationKey: VerificationKey | undefined = undefined;
 let tx: Mina.TransactionId | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
 
@@ -256,6 +259,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee() },
       () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         zkApp.verifyRedactedTree(proof!);
       }
     );
