@@ -1,8 +1,10 @@
 import { describe, expect, it } from "@jest/globals";
-import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
+import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64, AccountUpdate } from "o1js";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
+import { MinaNFT } from "../src/minanft";
 const TESTNET = "https://proxy.testworld.minaexplorer.com/graphql";
 
+const topup : boolean = false;
 
 describe("deployers", () => {
   it("should get deployers balance", async () => {
@@ -20,6 +22,32 @@ describe("deployers", () => {
     deployers.push(privateKey);
     const balanceDeployer =
       Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) / 1e9;
+
+      if( topup && balanceDeployer > 61) {
+        const privateKeyNew = PrivateKey.random();
+        const publicKey = privateKeyNew.toPublicKey();
+        const sender = privateKey.toPublicKey();
+      await fetchAccount({ publicKey: sender });
+      await fetchAccount({ publicKey });
+      const hasAccount = Mina.hasAccount(publicKey);
+
+      const transaction = await Mina.transaction(
+        { sender, fee: "160000000"},
+        () => {
+          if (!hasAccount) AccountUpdate.fundNewAccount(sender);
+          const senderUpdate = AccountUpdate.create(sender);
+          senderUpdate.requireSignature();
+          senderUpdate.send({ to: publicKey, amount: 30_000_000_000n });
+        }
+      );
+      await transaction.prove();
+      transaction.sign([privateKey]);
+      const tx = await transaction.send();
+      const hash = tx.hash();
+      if( hash !== undefined) 
+        console.log(`"${privateKeyNew.toBase58()}",`);
+
+      } else {
     console.log(
       `Balance of the Deployer`,
       i,
@@ -27,6 +55,7 @@ describe("deployers", () => {
       balanceDeployer.toLocaleString(`en`),
       //privateKey.toPublicKey().toBase58()
     );
+      }
     /*
     if (balanceDeployer <= 1) {
       try {
