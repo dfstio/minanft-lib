@@ -25,6 +25,5 @@
   },
   "include": [
     "src/**/*"
-  ],
-  "files": ["src/config.json"],
+  ]
 }

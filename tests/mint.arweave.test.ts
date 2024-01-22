@@ -6,7 +6,7 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { ARWEAVE_KEY_STRING, NAMES_ORACLE_SK } from "../env.json";
-import { MINANFT_NAME_SERVICE } from "../src/config.json";
+//import { MINANFT_NAME_SERVICE } from "../src/config.json";
 import { MapData } from "../src/storage/map";
 import { ARWEAVE } from "../src/storage/arweave";
 

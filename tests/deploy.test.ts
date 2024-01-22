@@ -23,7 +23,8 @@ import {
   BADGE_LINKEDIN_ORACLE_SK,
   MINANFT_NAME_SERVICE_SK,
 } from "../env.json";
-import {
+import config from "../src/config";
+const {
   CONTRACT_DEPLOYER,
   MINANFT_NFT_ADDRESS,
   BADGE_TWITTER,
@@ -39,7 +40,7 @@ import {
   BADGE_GITHUB_ORACLE,
   BADGE_LINKEDIN_ORACLE,
   MINANFT_NAME_SERVICE,
-} from "../src/config.json";
+} = config;
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
 const useLocalBlockchain: boolean = true;

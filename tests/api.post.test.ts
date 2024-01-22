@@ -7,7 +7,7 @@ import { api } from "../src/api/api";
 import { blockchain, initBlockchain, makeString } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { PINATA_JWT, JWT } from "../env.json";
-import { MINANFT_NAME_SERVICE } from "../src/config.json";
+import { MINANFT_NAME_SERVICE } from "../src/config";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = PINATA_JWT;

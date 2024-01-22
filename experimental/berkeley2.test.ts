@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64, AccountUpdate } from "o1js";
+import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64, AccountUpdate,  } from "o1js";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 import { MinaNFT } from "../src/minanft";
 const TESTNET = "https://proxy.testworld.minaexplorer.com/graphql";
@@ -11,12 +11,9 @@ describe("deployers", () => {
 
   let deployer: PrivateKey | undefined = undefined;
   const deployers: PrivateKey[] = [];
-  const network = Mina.Network({
-    mina: TESTNET,
-  });
-  Mina.setActiveInstance(network);
+  MinaNFT.minaInit('berkeley')
   deployer = PrivateKey.fromBase58(DEPLOYER);
-
+  let count = 0;
   for (let i = 0; i < DEPLOYERS.length; i++) {
     const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);
     deployers.push(privateKey);
@@ -48,6 +45,7 @@ describe("deployers", () => {
         console.log(`"${privateKeyNew.toBase58()}",`);
 
       } else 
+      /*
     console.log(
       `Balance of the Deployer`,
       i,
@@ -55,17 +53,23 @@ describe("deployers", () => {
       balanceDeployer.toLocaleString(`en`),
       //privateKey.toPublicKey().toBase58()
     );
-      
-    /*
+      */
+    
     if (balanceDeployer <= 1) {
+      console.log("Funding...")
       try {
-        await Mina.faucet(privateKey.toPublicKey());
+
+        if( count >= 0 ) {
+          await Mina.faucet(privateKey.toPublicKey());
+          await sleep(1000 * (600 + Math.floor(Math.random() * 600)));
+        }
+        count++;
       } catch (e) {
         console.log(e);
-        await sleep(1000 * 600);
+        await sleep(1000 * 60 * 60);
         await Mina.faucet(privateKey.toPublicKey());
       }
-      await sleep(1000 * (60 + Math.floor(Math.random() * 600)));
+      
       const balanceDeployer =
         Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) /
         1e9;
@@ -76,7 +80,7 @@ describe("deployers", () => {
         balanceDeployer.toLocaleString(`en`)
       );
     }
-    */
+    
   }
 
 
@@ -107,7 +111,7 @@ describe("deployers", () => {
     );
   }
   */
-})
+}, 1000 * (60 * 60 * 24))
 });
 
 async function accountBalance(address: PublicKey): Promise<UInt64> {

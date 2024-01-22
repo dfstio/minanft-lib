@@ -6,7 +6,7 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { PINATA_JWT, NAMES_ORACLE_SK } from "../env.json";
-import { MINANFT_NAME_SERVICE } from "../src/config.json";
+//import { MINANFT_NAME_SERVICE } from "../src/config.json";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = PINATA_JWT;

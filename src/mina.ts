@@ -7,41 +7,49 @@ export {
   accountBalance,
   accountBalanceMina,
   formatTime,
+  MinaNetwork
 };
 
-import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount } from "o1js";
-import config from "../src/config";
-const { MINAURL, ARCHIVEURL, TESTWORLD2, TESTWORLD2_ARCHIVE } = config;
+import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount} from "o1js";
+import { MinaNetworkURL, Berkeley, Lightnet as Lightnet} from "./networks";
 
-type blockchain = "local" | "berkeley" | "testworld2" | "mainnet";
 
-function initBlockchain(instance: blockchain):
-  | {
-      publicKey: PublicKey;
-      privateKey: PrivateKey;
-    }[]
-  | undefined {
+type blockchain = "local" | "berkeley" | "lighnet" | "mainnet";
+
+interface MinaNetwork {
+  keys: {
+    publicKey: PublicKey;
+    privateKey: PrivateKey;
+  }[];
+  url?: MinaNetworkURL;
+}
+
+
+function initBlockchain(instance: blockchain): MinaNetwork {
   if (instance === "local") {
     const Local = Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
-    return Local.testAccounts;
-  } else if (instance === "berkeley" || instance === "testworld2") {
-    const network = Mina.Network(
-      instance === "berkeley"
-        ? {
-            mina: MINAURL,
-            archive: ARCHIVEURL,
-          }
-        : {
-            mina: TESTWORLD2,
-            archive: TESTWORLD2_ARCHIVE,
-          }
-    );
+    return { keys: Local.testAccounts };
+  } else if (instance === "berkeley") {
+    const network = Mina.Network({
+            mina: Berkeley.graphql,
+            archive: Berkeley.archive,
+
+  });
     Mina.setActiveInstance(network);
+    return { keys: [], url: Berkeley}
+  } else if ( instance === 'lighnet') {
+    const network = Mina.Network({
+            mina: Lightnet.graphql,
+            archive: Lightnet.archive,
+            lightnetAccountManager: Lightnet.accountManager
+
+  });
+    Mina.setActiveInstance(network);
+    return { keys: [], url: Lightnet}
   } else {
-    throw new Error("Mainnet is not supported yet.");
+    throw new Error("Mainnet is not supported yet by zkApps");
   }
-  return undefined;
 }
 
 async function accountBalance(address: PublicKey): Promise<UInt64> {
