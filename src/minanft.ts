@@ -55,7 +55,7 @@ import {
   MinaNFTCommitData,
 } from "./update";
 import { MapData } from "./storage/map";
-import { blockchain, initBlockchain } from "./mina";
+import { blockchain, initBlockchain, MinaNetwork } from "./mina";
 import config from "./config";
 import { MinaNFTNameService } from "./minanftnames";
 const { MINAFEE, MINANFT_NAME_SERVICE } = config;
@@ -556,12 +556,7 @@ class MinaNFT extends BaseMinaNFT {
    * Initialize Mina o1js library
    * @param chain blockchain to initialize
    */
-  public static minaInit(chain: blockchain):
-    | {
-        publicKey: PublicKey;
-        privateKey: PrivateKey;
-      }[]
-    | undefined {
+  public static minaInit(chain: blockchain): MinaNetwork {
     return initBlockchain(chain);
   }
 

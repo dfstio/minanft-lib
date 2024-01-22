@@ -10,7 +10,8 @@ import {
   MINANFT_NAME_SERVICE_SK,
   NAMES_ORACLE_SK,
 } from "../env.json";
-import { MINANFT_NAME_SERVICE, NAMES_ORACLE } from "../src/config.json";
+import config from "../src/config";
+const { MINANFT_NAME_SERVICE, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types

@@ -5,7 +5,8 @@ import { PublicKey, PrivateKey } from "o1js";
 import {  blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { MINANFT_NAME_SERVICE_SK } from "../env.json";
-import { MINANFT_NAME_SERVICE } from "../src/config.json";
+import config from "../src/config";
+const { MINANFT_NAME_SERVICE } = config;
 
 const blockchainInstance: blockchain = 'local';
 

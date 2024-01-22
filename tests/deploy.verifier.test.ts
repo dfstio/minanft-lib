@@ -6,7 +6,8 @@ import { RedactedMinaNFT } from "../src/redactedminanft";
 import { initBlockchain, accountBalance } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { CONTRACT_DEPLOYER_SK, VERIFIER_SK } from "../env.json";
-import { CONTRACT_DEPLOYER, VERIFIER } from "../src/config.json";
+import config from "../src/config";
+const { CONTRACT_DEPLOYER, VERIFIER } = config;
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
 const useLocalBlockchain: boolean = true;
