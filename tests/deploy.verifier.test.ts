@@ -10,13 +10,13 @@ import config from "../src/config";
 const { CONTRACT_DEPLOYER, VERIFIER } = config;
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = true;
+const useLocalBlockchain: boolean = false;
 
 let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   const data = await initBlockchain(
-    useLocalBlockchain ? "local" : "testworld2",
+    useLocalBlockchain ? "local" : 'berkeley',
     0
   );
   expect(data).toBeDefined();

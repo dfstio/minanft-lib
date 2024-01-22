@@ -15,7 +15,7 @@ const { MINANFT_NAME_SERVICE, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = true;
+const useLocalBlockchain: boolean = false;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -24,8 +24,7 @@ let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   const data = await initBlockchain(
-    useLocalBlockchain ? "local" : "testworld2",
-    0
+    useLocalBlockchain ? "local" : 'berkeley',
   );
   expect(data).toBeDefined();
   if (data === undefined) return;

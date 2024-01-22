@@ -1,20 +1,18 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 export {
   accountBalance,
   accountBalanceMina,
   sleep,
   makeString,
-  blockchain,
   initBlockchain,
 };
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
-import config from "../src/config";
+import { blockchain, initBlockchain as initBlockchainMina } from "../src/mina";
 import { Memory } from "../src/mina";
 
-const { MINAURL, ARCHIVEURL, TESTWORLD2 } = config;
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 
-type blockchain = "local" | "berkeley" | "testworld2" | "mainnet";
 
 async function initBlockchain(
   instance: blockchain,
@@ -32,18 +30,8 @@ async function initBlockchain(
       const { privateKey } = Local.testAccounts[i];
       deployers.push(privateKey);
     }
-  } else if (instance === "berkeley" || instance === "testworld2") {
-    const network = Mina.Network(
-      instance === "berkeley"
-        ? {
-            mina: MINAURL,
-            archive: ARCHIVEURL,
-          }
-        : {
-            mina: TESTWORLD2,
-          }
-    );
-    Mina.setActiveInstance(network);
+  } else if (instance === "berkeley") {
+    initBlockchainMina('berkeley');
     deployer = PrivateKey.fromBase58(DEPLOYER);
     for (let i = 0; i < deployersNumber; i++) {
       const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);

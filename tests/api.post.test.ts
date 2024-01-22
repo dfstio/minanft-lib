@@ -4,14 +4,15 @@ import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { PublicKey, PrivateKey, Poseidon, Signature } from "o1js";
 import { api } from "../src/api/api";
-import { blockchain, initBlockchain, makeString } from "../utils/testhelpers";
+import { initBlockchain, makeString } from "../utils/testhelpers";
+import { blockchain } from "../src/mina"
 import { Memory } from "../src/mina";
 import { PINATA_JWT, JWT } from "../env.json";
 import { MINANFT_NAME_SERVICE } from "../src/config";
 import { MapData } from "../src/storage/map";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'berkeley';
 const includeFiles = true;
 
 let deployer: PrivateKey | undefined = undefined;
