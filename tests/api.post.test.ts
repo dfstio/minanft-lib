@@ -8,8 +8,10 @@ import { initBlockchain, makeString } from "../utils/testhelpers";
 import { blockchain } from "../src/mina"
 import { Memory } from "../src/mina";
 import { PINATA_JWT, JWT } from "../env.json";
-import { MINANFT_NAME_SERVICE } from "../src/config";
+import config from "../src/config";
 import { MapData } from "../src/storage/map";
+
+const  { MINANFT_NAME_SERVICE } = config;
 
 const pinataJWT = PINATA_JWT;
 const blockchainInstance: blockchain = 'berkeley';

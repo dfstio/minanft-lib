@@ -8,7 +8,7 @@ const config = {
   ARCHIVEURL2: "https://api.minascan.io/archive/berkeley/v1/graphql",
   MINAEXPLORER: "https://berkeley.minaexplorer.com",
   */
-  MINAFEE: "2000000000",
+  MINAFEE: "200000000",
   MINNFTAPIAUTH:
     "AkRjS8yioA7i1CwvB3nOvcyLYh6sNMi4em7C0ybmYy67lhDC2KxEQtm1z45llEAR",
   MINNFTAPI: "https://n1zjzclr99.execute-api.eu-west-1.amazonaws.com/dev/api",

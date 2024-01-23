@@ -4,12 +4,12 @@ import {
 } from "o1js";
 import {
   blockchain,
-  initBlockchain,
   Memory,
   makeString,
   sleep,
   accountBalance,
   accountBalanceMina,
+  initBlockchain
 } from "../src/mina";
 
 const useBlockchain: blockchain = "local";
@@ -20,12 +20,10 @@ let deployers: {
 }[] | undefined = undefined;
 
 beforeAll(async () => {
-  const data = initBlockchain(
-    useBlockchain
-  );
+  const data = initBlockchain(useBlockchain);
   expect(data).toBeDefined();
   if (data === undefined) return;
-  deployers = data;
+  deployers = data.keys;
 
 });
 

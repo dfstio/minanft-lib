@@ -14,10 +14,10 @@ import { Memory } from "../src/mina";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PINATA_JWT } from "../env.json";
 
-const CONTRACTS_NUMBER = 1;
+const CONTRACTS_NUMBER = 30;
 const ITERATIONS_NUMBER = 2;
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "testworld2";
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
@@ -182,13 +182,13 @@ describe(`MinaNFT contract - load private metadata from json`, () => {
           nameService: nameService.address,
         });
         await nft.loadMetadata(metadata[i]);
-        nft.update({ key: `twitter`, value: makeString(15) });
+        //nft.update({ key: `twitter`, value: makeString(15) });
         nft.update({
           key: makeString(10),
           value: makeString(15),
           isPrivate: true,
         });
-        nft.update({ key: makeString(10), value: makeString(15) });
+        //nft.update({ key: makeString(10), value: makeString(15) });
         try {
           const tx = await nft.commit({
             deployer,

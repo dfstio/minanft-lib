@@ -10,7 +10,7 @@ import config from "../src/config";
 const { CONTRACT_DEPLOYER, VERIFIER } = config;
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = false;
+const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;
 

@@ -5,6 +5,7 @@ export {
   sleep,
   makeString,
   initBlockchain,
+  blockchain
 };
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
@@ -32,6 +33,13 @@ async function initBlockchain(
     }
   } else if (instance === "berkeley") {
     initBlockchainMina('berkeley');
+    deployer = PrivateKey.fromBase58(DEPLOYER);
+    for (let i = 0; i < deployersNumber; i++) {
+      const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);
+      deployers.push(privateKey);
+    }
+  } else if (instance === "testworld2") {
+    initBlockchainMina('testworld2');
     deployer = PrivateKey.fromBase58(DEPLOYER);
     for (let i = 0; i < deployersNumber; i++) {
       const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);

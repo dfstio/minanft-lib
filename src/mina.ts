@@ -11,10 +11,10 @@ export {
 };
 
 import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount} from "o1js";
-import { MinaNetworkURL, Berkeley, Lightnet as Lightnet} from "./networks";
+import { MinaNetworkURL, Berkeley, TestWorld2, Lightnet as Lightnet} from "./networks";
 
 
-type blockchain = "local" | "berkeley" | "lighnet" | "mainnet";
+type blockchain = "local" | "berkeley" | "lighnet" | "mainnet" | "testworld2";
 
 interface MinaNetwork {
   keys: {
@@ -38,7 +38,16 @@ function initBlockchain(instance: blockchain): MinaNetwork {
   });
     Mina.setActiveInstance(network);
     return { keys: [], url: Berkeley}
-  } else if ( instance === 'lighnet') {
+  } else if (instance === "testworld2") {
+    const network = Mina.Network({
+            mina: TestWorld2.graphql,
+            archive: TestWorld2.archive,
+
+  });
+    Mina.setActiveInstance(network);
+    return { keys: [], url: TestWorld2}
+  } 
+  else if ( instance === 'lighnet') {
     const network = Mina.Network({
             mina: Lightnet.graphql,
             archive: Lightnet.archive,

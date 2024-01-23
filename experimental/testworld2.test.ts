@@ -2,7 +2,8 @@ import { describe, expect, it } from "@jest/globals";
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64, AccountUpdate } from "o1js";
 import { DEPLOYER, DEPLOYERS } from "../env.json";
 import { MinaNFT } from "../src/minanft";
-const TESTNET = "https://proxy.testworld.minaexplorer.com/graphql";
+const TESTNET = "https://api.minascan.io/node/testworld/v1/graphql";
+//"https://proxy.testworld.minaexplorer.com/graphql";
 
 const topup : boolean = false;
 
