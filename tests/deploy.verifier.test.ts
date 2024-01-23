@@ -16,7 +16,7 @@ let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   const data = await initBlockchain(
-    useLocalBlockchain ? "local" : "testworld2",
+    useLocalBlockchain ? "local" : 'berkeley',
     0
   );
   expect(data).toBeDefined();

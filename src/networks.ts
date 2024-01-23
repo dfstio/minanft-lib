@@ -1,4 +1,4 @@
-export { MinaNetworkURL, Berkeley, Lightnet };
+export { MinaNetworkURL, Berkeley, Lightnet, TestWorld2 };
 
 interface MinaNetworkURL {
   graphql: string;
@@ -18,6 +18,16 @@ const Berkeley : MinaNetworkURL = {
   chainId: 'berkeley', 
   name: 'Berkeley'
 };
+
+const TestWorld2 : MinaNetworkURL = {
+  graphql: "https://api.minascan.io/node/testworld/v1/graphql",
+  archive: "https://api.minascan.io/archive/testworld/v1/graphql",
+  explorerAccountUrl: "https://minascan.io/testworld/account/",
+  explorerTransactionUrl: "https://minascan.io/testworld/tx/",
+  chainId: 'testworld2', 
+  name: 'TestWorld2'
+};
+
 
 const Lightnet: MinaNetworkURL = {
   graphql: "http://localhost:8080/graphql",

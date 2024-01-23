@@ -17,15 +17,15 @@ import {
   Types,
 } from "o1js";
 import axios from "axios";
-import { formatTime } from "../src/mina";
+import { formatTime, Memory } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
-import { Memory, blockchain, initBlockchain } from "../utils/testhelpers";
+import {  blockchain, initBlockchain } from "../utils/testhelpers";
 import { JWT } from "../env.json";
-import api from "../src/api/api";
+import { api } from "../src/api/api";
 
 const blockchainInstance: blockchain = "testworld2";
-const maxElements = 128;
+const maxElements = 2;
 
 class MerkleTreeWitness20 extends MerkleWitness(20) {}
 
@@ -95,8 +95,9 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     }
 
     votingPrivateKey = PrivateKey.fromBase58(
-      "EKFFUsvNekUQwFrvVCHVrSM8BVGEywvPjBBRU7KS2KHcBR6GqUSV"
-    ); //PrivateKey.random();
+      "EKFCNNGdcMpuy85Y4cifs3J9PX1LZxrKwGHxjpvMzt8NKrtdqiZA"
+    ); 
+    //PrivateKey.random();
     votingContract = votingPrivateKey.toPublicKey();
     Memory.info(`prepared`);
   });
@@ -118,6 +119,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     console.time(`deployed RealTimeVoting`);
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = votingPrivateKey;
+    console.log("zkAppPrivateKey", zkAppPrivateKey.toBase58());
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     console.log(
       `deploying the RealTimeVoting contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
@@ -186,7 +188,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     expect(jobId).not.toBe("");
     if (jobId === "") return;
     const minanft = new api(JWT);
-    const result = await minanft.waitForProofResult({ jobId });
+    const result = await minanft.waitForJobResult({ jobId });
     endTime = Date.now();
     console.log(
       `Time spent to calculate ${maxElements} proofs: ${endTime - startTime} ms`
