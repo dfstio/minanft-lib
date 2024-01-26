@@ -15,6 +15,7 @@ import { MinaNFTVerifierBadge } from "./plugins/badge";
 import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
 import { PrivateMetadata } from "./privatemetadata";
+import { sleep } from "./mina";
 
 // Dummy class to ovecome o1js compile bug - fixed now
 /*
@@ -242,6 +243,7 @@ class BaseMinaNFT {
 
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
+      await sleep(100); // alow GC to run
       //await Key.compile(options);
       const { verificationKey } = await MinaNFTMetadataUpdate.compile(options);
       console.timeEnd("MinaNFTMetadataUpdate compiled");
@@ -250,6 +252,7 @@ class BaseMinaNFT {
 
     if (MinaNFT.verificationKey == undefined) {
       console.time("MinaNFT compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } = await MinaNFTContract.compile(options);
       console.timeEnd("MinaNFT compiled");
       MinaNFT.verificationKey = verificationKey as VerificationKey;
@@ -257,6 +260,7 @@ class BaseMinaNFT {
 
     if (MinaNFT.namesVerificationKey == undefined) {
       console.time("MinaNFTNameServiceContract compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } =
         await MinaNFTNameServiceContract.compile(options);
       console.timeEnd("MinaNFTNameServiceContract compiled");
@@ -274,6 +278,7 @@ class BaseMinaNFT {
     const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } =
         await RedactedMinaNFTMapCalculation.compile(options);
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
@@ -281,6 +286,7 @@ class BaseMinaNFT {
     }
     if (MinaNFT.verifierVerificationKey === undefined) {
       console.time("MinaNFTVerifier compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } = await MinaNFTVerifier.compile(options);
       console.timeEnd("MinaNFTVerifier compiled");
       MinaNFT.verifierVerificationKey = verificationKey as VerificationKey;
@@ -296,6 +302,7 @@ class BaseMinaNFT {
     const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } =
         await RedactedMinaNFTMapCalculation.compile(options);
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
@@ -303,6 +310,7 @@ class BaseMinaNFT {
     }
     if (MinaNFT.badgeVerificationKey === undefined) {
       console.time("MinaNFTBadgeCalculation compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } =
         await MinaNFTBadgeCalculation.compile(options);
       console.timeEnd("MinaNFTBadgeCalculation compiled");
@@ -310,6 +318,7 @@ class BaseMinaNFT {
     }
     if (MinaNFT.badgeVerifierVerificationKey === undefined) {
       console.time("MinaNFTVerifierBadge compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } = await MinaNFTVerifierBadge.compile(options);
       console.timeEnd("MinaNFTVerifierBadge compiled");
       MinaNFT.badgeVerifierVerificationKey = verificationKey as VerificationKey;
@@ -325,6 +334,7 @@ class BaseMinaNFT {
     const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.escrowVerificationKey === undefined) {
       console.time("Escrow compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } = await Escrow.compile(options);
       console.timeEnd("Escrow compiled");
       MinaNFT.escrowVerificationKey = verificationKey as VerificationKey;
@@ -340,6 +350,7 @@ class BaseMinaNFT {
     const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
+      await sleep(100); // alow GC to run
       const { verificationKey } =
         await RedactedMinaNFTMapCalculation.compile(options);
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");

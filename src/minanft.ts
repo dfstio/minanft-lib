@@ -55,7 +55,7 @@ import {
   MinaNFTCommitData,
 } from "./update";
 import { MapData } from "./storage/map";
-import { blockchain, initBlockchain, MinaNetwork } from "./mina";
+import { blockchain, initBlockchain, MinaNetwork, sleep } from "./mina";
 import config from "./config";
 import { MinaNFTNameService } from "./minanftnames";
 const { MINAFEE, MINANFT_NAME_SERVICE } = config;
@@ -894,6 +894,7 @@ class MinaNFT extends BaseMinaNFT {
     console.time(logMsg);
     let proofs: MinaNFTMetadataUpdateProof[] = [];
     for (const update of this.updates) {
+      await sleep(100); // alow GC to run
       let state: MetadataTransition | null = MetadataTransition.create(update);
       let proof: MinaNFTMetadataUpdateProof | null =
         await MinaNFTMetadataUpdate.update(state, update);
@@ -905,6 +906,7 @@ class MinaNFT extends BaseMinaNFT {
     //console.log("Merging proofs...");
     let proof: MinaNFTMetadataUpdateProof | null = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
+      await sleep(100); // alow GC to run
       let state: MetadataTransition | null = MetadataTransition.merge(
         proof.publicInput,
         proofs[i].publicInput
@@ -981,6 +983,7 @@ class MinaNFT extends BaseMinaNFT {
     );
     let sentTx: Mina.TransactionId | undefined = undefined;
     try {
+      await sleep(100); // alow GC to run
       await tx.prove();
       tx.sign([deployer]);
       console.time("Update transaction sent");
@@ -1166,6 +1169,7 @@ class MinaNFT extends BaseMinaNFT {
     console.time(logMsg);
     let proofs: MinaNFTMetadataUpdateProof[] = [];
     for (const transaction of transactions) {
+      await sleep(100); // alow GC to run
       const proof: MinaNFTMetadataUpdateProof =
         await MinaNFTMetadataUpdate.update(
           transaction.state,
@@ -1177,6 +1181,7 @@ class MinaNFT extends BaseMinaNFT {
     console.log("Merging proofs...");
     let proof: MinaNFTMetadataUpdateProof = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
+      await sleep(100); // alow GC to run
       const state: MetadataTransition = MetadataTransition.merge(
         proof.publicInput,
         proofs[i].publicInput
@@ -1221,6 +1226,7 @@ class MinaNFT extends BaseMinaNFT {
     );
     let sentTx: Mina.TransactionId | undefined = undefined;
     try {
+      await sleep(100); // alow GC to run
       await tx.prove();
       tx.sign([deployer]);
       console.time("Update transaction sent");
@@ -1548,6 +1554,7 @@ class MinaNFT extends BaseMinaNFT {
         zkApp.mint(mintData);
       }
     );
+    await sleep(100); // alow GC to run
     await transaction.prove();
     transaction.sign([deployer, zkAppPrivateKey]);
     const sentTx = await transaction.send();
@@ -1677,6 +1684,7 @@ class MinaNFT extends BaseMinaNFT {
         );
       }
     );
+    await sleep(100); // alow GC to run
     await tx.prove();
     tx.sign([deployer]);
     const txSent = await tx.send();
@@ -1745,6 +1753,7 @@ class MinaNFT extends BaseMinaNFT {
         zkApp.approveEscrow(address, data, signature, ownerPublicKey);
       }
     );
+    await sleep(100); // alow GC to run
     await tx.prove();
     tx.sign([deployer]);
     const txSent = await tx.send();
@@ -1790,6 +1799,7 @@ class MinaNFT extends BaseMinaNFT {
         zkApp.verifyRedactedMetadata(address, tokenId, proof);
       }
     );
+    await sleep(100); // alow GC to run
     await tx.prove();
     tx.sign([deployer]);
     const res = await tx.send();

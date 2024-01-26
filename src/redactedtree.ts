@@ -15,7 +15,7 @@ import {
   MinaNFTTreeVerifierFunction,
   TreeElement,
 } from "./plugins/redactedtree";
-import { Memory } from "./mina";
+import { Memory, sleep } from "./mina";
 
 class RedactedTree {
   height: number;
@@ -52,6 +52,7 @@ class RedactedTree {
   public async compile(): Promise<VerificationKey> {
     if (this.verificationKey !== undefined) return this.verificationKey;
     console.time(`compiled RedactedTreeCalculation`);
+    await sleep(100); // alow GC to run
     const verificationKey = (
       await this.contracts.RedactedMinaNFTTreeCalculation.compile()
     ).verificationKey;
@@ -74,6 +75,7 @@ class RedactedTree {
     const redactedRoot = this.redactedTree.getRoot();
     const proofs: TreeStateProof[] = [];
     for (let i = 0; i < this.leafs.length; i++) {
+      await sleep(100); // alow GC to run
       const originalWitness = new this.contracts.MerkleTreeWitness(
         this.originalTree.getWitness(BigInt(this.leafs[i].key))
       );
@@ -106,6 +108,7 @@ class RedactedTree {
     console.time(`merged proofs`);
     let proof: TreeStateProof = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
+      await sleep(100); // alow GC to run
       const state = this.contracts.RedactedMinaNFTTreeState.merge(
         proof.publicInput,
         proofs[i].publicInput

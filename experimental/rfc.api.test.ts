@@ -25,7 +25,7 @@ import { JWT } from "../env.json";
 import { api } from "../src/api/api";
 
 const blockchainInstance: blockchain = "testworld2";
-const maxElements = 2;
+const maxElements = 128;
 
 class MerkleTreeWitness20 extends MerkleWitness(20) {}
 
