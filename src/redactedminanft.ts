@@ -19,7 +19,7 @@ import {
   MapElement,
 } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
-import { Memory } from "./mina";
+import { Memory, sleep } from "./mina";
 
 class RedactedMinaNFT extends BaseMinaNFT {
   nft: MinaNFT;
@@ -74,6 +74,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
 
     let proofs: Proof<RedactedMinaNFTMapState, void>[] = [];
     for (let i = 0; i < elements.length; i++) {
+      await sleep(100); // alow GC to run
       const state = RedactedMinaNFTMapState.create(
         elements[i],
         originalWitnesses[i],
@@ -94,6 +95,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
     //console.log("Merging redacted proofs...");
     let proof: RedactedMinaNFTMapStateProof = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
+      await sleep(100); // alow GC to run
       const state = RedactedMinaNFTMapState.merge(
         proof.publicInput,
         proofs[i].publicInput

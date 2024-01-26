@@ -23,6 +23,7 @@ import {
 } from "./plugins/badge";
 import { RedactedMinaNFT } from "./redactedminanft";
 import { MinaNFTContract } from "./contract/nft";
+import { sleep } from "./mina";
 
 /**
  * interface for MinaNFTBadge constructor
@@ -283,6 +284,7 @@ class MinaNFTBadge {
         );
       }
     );
+    await sleep(100); // alow GC to run
     await transaction.prove();
     transaction.sign([deployer]);
     const tx = await transaction.send();

@@ -12,6 +12,7 @@ import {
 import { MinaNFT } from "./minanft";
 import { Escrow, EscrowDeposit } from "./plugins/escrow";
 import { EscrowTransfer } from "./contract/escrow";
+import { sleep } from "./mina";
 
 interface EscrowTransferData {
   data: EscrowTransfer;
@@ -97,6 +98,7 @@ class MinaNFTEscrow {
         senderUpdate.send({ to: escrow, amount: data.price });
       }
     );
+    await sleep(100); // alow GC to run
     await transaction.prove();
     transaction.sign([buyer]);
     const tx = await transaction.send();
@@ -129,6 +131,7 @@ class MinaNFTEscrow {
         zkApp.approveSale(deposited, seller.toPublicKey());
       }
     );
+    await sleep(100); // alow GC to run
     await transaction.prove();
     transaction.sign([seller]);
     const tx = await transaction.send();
@@ -219,6 +222,7 @@ class MinaNFTEscrow {
         senderUpdate.send({ to: seller, amount: data.price });
       }
     );
+    await sleep(100); // alow GC to run
     await transaction.prove();
     transaction.sign([escrow]);
     const tx = await transaction.send();

@@ -97,7 +97,7 @@ export {
   formatTime,
   MinaNetwork
 } from "./mina";
-export { MinaNetworkURL, Berkeley, Lightnet} from "./networks";
+export { MinaNetworkURL, Berkeley, Lightnet, TestWorld2} from "./networks";
 export { BackendPlugin } from "./plugins/backend";
 //import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config";
 const NAMES_ORACLE = "B62qids6rU9iqjvBV4DHxW8z67mgHFws1rPmFoqpcyRq2arYxUw6sZu";
