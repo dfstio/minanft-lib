@@ -50,8 +50,9 @@ export class api {
 
   /**
     * Reserves the name of the NFT using serverless api call
-    * @param name The name of the NFT
-    * @param publicKey The public key of the NFT
+    * @param data The data for the reserveName call
+    * @param data.name The name of the NFT
+    * @param data.publicKey The public key of the NFT
     */
   public async reserveName(data: { name: string; publicKey: string }): Promise<{
     success: boolean;
@@ -85,7 +86,8 @@ export class api {
     * Index the NFT using serverless api call
     * The NFT mint transaction should be included in the block before calling this function
     * otherwise it will fail and return isIndexed : false
-    * @param name The name of the NFT
+    * @param data The data for the indexName call
+    * @param data.name The name of the NFT
     */
   public async indexName(data: { name: string }): Promise<{
     success: boolean;
@@ -111,10 +113,11 @@ export class api {
 
   /**
    * Mints a new NFT using serverless api call
-   * @param uri the uri of the metadata
-   * @param signature the signature returned by the reserveName call
-   * @param privateKey the private key of the address where NFT should be minted
-   * @param useArweave true if the metadata should be uploaded to the Arweave, default is IPFS
+   * @param data the data for the mint call
+   * @param data.uri the uri of the metadata
+   * @param data.signature the signature returned by the reserveName call
+   * @param data.privateKey the private key of the address where NFT should be minted
+   * @param data.useArweave true if the metadata should be uploaded to the Arweave, default is IPFS
    * @returns { success: boolean, error?: string, jobId?: string }
    * where jonId is the jobId of the minting transaction
    */
@@ -144,10 +147,11 @@ export class api {
 
   /**
    * Creates a new post for existing NFT using serverless api call
-   * @param commitData the commit data
-   * @param ownerPublicKey the owner's public key
-   * @param nftName the name of the NFT
-   * @param postName the name of the post
+   * @param data the data for the post call
+   * @param data.commitData the commit data
+   * @param data.ownerPublicKey the owner's public key
+   * @param data.nftName the name of the NFT
+   * @param data.postName the name of the post
    * @returns { success: boolean, error?: string, jobId?: string }
    * where jonId is the jobId of the minting transaction
    */
@@ -182,11 +186,12 @@ export class api {
     * Starts a new job for the proof calculation using serverless api call
     * The developer and name should correspond to the BackupPlugin of the API
     * All other parameters should correspond to the parameters of the BackupPlugin
-    * @param transactions the transactions
-    * @param developer the developer
-    * @param name the name of the job
-    * @param task the task of the job
-    * @param args the arguments of the job
+    * @param data the data for the proof call
+    * @param data.transactions the transactions
+    * @param data.developer the developer
+    * @param data.name the name of the job
+    * @param data.task the task of the job
+    * @param data.args the arguments of the job
     * @returns { success: boolean, error?: string, jobId?: string }
     * where jonId is the jobId of the job
     */
@@ -217,7 +222,8 @@ export class api {
 
   /** 
     * Gets the result of the job using serverless api call
-    * @param jobId the jobId of the job
+    * @param data the data for the jobResult call
+    * @param data.jobId the jobId of the job
     * @returns { success: boolean, error?: string, result?: any }
     * where result is the result of the job
     * if the job is not finished yet, the result will be undefined
@@ -274,10 +280,11 @@ export class api {
 
   /**
     * Waits for the job to finish
-    * @param jobId the jobId of the job
-    * @param maxAttempts the maximum number of attempts, default is 360 (2 hours)
-    * @param interval the interval between attempts, default is 20000 (20 seconds)
-    * @param maxErrors the maximum number of network errors, default is 10
+    * @param data the data for the waitForJobResult call
+    * @param data.jobId the jobId of the job
+    * @param data.maxAttempts the maximum number of attempts, default is 360 (2 hours)
+    * @param data.interval the interval between attempts, default is 20000 (20 seconds)
+    * @param data.maxErrors the maximum number of network errors, default is 10
     * @returns { success: boolean, error?: string, result?: any }
     * where result is the result of the job
     */
