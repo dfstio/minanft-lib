@@ -55,8 +55,7 @@ class MinaNFTBadge {
 
   /**
    * Create MinaNFT object
-   * @param name Name of NFT
-   * @param zkAppPublicKey Public key of the deployed NFT zkApp
+   * @param args {@link MinaNFTBadgeConstructor} 
    */
   constructor(args: MinaNFTBadgeConstructor) {
     if (args.name.length > 30)

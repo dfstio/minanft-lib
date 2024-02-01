@@ -101,13 +101,14 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Create MinaNFT object
-   * @param name Name of NFT
-   * @param address Public key of the deployed NFT zkApp
-   * @param creator Creator of the NFT
-   * @param storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
-   * @param owner Owner of the NFT - Poseidon hash of owner's public key
-   * @param escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
-   * @param nameService Public key of the NFT Name Service
+   * @param params arguments
+   * @param params.name Name of NFT
+   * @param params.address Public key of the deployed NFT zkApp
+   * @param params.creator Creator of the NFT
+   * @param params.storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
+   * @param params.owner Owner of the NFT - Poseidon hash of owner's public key
+   * @param params.escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
+   * @param params.nameService Public key of the NFT Name Service
    */
   constructor(params: {
     name: string;
@@ -330,9 +331,10 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Load metadata from blockchain and IPFS/Arweave
-   * @param metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
-   * @param nameServiceAddress Public key of the Name Service
-   * @param skipCalculatingMetadataRoot Skip calculating metadata root
+   * @param params arguments
+   * @param params.metadataURI URI of the metadata. Obligatorily in case there is private metadata as private metadata cannot be fetched from IPFS/Arweave
+   * @param params.nameServiceAddress Public key of the Name Service
+   * @param params.skipCalculatingMetadataRoot Skip calculating metadata root
    * @returns MinaNFT object
    */
   public static fromJSON(params: {
@@ -475,8 +477,9 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Converts a NFT to string
-   * @param increaseVersion increase version by one
-   * @param includePrivateData include private data
+   * @param params arguments
+   * @param params.increaseVersion increase version by one
+   * @param params.includePrivateData include private data
    * @returns NFT's serialized JSON as string
    */
   public exportToString(params: {
@@ -726,10 +729,11 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * updates PrivateMetadata
-   * @param key key to update
-   * @param type type of metadata ('file' or 'image' for example)
-   * @param data {@link FileData} file data
-   * @param isPrivate is metadata private
+   * @param params arguments
+   * @param params.key key to update
+   * @param params.type type of metadata ('file' or 'image' for example)
+   * @param params.data {@link FileData} file data
+   * @param params.isPrivate is metadata private
    */
   public updateFileData(params: {
     key: string;
@@ -1454,8 +1458,8 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Mints an NFT. Deploys and compiles the MinaNFT contract if needed.
-   * @param minaData: {@link MinaNFTMint} mint data
-   * @param skipCalculatingMetadataRoot: skip calculating metadata root in case the NFT is imported from the JSON that do not contains private metadata and therefore the root cannot be calculated
+   * @param minaData {@link MinaNFTMint} mint data
+   * @param skipCalculatingMetadataRoot skip calculating metadata root in case the NFT is imported from the JSON that do not contains private metadata and therefore the root cannot be calculated
    */
   public async mint(
     minaData: MinaNFTMint,
@@ -1606,17 +1610,7 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Transfer the NFT. Compiles the contract if needed.
-   *
-   * @param deployer Private key of the deployer
-   * @param data Escrow transfer data
-   * @param signature1 Signature of the first escrow
-   * @param signature2 Signature of the second escrow
-   * @param signature3 Signature of the third escrow
-   * @param escrow1 Public key of the first escrow
-   * @param escrow2 Public key of the second escrow
-   * @param escrow3 Public key of the third escrow
-   * @param nameService Name service
-   * @param nonce Nonce
+   * @param transferData {@link MinaNFTTransfer} transfer data
    */
   public async transfer(
     transferData: MinaNFTTransfer
@@ -1767,12 +1761,12 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Verify Redacted MinaNFT proof
-   *
-   * @param deployer Private key of the account that will commit the updates
-   * @param verifier Public key of the Verifier contract that will verify the proof
-   * @param nft Public key of the NFT contract
-   * @param nameServiceAddress Public key of the Name Service contract
-   * @param proof Redacted MinaNFT proof
+   * @param params arguments
+   * @param params.deployer Private key of the account that will commit the updates
+   * @param params.verifier Public key of the Verifier contract that will verify the proof
+   * @param params.nft Public key of the NFT contract
+   * @param params.nameServiceAddress Public key of the Name Service contract
+   * @param params.proof Redacted MinaNFT proof
    */
   public static async verify(params: {
     deployer: PrivateKey;

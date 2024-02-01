@@ -20,7 +20,9 @@ class MinaNFTNameService {
 
   /**
    * Create MinaNFTNameService object
-   * @param address Public key of the deployed Names Service
+   * @param value Object with address and oraclePrivateKey fields
+   * @param value.address Public key of the deployed Names Service
+   * @param value.oraclePrivateKey Private key of the oracle
    */
   constructor(value: { address?: PublicKey; oraclePrivateKey?: PrivateKey }) {
     this.address = value.address;

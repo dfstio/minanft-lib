@@ -189,7 +189,7 @@ class BaseMinaNFT {
 
   /**
    * Converts a string "i:..." or "a:..." to a storage url string
-   * @param str string to convert
+   * @param storageStr string to convert
    * @returns string
    */
   public static urlFromStorageString(storageStr: string): string {
@@ -208,7 +208,7 @@ class BaseMinaNFT {
 
   /**
    * Converts a Storage to a storage url string
-   * @param stirage Storage to convert
+   * @param storage Storage to convert
    * @returns string
    */
   public static urlFromStorage(storage: Storage): string {
