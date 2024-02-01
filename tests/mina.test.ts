@@ -54,7 +54,7 @@ describe("Check Mina utils", () => {
   });
   it("should sleep", async () => {
     const time1 = Date.now();
-    await sleep(1000);
+    await sleep(1005);
     const time2 = Date.now();
     expect(time2 - time1).toBeGreaterThan(1000);
     Memory.info("after sleep");

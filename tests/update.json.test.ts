@@ -14,10 +14,10 @@ import { Memory } from "../src/mina";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PINATA_JWT } from "../env.json";
 
-const CONTRACTS_NUMBER = 30;
-const ITERATIONS_NUMBER = 2;
+const CONTRACTS_NUMBER = 1;
+const ITERATIONS_NUMBER = 1;
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'local';
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;

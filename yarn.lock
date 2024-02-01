@@ -1251,6 +1251,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mime@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@types/mime@npm:3.0.4"
+  checksum: 10c0/db478bc0f99e40f7b3e01d356a9bdf7817060808a294978111340317bcd80ca35382855578c5b60fbc84ae449674bd9bb38427b18417e1f8f19e4f72f8b242cd
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:^20.11.15":
   version: 20.11.15
   resolution: "@types/node@npm:20.11.15"
@@ -3308,6 +3315,7 @@ __metadata:
   dependencies:
     "@jest/globals": "npm:^29.7.0"
     "@types/jest": "npm:^29.5.11"
+    "@types/mime": "npm:^3.0.4"
     "@types/node": "npm:^20.11.15"
     arweave: "npm:^1.14.4"
     axios: "npm:^1.6.7"
