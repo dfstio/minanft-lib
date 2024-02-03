@@ -16,8 +16,9 @@ import { MinaNFTBadgeCalculation } from "./plugins/badgeproof";
 import { Escrow } from "./plugins/escrow";
 import { PrivateMetadata } from "./privatemetadata";
 import { sleep } from "./mina";
+import { Storage } from "./contract/metadata";
 
-// Dummy class to ovecome o1js compile bug - fixed now
+// Dummy class to overcome o1js compile bug - fixed now
 /*
 class Key extends SmartContract {
   @state(Field) key = State<Field>();

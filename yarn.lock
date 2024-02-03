@@ -1241,13 +1241,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^29.5.11":
-  version: 29.5.11
-  resolution: "@types/jest@npm:29.5.11"
+"@types/jest@npm:^29.5.12":
+  version: 29.5.12
+  resolution: "@types/jest@npm:29.5.12"
   dependencies:
     expect: "npm:^29.0.0"
     pretty-format: "npm:^29.0.0"
-  checksum: 10c0/524a3394845214581278bf4d75055927261fbeac7e1a89cd621bd0636da37d265fe0a85eac58b5778758faad1cbd7c7c361dfc190c78ebde03a91cce33463261
+  checksum: 10c0/25fc8e4c611fa6c4421e631432e9f0a6865a8cb07c9815ec9ac90d630271cad773b2ee5fe08066f7b95bebd18bb967f8ce05d018ee9ab0430f9dfd1d84665b6f
   languageName: node
   linkType: hard
 
@@ -1258,12 +1258,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.11.15":
-  version: 20.11.15
-  resolution: "@types/node@npm:20.11.15"
+"@types/node@npm:*, @types/node@npm:^20.11.16":
+  version: 20.11.16
+  resolution: "@types/node@npm:20.11.16"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/7dfab4208fedc02e9584c619551906f46ade7955bb929b1e32e354a50522eb532d6bfb2844fdaad2c8dca03be84a590674460c64cb101e1a33bb318e1ec448d4
+  checksum: 10c0/4886b90278e9c877a84efd3edd4667cd990e032d77268d2a798b99ebc1901ea336fa7dfbe9eaf4ad6ad1da9ce2ec31baf300038a3905838692362eb19904ebde
   languageName: node
   linkType: hard
 
@@ -1706,9 +1706,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001580":
-  version: 1.0.30001582
-  resolution: "caniuse-lite@npm:1.0.30001582"
-  checksum: 10c0/6fe9dede07b61755a1ca55e7e6381d113a166942196c98828038524eb0adc8f0001d492a7c0e81a568a6c6edfe76051e0a0dc5a435d72a77d351144be31998ec
+  version: 1.0.30001583
+  resolution: "caniuse-lite@npm:1.0.30001583"
+  checksum: 10c0/9ce61437e7a0c8e69bdb3480962dca7d7a9e9fa8d7c56ae411454d8b101d7c83d71f6c7fa74450c131f6c14e35e347042b3e1787b15edbfaba0e05fd75ab2625
   languageName: node
   linkType: hard
 
@@ -1952,9 +1952,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.648":
-  version: 1.4.653
-  resolution: "electron-to-chromium@npm:1.4.653"
-  checksum: 10c0/22c9dbe6d9a756caf7909d87fd93d00ca0043158a82f1ba87e855e09de295da6d3c1346feab89e49119b5043bb4c4f56f868fd184e6a7654b088bd089b451b3a
+  version: 1.4.655
+  resolution: "electron-to-chromium@npm:1.4.655"
+  checksum: 10c0/a96c56496803240e351fc2130cf0395c67fc4b87fab985560c462a4f2df0965986b4594e7069b6cee548f5cdae75522e27a97b0ef6cffb1321a52b08e6f7300b
   languageName: node
   linkType: hard
 
@@ -3314,16 +3314,16 @@ __metadata:
   resolution: "minanft@workspace:."
   dependencies:
     "@jest/globals": "npm:^29.7.0"
-    "@types/jest": "npm:^29.5.11"
+    "@types/jest": "npm:^29.5.12"
     "@types/mime": "npm:^3.0.4"
-    "@types/node": "npm:^20.11.15"
+    "@types/node": "npm:^20.11.16"
     arweave: "npm:^1.14.4"
     axios: "npm:^1.6.7"
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"
     jimp: "npm:^0.22.10"
     mime: "npm:^3.0.0"
-    o1js: "npm:^0.15.4"
+    o1js: "npm:^0.16.0"
     ts-jest: "npm:^29.1.2"
     typescript: "npm:5.3.3"
   languageName: unknown
@@ -3543,9 +3543,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^0.15.4":
-  version: 0.15.4
-  resolution: "o1js@npm:0.15.4"
+"o1js@npm:^0.16.0":
+  version: 0.16.0
+  resolution: "o1js@npm:0.16.0"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -3556,7 +3556,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 10c0/9271b6b2c241b3c793beb20115f6a3d88a185b03984e319c9e6473a6fbb2d9b7020bafe395f49c06579e006d96b259394d4cf3e57a5686a33e1bb9743dcdbd45
+  checksum: 10c0/5303c15a56fcf48519bf396adc00969179722d2892138323a17a2de5c5ab0c7cd6a4812f539b896884e77e3cc514b69e311373de0dfa944bc63452d97388bb5f
   languageName: node
   linkType: hard
 

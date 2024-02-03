@@ -1,0 +1,50 @@
+{
+  "name": "minanft",
+  "version": "1.6.0",
+  "description": "MinaNFT Typescript/JavaScript integration library",
+  "author": "dfst.io",
+  "license": "Apache-2.0",
+  "homepage": "https://docs.minanft.io",
+  "bugs": {
+    "url": "https://github.com/dfstio/minanft-lib/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfstio/minanft-lib.git"
+  },
+  "main": "lib/web/src/index.js",
+  "exports": {
+    "types": "./lib/ts/src/index.d.ts",
+    "browser": "./lib/web/src/index.js",
+    "node": {
+      "import": "./lib/ts/src/index.js",
+      "require": "./lib/ts/src/index.js"
+    },
+    "default": "./lib/ts/src/index.js"
+  },
+  "types": "lib/web/src/index.d.ts",
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16.4.0"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "mina-protocol",
+    "minanft"
+  ],
+  "dependencies": {
+    "arweave": "^1.14.4",
+    "axios": "^1.6.7",
+    "form-data": "^4.0.0",
+    "jimp": "^0.22.10",
+    "mime": "^3.0.0"
+  },
+  "peerDependencies": {
+    "o1js": "^0.15.4"
+  }
+}
