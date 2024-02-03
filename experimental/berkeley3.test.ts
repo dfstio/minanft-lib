@@ -12,6 +12,7 @@ describe("deployers", () => {
 
       try {
           await Mina.faucet(privateKey.toPublicKey());
+          console.log(`"${privateKey.toBase58()}",`);
           await sleep(1000 * (600 + Math.floor(Math.random() * 600)));
       } catch (e) {
         console.log(e);
@@ -22,9 +23,7 @@ describe("deployers", () => {
       const balanceDeployer =
         Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) /
         1e9;
-      if( balanceDeployer > 0 ) 
-        console.log(`[${privateKey.toBase58()}],`);
-      else
+      if( balanceDeployer === 0 ) 
       console.log(
         `Balance of the Deployer`,
         i,

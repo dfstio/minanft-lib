@@ -43,7 +43,7 @@ const {
 } = config;
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = true;
+const useLocalBlockchain: boolean = false;
 
 let deployer: PrivateKey | undefined = undefined;
 

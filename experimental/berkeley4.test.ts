@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64, AccountUpdate,  } from "o1js";
-import { DEPLOYER, DEPLOYERS } from "../env.json";
+import { DEPLOYER, DEPLOYERS, CONTRACT_DEPLOYER_SK } from "../env.json";
 import { MinaNFT } from "../src/minanft";
 
 
@@ -10,13 +10,19 @@ describe("deployers", () => {
   let deployer: PrivateKey | undefined = undefined;
   MinaNFT.minaInit('berkeley')
   deployer = PrivateKey.fromBase58(DEPLOYER);
+  const contractDeployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 
   const balanceDeployer =
   Number((await accountBalance(deployer.toPublicKey())).toBigInt()) / 1e9;
 console.log(
-  `Balance of the Deployer is`,
-  balanceDeployer.toLocaleString(`en`),
-  deployer.toPublicKey().toBase58()
+  `Balance of the Deployer ${deployer.toPublicKey().toBase58()} is`,
+  balanceDeployer.toLocaleString(`en`)
+);
+const balanceContractDeployer =
+  Number((await accountBalance(contractDeployer.toPublicKey())).toBigInt()) / 1e9;
+console.log(
+  `Balance of the Contract Deployer ${contractDeployer.toPublicKey().toBase58()} is`,
+  balanceContractDeployer.toLocaleString(`en`)
 );
 
   for (let i = 0; i < DEPLOYERS.length; i++) {

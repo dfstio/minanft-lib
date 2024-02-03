@@ -25,6 +25,12 @@ beforeAll(async () => {
 });
 
 describe(`Upgrade MinaNFT name service contract`, () => {
+  it(`should check addresses`, async () => {
+   const privateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK);
+   const publicKey = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
+   expect(privateKey.toPublicKey().toBase58()).toBe(publicKey.toBase58());
+  });
+
   it(`should compile contracts`, async () => {
     MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
@@ -32,6 +38,23 @@ describe(`Upgrade MinaNFT name service contract`, () => {
     await MinaNFT.compile();
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
+  });
+
+  it(`should deploy NameService`, async () => {
+    expect(deployer).toBeDefined();
+    if (deployer === undefined) return;
+    const oraclePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK);
+    const names = new MinaNFTNameService({
+      address: PublicKey.fromBase58(MINANFT_NAME_SERVICE),
+      oraclePrivateKey,
+    });
+    
+    const txDeploy = await names.deploy(deployer, PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK));
+    expect(txDeploy).toBeDefined();
+    if (txDeploy === undefined) return;
+    Memory.info(`names service deployed`);
+    expect(await MinaNFT.wait(txDeploy)).toBe(true);
+    
   });
 
   it(`should upgrade NameService`, async () => {
@@ -43,13 +66,6 @@ describe(`Upgrade MinaNFT name service contract`, () => {
       oraclePrivateKey,
     });
     
-    const txDeploy = await names.deploy(deployer);
-    expect(txDeploy).toBeDefined();
-    if (txDeploy === undefined) return;
-    Memory.info(`names service deployed`);
-    expect(await MinaNFT.wait(txDeploy)).toBe(true);
-    
-    /*
     const tx = await names.upgrade(
       deployer,
       PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK)
@@ -58,6 +74,6 @@ describe(`Upgrade MinaNFT name service contract`, () => {
     if (tx === undefined) return;
     Memory.info(`names service upgraded`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    */
+    
   });
 });
