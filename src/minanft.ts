@@ -1438,10 +1438,12 @@ class MinaNFT extends BaseMinaNFT {
   * @param tx transaction
   */
   public static async wait(tx: Mina.TransactionId): Promise<boolean> {
+    /*
     try {
       Mina.getNetworkState();
     } catch (error) {
       // We're on Berkeley
+      */
       try {
         //console.log("Waiting for transaction...");
         console.time("Transaction wait time");
@@ -1452,8 +1454,8 @@ class MinaNFT extends BaseMinaNFT {
         console.log("Error waiting for transaction", error);
         return false;
       }
-    }
-    return true;
+    //}
+    //return true;
   }
 
   /**

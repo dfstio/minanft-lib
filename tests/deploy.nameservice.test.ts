@@ -45,6 +45,7 @@ beforeAll(async () => {
 });
 
 describe(`Deploy MinaNFT Name Service contract`, () => {
+  
   it(`should compile contracts`, async () => {
     MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);

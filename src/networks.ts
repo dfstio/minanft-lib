@@ -12,7 +12,7 @@ interface MinaNetworkURL {
 
 const Berkeley : MinaNetworkURL = {
   graphql: "https://api.minascan.io/node/berkeley/v1/graphql",
-  archive: "https://archive.berkeley.minaexplorer.com", // "https://api.minascan.io/archive/berkeley/v1/graphql"
+  archive: "https://api.minascan.io/archive/berkeley/v1/graphql", // "https://api.minascan.io/archive/berkeley/v1/graphql"
   explorerAccountUrl: "https://minascan.io/berkeley/account/",
   explorerTransactionUrl: "https://minascan.io/berkeley/tx/",
   chainId: 'berkeley', 

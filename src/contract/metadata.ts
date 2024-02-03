@@ -1,5 +1,4 @@
 export { Update, Metadata, MetadataWitness, Storage };
-import { from } from "form-data";
 import { PublicKey, Struct, Field, UInt64, MerkleMapWitness } from "o1js";
 /**
  * Metadata is the metadata of the NFT written to the Merkle Map

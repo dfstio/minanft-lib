@@ -168,7 +168,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     await MinaNFT.compileVerifier();
     console.log(
-      `deploying the MinaNFTVerifierBadge contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      `deploying the MinaNFTVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });

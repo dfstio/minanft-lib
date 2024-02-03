@@ -1,5 +1,6 @@
 export { EscrowApproval, EscrowTransfer };
-import { Field, Struct, UInt64 } from "o1js";
+import  { Field, Struct, UInt64 } from "o1js";
+
 /**
  * EscrowTransfer is the data for transfer of the NFT from one owner to another
  * @property oldOwner The old owner of the NFT
