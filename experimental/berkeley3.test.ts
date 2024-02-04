@@ -9,17 +9,14 @@ describe("deployers", () => {
   MinaNFT.minaInit('berkeley');
   for (let i = 0; i < 1000; i++) {
     const privateKey = PrivateKey.random();
+    console.log(`"${privateKey.toBase58()}",`);
 
       try {
-          await Mina.faucet(privateKey.toPublicKey());
-          console.log(`"${privateKey.toBase58()}",`);
-          await sleep(1000 * (600 + Math.floor(Math.random() * 600)));
+        await Mina.faucet(privateKey.toPublicKey());     
       } catch (e) {
         console.log(e);
-        await sleep(1000 * 60 * 60);
-        await Mina.faucet(privateKey.toPublicKey());
       }
-      
+      await sleep(1000 * (600 + Math.floor(Math.random() * 600)));
       const balanceDeployer =
         Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) /
         1e9;
