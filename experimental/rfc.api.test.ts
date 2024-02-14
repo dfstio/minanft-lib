@@ -21,10 +21,10 @@ import { formatTime, Memory } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
 import {  blockchain, initBlockchain } from "../utils/testhelpers";
-import { JWT } from "../env.json";
+import { JWT, DEPLOYER_API, DEPLOYERS } from "../env.json";
 import { api } from "../src/api/api";
 
-const blockchainInstance: blockchain = "testworld2";
+const blockchainInstance: blockchain = 'berkeley';
 const maxElements = 128;
 
 class MerkleTreeWitness20 extends MerkleWitness(20) {}
@@ -64,7 +64,8 @@ beforeAll(async () => {
   if (data === undefined) return;
 
   const { deployer: d } = data;
-  deployer = d;
+  //deployer = d;
+  deployer = PrivateKey.fromBase58(DEPLOYERS[14]);
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;
 });
@@ -95,7 +96,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     }
 
     votingPrivateKey = PrivateKey.fromBase58(
-      "EKFCNNGdcMpuy85Y4cifs3J9PX1LZxrKwGHxjpvMzt8NKrtdqiZA"
+      "EKDz5KES66CTDv1PgvCaJUsrk3J9GUrPA6VKuv5n8vpjvRKojXMt"
     ); 
     //PrivateKey.random();
     votingContract = votingPrivateKey.toPublicKey();
@@ -110,6 +111,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     console.timeEnd(`compiled`);
     Memory.info(`compiled`);
   });
+  
   /*
   it(`should deploy RealTimeVoting`, async () => {
     expect(deployer).toBeDefined();
@@ -133,6 +135,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
       () => {
         AccountUpdate.fundNewAccount(sender);
         zkApp.deploy({});
+        zkApp.account.zkappUri.set("zkCloudWorker");
       }
     );
     await transaction.prove();
@@ -162,6 +165,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     expect(deployer).not.toBeUndefined();
     if (deployer === undefined) return;
     const sender = deployer.toPublicKey();
+    await fetchAccount({ publicKey: sender });
     const account = Account(sender);
     const nonce: number = Number(account.nonce.get().toBigint());
     console.log("Nonce:", nonce.toString());
@@ -231,6 +235,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
       "https://minanft-storage.s3.eu-west-1.amazonaws.com/" + proofs;
     const response: any = await axios.get(url);
     const txs = response.data.txs;
+    //console.log("Downloaded transactions:", txs);
     console.log("Downloaded transactions:", txs.length);
     const sender = deployer.toPublicKey();
     let tx: Mina.TransactionId | undefined = undefined;

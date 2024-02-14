@@ -14,15 +14,14 @@ import {
 } from "o1js";
 
 // Private key of the deployer:
-import { DEPLOYER } from "../env.json";
+import { DEPLOYER, DEPLOYERS } from "../env.json";
+import { MinaNFT } from "../src/minanft";
 
 // True - local blockchain, false - Berkeley
 const useLocalBlockchain: boolean = false;
-const txNumber = 50;
+const txNumber = 256;
 
-const TESTWORLD2 = "https://proxy.testworld.minaexplorer.com/graphql";
-const TESTWORLD2_ARCHIVE = "https://archive.testworld.minaexplorer.com";
-const transactionFee = 150_000_000;
+const transactionFee = 10_000_000;
 jest.setTimeout(1000 * 60 * 60 * 10); // 10 hours
 let deployer: PrivateKey | undefined = undefined;
 let nonce: number = 0;
@@ -45,12 +44,8 @@ beforeAll(async () => {
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
   } else {
-    const network = Mina.Network({
-      mina: TESTWORLD2,
-      archive: TESTWORLD2_ARCHIVE,
-    });
-    Mina.setActiveInstance(network);
-    deployer = PrivateKey.fromBase58(DEPLOYER);
+    MinaNFT.minaInit("berkeley");
+    deployer = PrivateKey.fromBase58(DEPLOYERS[6]);
   }
   await Counter.compile();
 });
@@ -126,7 +121,7 @@ using the deployer with public key ${sender.toBase58()}:
     console.time(`sent ${txNumber} transactions`);
     for (let i = 0; i < txNumber; i++) {
       const transaction = await Mina.transaction(
-        { sender, fee: transactionFee, nonce: nonce++ },
+        { sender, fee: transactionFee, nonce: nonce++, memo: `zkCloudWorker`},
         () => {
           zkCounter.changeValue(Field(i + 2));
         }

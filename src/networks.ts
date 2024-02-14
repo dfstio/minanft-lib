@@ -1,8 +1,8 @@
 export { MinaNetworkURL, Berkeley, Lightnet, TestWorld2 };
 
 interface MinaNetworkURL {
-  graphql: string;
-  archive: string;
+  mina: string[];
+  archive: string[];
   chainId?: string;
   name?: string;
   accountManager?: string;
@@ -10,30 +10,32 @@ interface MinaNetworkURL {
   explorerTransactionUrl?: string;
 }
 
-const Berkeley : MinaNetworkURL = {
-  graphql: "https://api.minascan.io/node/berkeley/v1/graphql",
-  archive: "https://api.minascan.io/archive/berkeley/v1/graphql", // "https://api.minascan.io/archive/berkeley/v1/graphql"
+const Berkeley: MinaNetworkURL = {
+  mina: [
+    "https://api.minascan.io/node/berkeley/v1/graphql",
+    "https://proxy.berkeley.minaexplorer.com/graphql",
+  ],
+  archive: [
+    "https://api.minascan.io/archive/berkeley/v1/graphql",
+    "https://archive.berkeley.minaexplorer.com",
+  ],
   explorerAccountUrl: "https://minascan.io/berkeley/account/",
   explorerTransactionUrl: "https://minascan.io/berkeley/tx/",
-  chainId: 'berkeley', 
-  name: 'Berkeley'
+  chainId: "berkeley",
+  name: "Berkeley",
 };
 
-const TestWorld2 : MinaNetworkURL = {
-  graphql: "https://api.minascan.io/node/testworld/v1/graphql",
-  archive: "https://archive.testworld.minaexplorer.com",
+const TestWorld2: MinaNetworkURL = {
+  mina: ["https://api.minascan.io/node/testworld/v1/graphql"],
+  archive: ["https://archive.testworld.minaexplorer.com"],
   explorerAccountUrl: "https://minascan.io/testworld/account/",
   explorerTransactionUrl: "https://minascan.io/testworld/tx/",
-  chainId: 'testworld2', 
-  name: 'TestWorld2'
+  chainId: "testworld2",
+  name: "TestWorld2",
 };
 
-
 const Lightnet: MinaNetworkURL = {
-  graphql: "http://localhost:8080/graphql",
-  archive: "http://localhost:8282 ",
+  mina: ["http://localhost:8080/graphql"],
+  archive: ["http://localhost:8282"],
   accountManager: "http://localhost:8181",
-}
-
-
-
+};
