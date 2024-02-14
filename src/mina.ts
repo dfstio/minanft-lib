@@ -7,12 +7,16 @@ export {
   accountBalance,
   accountBalanceMina,
   formatTime,
-  MinaNetwork
+  MinaNetwork,
 };
 
-import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount} from "o1js";
-import { MinaNetworkURL, Berkeley, TestWorld2, Lightnet as Lightnet} from "./networks";
-
+import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount } from "o1js";
+import {
+  MinaNetworkURL,
+  Berkeley,
+  TestWorld2,
+  Lightnet as Lightnet,
+} from "./networks";
 
 type blockchain = "local" | "berkeley" | "lighnet" | "mainnet" | "testworld2";
 
@@ -24,7 +28,6 @@ interface MinaNetwork {
   url?: MinaNetworkURL;
 }
 
-
 function initBlockchain(instance: blockchain): MinaNetwork {
   if (instance === "local") {
     const Local = Mina.LocalBlockchain({ proofsEnabled: true });
@@ -32,30 +35,26 @@ function initBlockchain(instance: blockchain): MinaNetwork {
     return { keys: Local.testAccounts };
   } else if (instance === "berkeley") {
     const network = Mina.Network({
-            mina: Berkeley.graphql,
-            archive: Berkeley.archive,
-
-  });
+      mina: Berkeley.mina,
+      archive: Berkeley.archive,
+    });
     Mina.setActiveInstance(network);
-    return { keys: [], url: Berkeley}
+    return { keys: [], url: Berkeley };
   } else if (instance === "testworld2") {
     const network = Mina.Network({
-            mina: TestWorld2.graphql,
-            archive: TestWorld2.archive,
-
-  });
+      mina: TestWorld2.mina,
+      archive: TestWorld2.archive,
+    });
     Mina.setActiveInstance(network);
-    return { keys: [], url: TestWorld2}
-  } 
-  else if ( instance === 'lighnet') {
+    return { keys: [], url: TestWorld2 };
+  } else if (instance === "lighnet") {
     const network = Mina.Network({
-            mina: Lightnet.graphql,
-            archive: Lightnet.archive,
-            lightnetAccountManager: Lightnet.accountManager
-
-  });
+      mina: Lightnet.mina,
+      archive: Lightnet.archive,
+      lightnetAccountManager: Lightnet.accountManager,
+    });
     Mina.setActiveInstance(network);
-    return { keys: [], url: Lightnet}
+    return { keys: [], url: Lightnet };
   } else {
     throw new Error("Mainnet is not supported yet by zkApps");
   }
