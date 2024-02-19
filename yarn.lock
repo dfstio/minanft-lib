@@ -1258,7 +1258,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.11.16":
+"@types/node@npm:*":
   version: 20.11.16
   resolution: "@types/node@npm:20.11.16"
   dependencies:
@@ -1271,6 +1271,15 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 10c0/17877153b2fe748e85dd85432c7d6776cfaced7fd69f1998d005812d4865ac02e192a3adde7869ba8f449550f0a80ea6e3369e449a07c587e71222c56478e7d4
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.11.19":
+  version: 20.11.19
+  resolution: "@types/node@npm:20.11.19"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10c0/f451ef0a1d78f29c57bad7b77e49ebec945f2a6d0d7a89851d7e185ee9fe7ad94d651c0dfbcb7858c9fa791310c8b40a881e2260f56bd3c1b7e7ae92723373ae
   languageName: node
   linkType: hard
 
@@ -3316,14 +3325,14 @@ __metadata:
     "@jest/globals": "npm:^29.7.0"
     "@types/jest": "npm:^29.5.12"
     "@types/mime": "npm:^3.0.4"
-    "@types/node": "npm:^20.11.16"
+    "@types/node": "npm:^20.11.19"
     arweave: "npm:^1.14.4"
     axios: "npm:^1.6.7"
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"
     jimp: "npm:^0.22.10"
     mime: "npm:^3.0.0"
-    o1js: "npm:^0.16.0"
+    o1js: "npm:^0.16.2"
     ts-jest: "npm:^29.1.2"
     typescript: "npm:5.3.3"
   languageName: unknown
@@ -3543,9 +3552,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^0.16.0":
-  version: 0.16.0
-  resolution: "o1js@npm:0.16.0"
+"o1js@npm:^0.16.2":
+  version: 0.16.2
+  resolution: "o1js@npm:0.16.2"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -3556,7 +3565,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 10c0/5303c15a56fcf48519bf396adc00969179722d2892138323a17a2de5c5ab0c7cd6a4812f539b896884e77e3cc514b69e311373de0dfa944bc63452d97388bb5f
+  checksum: 10c0/078d7809737dbb2a9b3e78a520ce8e497e88fae07385814d604bbc7510a6e0b13bb862237e09c7bee5992fd06c32ab29ab66c7a6f5285f856528fcefa9266bc3
   languageName: node
   linkType: hard
 
