@@ -9,6 +9,7 @@ import { RedactedTree } from "../redactedtree";
 import { IPFS } from "./ipfs";
 import { ARWEAVE } from "./arweave";
 import Jimp from "jimp";
+import { calculateMerkleTreeRootFast } from "./fast-tree";
 
 const FILE_TREE_HEIGHT = 5;
 const FILE_TREE_ELEMENTS = 14;
@@ -296,20 +297,20 @@ class File {
     return fields;
   }
 
-  public static fillFields( bytes: Uint8Array ): Field[] {
+  public static fillFields(bytes: Uint8Array): Field[] {
     const fields: Field[] = [];
     let currentBigInt = BigInt(0);
-      let bitPosition = BigInt(0);
-      for (const byte of bytes) {
-        currentBigInt += BigInt(byte) << bitPosition;
-        bitPosition += BigInt(8);
-        if (bitPosition === BigInt(248)) {
-          fields.push(Field(currentBigInt.toString()));
-          currentBigInt = BigInt(0);
-          bitPosition = BigInt(0);
-        }
+    let bitPosition = BigInt(0);
+    for (const byte of bytes) {
+      currentBigInt += BigInt(byte) << bitPosition;
+      bitPosition += BigInt(8);
+      if (bitPosition === BigInt(248)) {
+        fields.push(Field(currentBigInt.toString()));
+        currentBigInt = BigInt(0);
+        bitPosition = BigInt(0);
       }
-      if (Number(bitPosition) > 0) fields.push(Field(currentBigInt.toString()));
+    }
+    if (Number(bitPosition) > 0) fields.push(Field(currentBigInt.toString()));
     return fields;
   }
 
@@ -331,7 +332,10 @@ class File {
     return fields;
   }
 
-  public async treeData(calculateRoot: boolean): Promise<{
+  public async treeData(
+    calculateRoot: boolean,
+    fastCalculation: boolean = true
+  ): Promise<{
     root: Field;
     height: number;
     leavesNumber: number;
@@ -352,16 +356,33 @@ class File {
         : await this.binaryFields();
 
     const height = Math.ceil(Math.log2(fields.length + 2)) + 1;
-    const tree = new MerkleTree(height);
-    if (fields.length > tree.leafCount)
-      throw new Error(`File is too big for this Merkle tree`);
-
-    // First field is the height, second number is the number of fields
-    tree.fill([Field.from(height), Field.from(fields.length), ...fields]);
-    this.root = tree.getRoot();
     this.height = height;
     this.leavesNumber = fields.length;
-    return { root: this.root, height, leavesNumber: this.leavesNumber };
+    const treeFields = [
+      Field.from(height),
+      Field.from(fields.length),
+      ...fields,
+    ];
+
+    if (fastCalculation) {
+      const { leafCount, root } = calculateMerkleTreeRootFast(
+        height,
+        treeFields
+      );
+      if (treeFields.length > leafCount)
+        throw new Error(`File is too big for this Merkle tree`);
+      this.root = root;
+      return { root, height, leavesNumber: this.leavesNumber };
+    } else {
+      const tree = new MerkleTree(height);
+      if (treeFields.length > tree.leafCount)
+        throw new Error(`File is too big for this Merkle tree`);
+
+      // First field is the height, second number is the number of fields
+      tree.fill(treeFields);
+      this.root = tree.getRoot();
+      return { root: this.root, height, leavesNumber: this.leavesNumber };
+    }
   }
 
   public async data(): Promise<FileData> {
