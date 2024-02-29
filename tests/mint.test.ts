@@ -6,13 +6,14 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { PINATA_JWT, NAMES_ORACLE_SK } from "../env.json";
-//import { MINANFT_NAME_SERVICE } from "../src/config.json";
+import config from "../src/config";
 import { MapData } from "../src/storage/map";
 
+const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "berkeley";
 const includeFiles = false;
-const includeImage = true;
+const includeImage = false;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -38,8 +39,7 @@ describe(`MinaNFT contract`, () => {
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-
-  
+  /*
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -54,8 +54,8 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
   });
+*/
 
-  /*
   it(`should use existing NameService`, async () => {
     oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
     const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
@@ -64,7 +64,6 @@ describe(`MinaNFT contract`, () => {
       address: nameServiceAddress,
     });
   });
-  */
 
   it(`should mint NFT`, async () => {
     expect(deployer).toBeDefined();
@@ -90,14 +89,14 @@ describe(`MinaNFT contract`, () => {
       await nft.updateImage({
         filename: "./images/navigator.jpg",
         pinataJWT,
-        calculateRoot : false
+        calculateRoot: false,
       });
     if (includeFiles) {
       await nft.updateFile({
         key: "sea",
         filename: "./images/sea.png",
         pinataJWT,
-        calculateRoot: false
+        calculateRoot: false,
       });
     }
     const map = new MapData();
@@ -112,7 +111,7 @@ describe(`MinaNFT contract`, () => {
         key: "woman",
         filename: "./images/woman.png",
         pinataJWT,
-        calculateRoot: false
+        calculateRoot: false,
       });
     const mapLevel3 = new MapData();
     mapLevel3.update({ key: `level3-1`, value: `value31` });
@@ -121,7 +120,7 @@ describe(`MinaNFT contract`, () => {
     map.updateMap({ key: `level2-4`, map: mapLevel3 });
     nft.updateMap({ key: `level 2 and 3 data`, map });
 
-    console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
+    //console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
     const tx = await nft.mint({ nameService, deployer, owner, pinataJWT });
     expect(tx).toBeDefined();
     if (tx === undefined) return;

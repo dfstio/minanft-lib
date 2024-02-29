@@ -1,13 +1,5 @@
 export { RedactedMinaNFT };
-import {
-  verify,
-  Proof,
-  PrivateKey,
-  AccountUpdate,
-  fetchAccount,
-  Mina,
-  Account,
-} from "o1js";
+import { verify, Proof, PrivateKey, AccountUpdate, Mina, Account } from "o1js";
 import { BaseMinaNFT } from "./baseminanft";
 import { PrivateMetadata } from "./privatemetadata";
 import { MinaNFT } from "./minanft";
@@ -20,6 +12,7 @@ import {
 } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 import { Memory, sleep } from "./mina";
+import { fetchMinaAccount } from "./fetch";
 
 class RedactedMinaNFT extends BaseMinaNFT {
   nft: MinaNFT;
@@ -170,8 +163,8 @@ class RedactedMinaNFT extends BaseMinaNFT {
     console.log(
       `deploying the MinaNFTVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: zkAppPublicKey });
     const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 

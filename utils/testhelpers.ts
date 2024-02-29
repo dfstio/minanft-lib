@@ -5,15 +5,19 @@ export {
   sleep,
   makeString,
   initBlockchain,
-  blockchain
+  blockchain,
 };
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
-import { blockchain, initBlockchain as initBlockchainMina } from "../src/mina";
+import {
+  blockchain,
+  initBlockchain as initBlockchainMina,
+  accountBalance,
+  accountBalanceMina,
+} from "../src/mina";
 import { Memory } from "../src/mina";
 
 import { DEPLOYER, DEPLOYERS } from "../env.json";
-
 
 async function initBlockchain(
   instance: blockchain,
@@ -32,14 +36,14 @@ async function initBlockchain(
       deployers.push(privateKey);
     }
   } else if (instance === "berkeley") {
-    initBlockchainMina('berkeley');
+    initBlockchainMina("berkeley");
     deployer = PrivateKey.fromBase58(DEPLOYER);
     for (let i = 0; i < deployersNumber; i++) {
       const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);
       deployers.push(privateKey);
     }
   } else if (instance === "testworld2") {
-    initBlockchainMina('testworld2');
+    initBlockchainMina("testworld2");
     deployer = PrivateKey.fromBase58(DEPLOYER);
     for (let i = 0; i < deployersNumber; i++) {
       const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);
@@ -52,8 +56,9 @@ async function initBlockchain(
 
   for (let i = 0; i < deployersNumber; i++) {
     const balanceDeployer =
-      Number((await accountBalance(deployers[i].toPublicKey())).toBigInt()) /
-      1e9;
+      Number(
+        (await accountBalance(deployers[i].toPublicKey(), true)).toBigInt()
+      ) / 1e9;
     if (balanceDeployer <= 5) {
       console.log(
         `Balance of the Deployer`,
@@ -72,16 +77,6 @@ async function initBlockchain(
   );
   if (balanceDeployer <= 2) return undefined;
   return { deployer, deployers };
-}
-
-async function accountBalance(address: PublicKey): Promise<UInt64> {
-  await fetchAccount({ publicKey: address });
-  if (Mina.hasAccount(address)) return Mina.getBalance(address);
-  else return UInt64.from(0);
-}
-
-async function accountBalanceMina(address: PublicKey): Promise<number> {
-  return Number((await accountBalance(address)).toBigInt()) / 1e9;
 }
 
 function sleep(ms: number) {

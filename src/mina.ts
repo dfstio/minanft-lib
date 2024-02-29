@@ -10,13 +10,14 @@ export {
   MinaNetwork,
 };
 
-import { Mina, PublicKey, PrivateKey, UInt64, fetchAccount } from "o1js";
+import { Mina, PublicKey, PrivateKey, UInt64 } from "o1js";
 import {
   MinaNetworkURL,
   Berkeley,
   TestWorld2,
   Lightnet as Lightnet,
 } from "./networks";
+import { fetchMinaAccount } from "./fetch";
 
 type blockchain = "local" | "berkeley" | "lighnet" | "mainnet" | "testworld2";
 
@@ -60,14 +61,20 @@ function initBlockchain(instance: blockchain): MinaNetwork {
   }
 }
 
-async function accountBalance(address: PublicKey): Promise<UInt64> {
-  await fetchAccount({ publicKey: address });
+async function accountBalance(
+  address: PublicKey,
+  force: boolean = false
+): Promise<UInt64> {
+  await fetchMinaAccount({ publicKey: address, force });
   if (Mina.hasAccount(address)) return Mina.getBalance(address);
   else return UInt64.from(0);
 }
 
-async function accountBalanceMina(address: PublicKey): Promise<number> {
-  return Number((await accountBalance(address)).toBigInt()) / 1e9;
+async function accountBalanceMina(
+  address: PublicKey,
+  force: boolean = false
+): Promise<number> {
+  return Number((await accountBalance(address, force)).toBigInt()) / 1e9;
 }
 
 function sleep(ms: number) {

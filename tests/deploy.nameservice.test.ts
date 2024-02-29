@@ -23,9 +23,7 @@ let nameServicePrivateKey: PrivateKey | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  const data = await initBlockchain(
-    useLocalBlockchain ? "local" : 'berkeley',
-  );
+  const data = await initBlockchain(useLocalBlockchain ? "local" : "berkeley");
   expect(data).toBeDefined();
   if (data === undefined) return;
 
@@ -45,7 +43,6 @@ beforeAll(async () => {
 });
 
 describe(`Deploy MinaNFT Name Service contract`, () => {
-  
   it(`should compile contracts`, async () => {
     MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
@@ -54,7 +51,7 @@ describe(`Deploy MinaNFT Name Service contract`, () => {
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-  
+
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
