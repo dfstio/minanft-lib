@@ -98,12 +98,17 @@ export {
   formatTime,
   MinaNetwork,
 } from "./mina";
+export {
+  fetchMinaAccount,
+  fetchMinaActions,
+  checkMinaZkappTransaction,
+} from "./fetch";
 export { MinaNetworkURL, Berkeley, Lightnet, TestWorld2 } from "./networks";
 export { BackendPlugin } from "./plugins/backend";
 //import { NAMES_ORACLE, MINANFT_NAME_SERVICE } from "./config";
 const NAMES_ORACLE = "B62qids6rU9iqjvBV4DHxW8z67mgHFws1rPmFoqpcyRq2arYxUw6sZu";
 const MINANFT_NAME_SERVICE =
-  "B62qpiD9ZWPi1JCx7hd4XcRujM1qc5jCADhhJVzTm3zZBWBpyRr3NFT";
+  "B62qrryunX2LzaZ1sGtqfJqzSdNdN7pVSZw8YtnxQNxrrF9Vt56bNFT";
 const VERIFICATION_KEY_HASH =
   "3349907056591642040458071088589981432309803022351009371929933548765456187269";
 const VERIFIER = "B62qqzwDxiH172SXE4SUVYsNV2FteL2UeYFsjRqF4Qf42KnE1q1VNFT";

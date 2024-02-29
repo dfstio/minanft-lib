@@ -3,7 +3,6 @@ import {
   verify,
   PrivateKey,
   AccountUpdate,
-  fetchAccount,
   Mina,
   Account,
   MerkleTree,
@@ -16,6 +15,7 @@ import {
   TreeElement,
 } from "./plugins/redactedtree";
 import { Memory, sleep } from "./mina";
+import { fetchMinaAccount } from "./fetch";
 
 class RedactedTree {
   height: number;
@@ -143,8 +143,8 @@ class RedactedTree {
     console.log(
       `deploying the MinaNFTTreeVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: zkAppPublicKey });
     const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 

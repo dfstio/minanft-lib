@@ -4,7 +4,6 @@ import {
   PrivateKey,
   PublicKey,
   AccountUpdate,
-  fetchAccount,
   MerkleMap,
   Signature,
   Account,
@@ -24,6 +23,7 @@ import {
 import { RedactedMinaNFT } from "./redactedminanft";
 import { MinaNFTContract } from "./contract/nft";
 import { sleep } from "./mina";
+import { fetchMinaAccount } from "./fetch";
 
 /**
  * interface for MinaNFTBadge constructor
@@ -55,7 +55,7 @@ class MinaNFTBadge {
 
   /**
    * Create MinaNFT object
-   * @param args {@link MinaNFTBadgeConstructor} 
+   * @param args {@link MinaNFTBadgeConstructor}
    */
   constructor(args: MinaNFTBadgeConstructor) {
     if (args.name.length > 30)
@@ -85,7 +85,7 @@ class MinaNFTBadge {
     badgePublicKey: PublicKey
   ): Promise<MinaNFTBadge | undefined> {
     const zkApp = new MinaNFTVerifierBadge(badgePublicKey);
-    await fetchAccount({ publicKey: badgePublicKey });
+    await fetchMinaAccount({ publicKey: badgePublicKey });
     if (!Mina.hasAccount(badgePublicKey)) return undefined;
     const name = zkApp.name.get();
     const owner = zkApp.owner.get();
@@ -117,8 +117,8 @@ class MinaNFTBadge {
     console.log(
       `deploying the MinaNFTVerifierBadge contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: zkAppPublicKey });
     const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 
@@ -251,10 +251,10 @@ class MinaNFTBadge {
     console.timeEnd(logStr);
     const sender = deployer.toPublicKey();
 
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: nftAddress, tokenId: nftTokenId });
-    await fetchAccount({ publicKey: this.address });
-    await fetchAccount({ publicKey: nftAddress, tokenId });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId: nftTokenId });
+    await fetchMinaAccount({ publicKey: this.address });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId });
     const hasAccount = Mina.hasAccount(nftAddress, tokenId);
     const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
 
@@ -305,8 +305,8 @@ class MinaNFTBadge {
     const issuer = new MinaNFTVerifierBadge(this.address);
     const tokenId = issuer.token.id;
     const zkNFT = new MinaNFTContract(nftAddress, nft.tokenId);
-    await fetchAccount({ publicKey: nftAddress, tokenId });
-    await fetchAccount({ publicKey: nftAddress, tokenId: nft.tokenId });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId: nft.tokenId });
     const hasAccount = Mina.hasAccount(nftAddress, tokenId);
     if (!hasAccount) return false;
     const version = zkNFT.version.get();
