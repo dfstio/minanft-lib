@@ -1,4 +1,4 @@
-export { MinaNetworkURL, Berkeley, Lightnet, TestWorld2 };
+export { MinaNetworkURL, Berkeley, Zeko, Lightnet, TestWorld2 };
 
 interface MinaNetworkURL {
   mina: string[];
@@ -23,6 +23,11 @@ const Berkeley: MinaNetworkURL = {
   explorerTransactionUrl: "https://minascan.io/berkeley/tx/",
   chainId: "berkeley",
   name: "Berkeley",
+};
+
+const Zeko: MinaNetworkURL = {
+  mina: ["http://sequencer-zeko-dev.dcspark.io/graphql"],
+  archive: [],
 };
 
 const TestWorld2: MinaNetworkURL = {
