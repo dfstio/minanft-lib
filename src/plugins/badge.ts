@@ -83,7 +83,7 @@ class MinaNFTVerifierBadge extends SmartContract {
     /*
     Excluded pending resolution of the issue
     https://github.com/o1-labs/o1js/issues/1245
-    
+   
     const minanft = new MinaNFTContract(nft, nftTokenId);
     badgeEvent.owner.assertEquals(minanft.owner.getAndAssertEquals());
     badgeEvent.address.assertEquals(nft);
@@ -94,6 +94,7 @@ class MinaNFTVerifierBadge extends SmartContract {
       proof.publicInput.originalRoot
     );
     */
+
     badgeProof.publicInput.data.kind.assertEquals(
       this.verifiedKind.getAndAssertEquals(),
       "Kind mismatch"

@@ -22,6 +22,8 @@ export async function fetchMinaAccount(params: {
         publicKey,
         tokenId,
       });
+      return result;
+      /*
       if (result.account !== undefined) return result;
       if (force !== true) return result;
       console.log(
@@ -29,6 +31,7 @@ export async function fetchMinaAccount(params: {
         typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
         result
       );
+      */
     } catch (error) {
       console.log("Error in fetchAccount:", error);
     }
