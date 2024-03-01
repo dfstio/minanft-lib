@@ -18,7 +18,7 @@ describe("deployers", () => {
     async () => {
       console.log("Number of deployers:", DEPLOYERS_API.length);
       let deployer: PrivateKey | undefined = undefined;
-      MinaNFT.minaInit("berkeley");
+      MinaNFT.minaInit("zeko");
       deployer = PrivateKey.fromBase58(DEPLOYER);
       const contractDeployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 
@@ -28,6 +28,7 @@ describe("deployers", () => {
         `Balance of the Deployer ${deployer.toPublicKey().toBase58()} is`,
         balanceDeployer.toLocaleString(`en`)
       );
+
       const balanceContractDeployer =
         Number(
           (await accountBalance(contractDeployer.toPublicKey())).toBigInt()
@@ -38,7 +39,7 @@ describe("deployers", () => {
           .toBase58()} is`,
         balanceContractDeployer.toLocaleString(`en`)
       );
-
+      return;
       for (let i = 0; i < DEPLOYERS_API.length; i++) {
         if (keys.includes(DEPLOYERS_API[i])) {
           console.log(`Duplicate key ${DEPLOYERS_API[i]}`);

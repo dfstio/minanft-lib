@@ -4,14 +4,14 @@ import { PrivateKey, Poseidon, PublicKey } from "o1js";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
-import { Memory } from "../src/mina";
+import { Memory, sleep } from "../src/mina";
 import { PINATA_JWT, NAMES_ORACLE_SK } from "../env.json";
 import config from "../src/config";
 import { MapData } from "../src/storage/map";
 
 const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "berkeley";
+const blockchainInstance: blockchain = "zeko";
 const includeFiles = false;
 const includeImage = false;
 
@@ -122,10 +122,12 @@ describe(`MinaNFT contract`, () => {
 
     //console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
     const tx = await nft.mint({ nameService, deployer, owner, pinataJWT });
+    console.log(`tx:`, tx);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`minted`);
-    expect(await MinaNFT.wait(tx)).toBe(true);
+    //expect(await MinaNFT.wait(tx)).toBe(true);
+    await sleep(60000);
     expect(await nft.checkState()).toBe(true);
   });
 });

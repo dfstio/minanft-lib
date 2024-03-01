@@ -14,12 +14,19 @@ import { Mina, PublicKey, PrivateKey, UInt64 } from "o1js";
 import {
   MinaNetworkURL,
   Berkeley,
+  Zeko,
   TestWorld2,
   Lightnet as Lightnet,
 } from "./networks";
 import { fetchMinaAccount } from "./fetch";
 
-type blockchain = "local" | "berkeley" | "lighnet" | "mainnet" | "testworld2";
+type blockchain =
+  | "local"
+  | "berkeley"
+  | "zeko"
+  | "lighnet"
+  | "mainnet"
+  | "testworld2";
 
 interface MinaNetwork {
   keys: {
@@ -41,6 +48,12 @@ function initBlockchain(instance: blockchain): MinaNetwork {
     });
     Mina.setActiveInstance(network);
     return { keys: [], url: Berkeley };
+  } else if (instance === "zeko") {
+    const network = Mina.Network({
+      mina: Zeko.mina,
+    });
+    Mina.setActiveInstance(network);
+    return { keys: [], url: Zeko };
   } else if (instance === "testworld2") {
     const network = Mina.Network({
       mina: TestWorld2.mina,
