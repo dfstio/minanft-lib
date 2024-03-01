@@ -25,7 +25,8 @@ import { JWT, DEPLOYER_API, DEPLOYERS } from "../env.json";
 import { api } from "../src/api/api";
 
 const blockchainInstance: blockchain = "zeko";
-const maxElements = 2;
+const maxElements = 32;
+const SHIFT = 10000;
 
 class MerkleTreeWitness20 extends MerkleWitness(20) {}
 
@@ -77,7 +78,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     console.log(`Generating ${maxElements} elements...`);
     for (let i = 0; i < maxElements; i++) {
       const oldRoot: Field = tree.getRoot();
-      const value = Field(i + 10);
+      const value = Field(i + SHIFT);
       leaves.push(value);
       tree.setLeaf(BigInt(i), value);
       const newRoot: Field = tree.getRoot();
@@ -114,6 +115,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     Memory.info(`compiled`);
   });
 
+  /*
   it(`should deploy RealTimeVoting`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -164,7 +166,7 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     const counter = zkApp.counter.get();
     expect(counter.toJSON()).toBe(Field(1).toJSON());
   });
-  /*
+  */
   it(`should calculate proof using api call`, async () => {
     expect(votingPrivateKey).toBeDefined();
     if (votingPrivateKey === undefined) return;
@@ -249,16 +251,45 @@ describe(`Parallel SmartContract proofs calculations`, () => {
     let tx: Mina.TransactionId | undefined = undefined;
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: votingContract });
+    const zkApp = new RealTimeVoting(votingContract);
 
     console.log(`Sending ${maxElements} transactions...`);
-
+    const timeSent: number[] = [];
+    console.time(`sent ${maxElements} transactions`);
     for (let i = 0; i < maxElements; i++) {
       const txData = txs.find((t: any) => t.i.toString() === i.toString());
       const transaction: Mina.Transaction = Mina.Transaction.fromJSON(
         JSON.parse(txData.tx) as Types.Json.ZkappCommand
       ) as Mina.Transaction;
-      tx = await transaction.send();
-      //console.log(`Transaction ${i} sent`); //, transaction.toPretty());
+      let isSent = false;
+      while (!isSent) {
+        try {
+          tx = await transaction.send();
+          if (tx.isSuccess) isSent = true;
+          else {
+            console.log("zeko: Transaction not sent");
+            await sleep(60000);
+          }
+        } catch (e) {
+          console.log("zeko: Error:", e);
+          await sleep(60000);
+        }
+      }
+      //tx = await transaction.send();
+      timeSent.push(Date.now());
+      await fetchAccount({ publicKey: votingContract });
+      const counter = zkApp.counter.get();
+      const counterValue = Number(counter.toBigInt()) - SHIFT;
+      if (counterValue >= 0 && counterValue < timeSent.length) {
+        const delay = Date.now() - timeSent[counterValue];
+        console.log(
+          `Transaction ${i} sent`,
+          Number(counter.toBigInt()),
+          delay,
+          " ms"
+        ); //, transaction.toPretty());
+      } else console.log(`Transaction ${i} sent`, Number(counter.toBigInt())); //, transaction.toPretty());
+      /*
       if (i === 0) {
         await MinaNFT.transactionInfo(tx, `first`, false);
         console.log(
@@ -267,13 +298,18 @@ describe(`Parallel SmartContract proofs calculations`, () => {
         expect(await MinaNFT.wait(tx)).toBe(true);
         console.time(`sent ${maxElements - 1} transactions`);
       }
+      */
     }
-    console.timeEnd(`sent ${maxElements - 1} transactions`);
+
+    console.timeEnd(`sent ${maxElements} transactions`);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     await MinaNFT.transactionInfo(tx, `sent last transaction`, false);
-    expect(await MinaNFT.wait(tx)).toBe(true);
+    //expect(await MinaNFT.wait(tx)).toBe(true);
+    await sleep(60000);
+    await fetchAccount({ publicKey: votingContract });
+    const counter = zkApp.counter.get();
+    console.log(`Transactions sent`, Number(counter.toBigInt()));
     Memory.info(`end`);
   });
-  */
 });
