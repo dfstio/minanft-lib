@@ -11,7 +11,7 @@ import { MapData } from "../src/storage/map";
 
 const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "zeko";
+const blockchainInstance: blockchain = "berkeley";
 const includeFiles = false;
 const includeImage = false;
 
@@ -126,8 +126,8 @@ describe(`MinaNFT contract`, () => {
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`minted`);
-    //expect(await MinaNFT.wait(tx)).toBe(true);
-    await sleep(60000);
+    expect(await MinaNFT.wait(tx)).toBe(true);
+    //await sleep(60000);
     expect(await nft.checkState()).toBe(true);
   });
 });
