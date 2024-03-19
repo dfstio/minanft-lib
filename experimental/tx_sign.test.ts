@@ -76,7 +76,7 @@ describe("Export, import and sign transaction", () => {
     await fs.writeFile("./json/tx-unsigned.json", transaction.toJSON());
   });
 
-  it("should import, sign and sendtransaction", async () => {
+  it("should import, sign and send transaction", async () => {
     const transaction: Mina.Transaction = Mina.Transaction.fromJSON(
       JSON.parse(
         await fs.readFile("./json/tx-unsigned.json", "utf8")

@@ -25,8 +25,8 @@ import { JWT, DEPLOYER_API, DEPLOYERS } from "../env.json";
 import { api } from "../src/api/api";
 
 const blockchainInstance: blockchain = "zeko";
-const maxElements = 32;
-const SHIFT = 10000;
+const maxElements = 64;
+const SHIFT = 10;
 
 class MerkleTreeWitness20 extends MerkleWitness(20) {}
 
@@ -283,10 +283,11 @@ describe(`Parallel SmartContract proofs calculations`, () => {
       if (counterValue >= 0 && counterValue < timeSent.length) {
         const delay = Date.now() - timeSent[counterValue];
         console.log(
-          `Transaction ${i} sent`,
+          `Transaction ${i} sent, counter:`,
           Number(counter.toBigInt()),
+          "delay:",
           delay,
-          " ms"
+          "ms"
         ); //, transaction.toPretty());
       } else console.log(`Transaction ${i} sent`, Number(counter.toBigInt())); //, transaction.toPretty());
       /*
