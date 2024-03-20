@@ -155,7 +155,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
     deployer: PrivateKey,
     privateKey: PrivateKey,
     nonce?: number
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = privateKey;
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
@@ -186,7 +186,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "verifier deploy", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return tx;
     } else return undefined;
   }

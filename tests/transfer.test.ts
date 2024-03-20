@@ -14,7 +14,7 @@ import {
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
-import {  blockchain, initBlockchain } from "../utils/testhelpers";
+import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { PINATA_JWT } from "../env.json";
 
@@ -49,7 +49,7 @@ describe(`MinaNFT contract`, () => {
   });
   const owners: PrivateKey[] = [];
   const nft: MinaNFT[] = [];
-  const txs: Mina.TransactionId[] = [];
+  const txs: Mina.PendingTransaction[] = [];
   const escrowPrivateKey1 = PrivateKey.random();
   const escrowPublicKey1 = escrowPrivateKey1.toPublicKey();
   const escrowPrivateKey2 = PrivateKey.random();
@@ -89,10 +89,11 @@ describe(`MinaNFT contract`, () => {
       const nftPublicKey = nftPrivateKey.toPublicKey();
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
-      nft.push(new MinaNFT({ name: `@test`, address: nftPublicKey, owner: ownerHash}));
+      nft.push(
+        new MinaNFT({ name: `@test`, address: nftPublicKey, owner: ownerHash })
+      );
       nft[i].update({ key: `description`, value: `my nft @test` });
       nft[i].update({ key: `twitter`, value: `@builder` });
-
 
       const tx = await nft[i].mint({
         deployer,

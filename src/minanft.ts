@@ -846,7 +846,7 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async commit(
     commitData: MinaNFTCommit
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const {
       deployer,
       ownerPrivateKey,
@@ -984,7 +984,7 @@ class MinaNFT extends BaseMinaNFT {
         zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
-    let sentTx: Mina.TransactionId | undefined = undefined;
+    let sentTx: Mina.PendingTransaction | undefined = undefined;
     try {
       await sleep(100); // alow GC to run
       await tx.prove();
@@ -1002,7 +1002,7 @@ class MinaNFT extends BaseMinaNFT {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const newRoot = proof!.publicInput.newRoot;
     proof = null;
-    if (sentTx.isSuccess) {
+    if (sentTx.status === "pending") {
       this.metadataRoot = newRoot;
       this.updates = [];
       this.version = newVersion;
@@ -1126,7 +1126,7 @@ class MinaNFT extends BaseMinaNFT {
     ownerPublicKey: string;
     nameService: MinaNFTNameService;
     nonce?: number;
-  }): Promise<Mina.TransactionId | undefined> {
+  }): Promise<Mina.PendingTransaction | undefined> {
     const {
       deployer,
       preparedCommitData,
@@ -1227,7 +1227,7 @@ class MinaNFT extends BaseMinaNFT {
         zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
-    let sentTx: Mina.TransactionId | undefined = undefined;
+    let sentTx: Mina.PendingTransaction | undefined = undefined;
     try {
       await sleep(100); // alow GC to run
       await tx.prove();
@@ -1242,7 +1242,7 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("Transaction error");
     }
     await MinaNFT.transactionInfo(sentTx, "update", false);
-    if (sentTx.isSuccess) {
+    if (sentTx.status === "pending") {
       return sentTx;
     } else return undefined;
   }
@@ -1400,11 +1400,11 @@ class MinaNFT extends BaseMinaNFT {
    * @param wait wait for transaction to be included in the block
    */
   public static async transactionInfo(
-    tx: Mina.TransactionId,
+    tx: Mina.PendingTransaction,
     description: string = "",
     wait: boolean = true
   ): Promise<void> {
-    if (tx.isSuccess === false) {
+    if (tx.status === "rejected") {
       console.error("Transaction failed");
       return;
     }
@@ -1412,7 +1412,7 @@ class MinaNFT extends BaseMinaNFT {
       Mina.getNetworkState();
     } catch (error) {
       // We're on Berkeley or TestWorld2
-      const hash = tx.hash();
+      const hash = tx.hash;
       if (hash === undefined) {
         throw new Error("Transaction hash is undefined");
         return;
@@ -1436,7 +1436,7 @@ class MinaNFT extends BaseMinaNFT {
    * Wait for transaction to be included in the block
    * @param tx transaction
    */
-  public static async wait(tx: Mina.TransactionId): Promise<boolean> {
+  public static async wait(tx: Mina.PendingTransaction): Promise<boolean> {
     /*
     try {
       Mina.getNetworkState();
@@ -1465,7 +1465,7 @@ class MinaNFT extends BaseMinaNFT {
   public async mint(
     minaData: MinaNFTMint,
     skipCalculatingMetadataRoot: boolean = false
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const {
       nameService: nameServiceArg,
       deployer,
@@ -1565,7 +1565,7 @@ class MinaNFT extends BaseMinaNFT {
     transaction.sign([deployer, zkAppPrivateKey]);
     const sentTx = await transaction.send();
     await MinaNFT.transactionInfo(sentTx, "mint", false);
-    if (sentTx.isSuccess) {
+    if (sentTx.status === "pending") {
       this.isMinted = true;
       this.metadataRoot = root;
       this.storage = storage.hashStr;
@@ -1616,7 +1616,7 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async transfer(
     transferData: MinaNFTTransfer
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const {
       deployer,
       data,
@@ -1684,7 +1684,7 @@ class MinaNFT extends BaseMinaNFT {
     tx.sign([deployer]);
     const txSent = await tx.send();
     await MinaNFT.transactionInfo(txSent, "transfer", false);
-    if (txSent.isSuccess) {
+    if (txSent.status === "pending") {
       this.owner = data.newOwner;
       this.escrow = Field(0);
       this.version = this.version.add(UInt64.from(1));
@@ -1698,7 +1698,7 @@ class MinaNFT extends BaseMinaNFT {
    */
   public async approve(
     approvalData: MinaNFTApproval
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const {
       deployer,
       data,
@@ -1753,7 +1753,7 @@ class MinaNFT extends BaseMinaNFT {
     tx.sign([deployer]);
     const txSent = await tx.send();
     await MinaNFT.transactionInfo(txSent, "approve", false);
-    if (txSent.isSuccess) {
+    if (txSent.status === "pending") {
       this.escrow = data.escrow;
       this.version = this.version.add(UInt64.from(1));
       return txSent;
@@ -1775,7 +1775,7 @@ class MinaNFT extends BaseMinaNFT {
     nft: PublicKey;
     nameServiceAddress: PublicKey;
     proof: RedactedMinaNFTMapStateProof;
-  }): Promise<Mina.TransactionId> {
+  }): Promise<Mina.PendingTransaction> {
     const { deployer, verifier, nft, nameServiceAddress, proof } = params;
     const address = nft;
     await MinaNFT.compileVerifier();

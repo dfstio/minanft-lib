@@ -41,7 +41,7 @@ class MinaNFTEscrow {
   public async deploy(
     deployer: PrivateKey,
     privateKey: PrivateKey | undefined = undefined
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
@@ -66,7 +66,7 @@ class MinaNFTEscrow {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "escrow deploy", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       this.address = zkAppPublicKey;
       return tx;
     } else return undefined;
@@ -76,7 +76,9 @@ class MinaNFTEscrow {
     data: EscrowTransfer,
     buyer: PrivateKey,
     escrow: PublicKey
-  ): Promise<{ tx: Mina.TransactionId; deposited: EscrowDeposit } | undefined> {
+  ): Promise<
+    { tx: Mina.PendingTransaction; deposited: EscrowDeposit } | undefined
+  > {
     if (this.address === undefined) {
       throw new Error("Escrow not deployed");
     }
@@ -103,7 +105,7 @@ class MinaNFTEscrow {
     transaction.sign([buyer]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "deposit", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return { tx, deposited };
     } else return undefined;
   }
@@ -111,7 +113,9 @@ class MinaNFTEscrow {
   public async approveSale(
     data: EscrowTransfer,
     seller: PrivateKey
-  ): Promise<{ tx: Mina.TransactionId; deposited: EscrowDeposit } | undefined> {
+  ): Promise<
+    { tx: Mina.PendingTransaction; deposited: EscrowDeposit } | undefined
+  > {
     if (this.address === undefined) {
       throw new Error("Escrow not deployed");
     }
@@ -136,14 +140,14 @@ class MinaNFTEscrow {
     transaction.sign([seller]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "approve sale", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return { tx, deposited };
     } else return undefined;
   }
 
   public async transfer(
     transferData: EscrowTransferData
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const {
       data,
       escrow,
@@ -227,7 +231,7 @@ class MinaNFTEscrow {
     transaction.sign([escrow]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "transfer", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return tx;
     } else return undefined;
   }

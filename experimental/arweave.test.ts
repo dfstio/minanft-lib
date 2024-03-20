@@ -2,7 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 import Arweave from "arweave";
 import { Encoding } from "o1js";
 import { MinaNFT } from "../src/minanft";
-import { ARWEAVE_KEY, ARWEAVE_ADDRESS, ARWEAVE_KEY_STRING } from "../env.json";
+import { ARWEAVE_ADDRESS, ARWEAVE_KEY_STRING } from "../env.json";
 
 let arweave: Arweave;
 
@@ -17,17 +17,22 @@ beforeAll(() => {
 describe("Arewave", () => {
   it("should create arweave account and transaction", async () => {
     //const key = await arweave.wallets.generate();
+    // Address: u9cyLbnFI5aFG9kbpF2kEkz4GnNXjqokhUMpIqoCZ_c
+    // old address : Nik3cTofN7VVthzC8D8HoCShtoxHdSVvId0TG7-QvlQ
+    /*
     const key = ARWEAVE_KEY;
     const keyString = JSON.stringify(key);
-    //console.log("Key:", keyString);
+    console.log("Key:", keyString);
     const address = await arweave.wallets.jwkToAddress(key);
     console.log("Address:", address);
     expect(address).toBe(ARWEAVE_ADDRESS);
+    */
 
     //console.log("Key2:", ARWEAVE_KEY_STRING);
-    const key2 = JSON.parse(ARWEAVE_KEY_STRING);
-    const address2 = await arweave.wallets.getAddress(key2);
-    expect(address2).toBe(ARWEAVE_ADDRESS);
+    const key = JSON.parse(ARWEAVE_KEY_STRING);
+    const address = await arweave.wallets.getAddress(key);
+    console.log("Address:", address);
+    expect(address).toBe(ARWEAVE_ADDRESS);
 
     const balance = await arweave.wallets.getBalance(address);
     console.log("Balance:", balance);

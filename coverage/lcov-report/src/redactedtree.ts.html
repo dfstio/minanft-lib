@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">67.08% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>52/78</span>
+                <span class='fraction'>53/79</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.44% </span>
+                <span class="strong">69.86% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>50/72</span>
+                <span class='fraction'>51/73</span>
             </div>
         
             
@@ -57,7 +57,7 @@
         <template id="filterTemplate">
             <div class="quiet">
                 Filter:
-                <input oninput="onInput()" type="search" id="fileSearch">
+                <input type="search" id="fileSearch">
             </div>
         </template>
     </div>
@@ -236,8 +236,8 @@
 <a name='L171'></a><a href='#L171'>171</a>
 <a name='L172'></a><a href='#L172'>172</a>
 <a name='L173'></a><a href='#L173'>173</a>
-<a name='L174'></a><a href='#L174'>174</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">24x</span>
-<span class="cline-any cline-yes">24x</span>
+<a name='L174'></a><a href='#L174'>174</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -247,13 +247,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24x</span>
-<span class="cline-any cline-yes">24x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -414,7 +414,6 @@ import {
   verify,
   PrivateKey,
   AccountUpdate,
-  fetchAccount,
   Mina,
   Account,
   MerkleTree,
@@ -427,6 +426,7 @@ import {
   TreeElement,
 } from "./plugins/redactedtree";
 import { Memory, sleep } from "./mina";
+import { fetchMinaAccount } from "./fetch";
 &nbsp;
 class RedactedTree {
   height: number;
@@ -546,7 +546,7 @@ class RedactedTree {
     deployer: PrivateKey,
     privateKey: PrivateKey,
     nonce?: number
-  ): Promise&lt;Mina.TransactionId | undefined&gt; {
+  ): Promise&lt;Mina.PendingTransaction | undefined&gt; {
     const sender = <span class="cstat-no" title="statement not covered" >deployer.toPublicKey();</span>
     const zkAppPrivateKey = <span class="cstat-no" title="statement not covered" >privateKey;</span>
     const zkAppPublicKey = <span class="cstat-no" title="statement not covered" >zkAppPrivateKey.toPublicKey();</span>
@@ -554,8 +554,8 @@ class RedactedTree {
 <span class="cstat-no" title="statement not covered" >    console.log(</span>
       `deploying the MinaNFTTreeVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
-<span class="cstat-no" title="statement not covered" >    await fetchAccount({ publicKey: sender });</span>
-<span class="cstat-no" title="statement not covered" >    await fetchAccount({ publicKey: zkAppPublicKey });</span>
+<span class="cstat-no" title="statement not covered" >    await fetchMinaAccount({ publicKey: sender });</span>
+<span class="cstat-no" title="statement not covered" >    await fetchMinaAccount({ publicKey: zkAppPublicKey });</span>
     const deployNonce = <span class="cstat-no" title="statement not covered" >nonce ?? Number(Account(sender).nonce.get().toBigint());</span>
     const hasAccount = <span class="cstat-no" title="statement not covered" >Mina.hasAccount(zkAppPublicKey);</span>
 &nbsp;
@@ -577,7 +577,7 @@ class RedactedTree {
 <span class="cstat-no" title="statement not covered" >    transaction.sign([deployer, zkAppPrivateKey]);</span>
     const tx = <span class="cstat-no" title="statement not covered" >await transaction.send();</span>
 <span class="cstat-no" title="statement not covered" >    await MinaNFT.transactionInfo(tx, "verifier deploy", false);</span>
-<span class="cstat-no" title="statement not covered" >    if (tx.isSuccess) {</span>
+<span class="cstat-no" title="statement not covered" >    if (tx.status === "pending") {</span>
 <span class="cstat-no" title="statement not covered" >      return tx;</span>
     } else <span class="cstat-no" title="statement not covered" >return undefined;</span>
   }
@@ -589,7 +589,7 @@ class RedactedTree {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-02-01T17:30:56.069Z
+                at 2024-03-20T19:24:35.438Z
             </div>
         <script src="../prettify.js"></script>
         <script>

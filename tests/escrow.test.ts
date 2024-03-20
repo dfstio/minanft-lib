@@ -26,7 +26,7 @@ import { PINATA_JWT } from "../env.json";
 import { Memory } from "../src/mina";
 
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 
 let deployer: PrivateKey | undefined = undefined;
 const deployers: PrivateKey[] = [];
@@ -108,11 +108,11 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`compiled`);
   });
 
-  let escrowTx: Mina.TransactionId | undefined = undefined;
-  let mintTx: Mina.TransactionId | undefined = undefined;
-  let approveTx: Mina.TransactionId | undefined = undefined;
-  let depositTx: Mina.TransactionId | undefined = undefined;
-  let transferTx: Mina.TransactionId | undefined = undefined;
+  let escrowTx: Mina.PendingTransaction | undefined = undefined;
+  let mintTx: Mina.PendingTransaction | undefined = undefined;
+  let approveTx: Mina.PendingTransaction | undefined = undefined;
+  let depositTx: Mina.PendingTransaction | undefined = undefined;
+  let transferTx: Mina.PendingTransaction | undefined = undefined;
 
   let sellerDeposited: EscrowDeposit | undefined = undefined;
   let buyerDeposited: EscrowDeposit | undefined = undefined;
@@ -120,7 +120,7 @@ describe(`MinaNFT contract`, () => {
   const nftPublicKey = nftPrivateKey.toPublicKey();
 
   const escrow = new MinaNFTEscrow();
-  const nft = new MinaNFT({ name: `@test`, address: nftPublicKey});
+  const nft = new MinaNFT({ name: `@test`, address: nftPublicKey });
 
   it(`should deploy Escrow contract`, async () => {
     expect(escrowPrivateKey).toBeDefined();
@@ -203,7 +203,7 @@ describe(`MinaNFT contract`, () => {
     const { tx, deposited } = result;
     expect(tx).toBeDefined();
     if (tx === undefined) return;
-    expect(tx.isSuccess).toBe(true);
+    expect(tx.status).toBe("pending");
     approveTx = tx;
     sellerDeposited = deposited;
   });
@@ -219,7 +219,7 @@ describe(`MinaNFT contract`, () => {
     const { tx, deposited } = result;
     expect(tx).toBeDefined();
     if (tx === undefined) return;
-    expect(tx.isSuccess).toBe(true);
+    expect(tx.status).toBe("pending");
     depositTx = tx;
     buyerDeposited = deposited;
   });
