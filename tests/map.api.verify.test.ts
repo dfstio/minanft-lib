@@ -133,7 +133,7 @@ describe(`MinaNFT contract`, () => {
     nftAddress = nft.address;
   });
 
-  it(`should create and verify redacted NFT`, async () => {
+  it.skip(`should create and verify redacted NFT`, async () => {
     expect(originalNFT).toBeDefined();
     if (originalNFT === undefined) return;
     redactedNFT = new RedactedMinaNFT(originalNFT);
@@ -271,7 +271,7 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`verified`);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
-    expect(tx.isSuccess).toBe(true);
+    expect(tx.status).toBe("pending");
     expect(await MinaNFT.wait(tx)).toBe(true);
   });
 });

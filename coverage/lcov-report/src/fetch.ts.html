@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/contract/escrow.ts</title>
+    <title>Code coverage report for src/fetch.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/contract</a> escrow.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> fetch.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">38.23% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>13/34</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>1/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">39.39% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>13/33</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -136,22 +136,37 @@
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">25x</span>
-<span class="cline-any cline-yes">25x</span>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">315x</span>
+<span class="cline-any cline-yes">315x</span>
+<span class="cline-any cline-yes">315x</span>
+<span class="cline-any cline-yes">315x</span>
+<span class="cline-any cline-yes">315x</span>
+<span class="cline-any cline-yes">315x</span>
+<span class="cline-any cline-yes">315x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">315x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -162,124 +177,127 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">81x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export { EscrowApproval, EscrowTransfer };
-import  { Field, Struct, UInt64 } from "o1js";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+  PublicKey,
+  Field,
+  Mina,
+  fetchAccount,
+  checkZkappTransaction,
+} from "o1js";
+import { sleep } from "./mina";
 &nbsp;
-/**
- * EscrowTransfer is the data for transfer of the NFT from one owner to another
- * @property oldOwner The old owner of the NFT
- * @property newOwner The new owner of the NFT
- * @property name The name of the NFT
- * @property escrow The escrow of the NFT - Poseidon hash of the escrow public key
- * @property version The new version of the NFT, increases by one with the changing of the metadata or owner
- * @property price The price of the NFT
- * @property tokenId The tokenId of the NFT, Field(0) for MINA payments
- */
-class EscrowTransfer extends Struct({
-  oldOwner: Field,
-  newOwner: Field,
-  name: Field,
-  escrow: Field,
-  version: UInt64,
-  price: UInt64,
-  tokenId: Field, // Field(0) for MINA payments
+export async function fetchMinaAccount(params: {
+  publicKey: string | PublicKey;
+  tokenId?: string | Field | undefined;
+  force?: boolean;
 }) {
-  constructor(value: {
-    oldOwner: Field;
-    newOwner: Field;
-    name: Field;
-    escrow: Field;
-    version: UInt64;
-    price: UInt64;
-    tokenId: Field;
-  }) {
-    super(value);
+  const { publicKey, tokenId, force } = params;
+  const timeout = 1000 * 60 * 10; // 10 minutes
+  const startTime = Date.now();
+  let result = { account: undefined };
+  while (Date.now() - startTime &lt; timeout) {
+    try {
+      const result = await fetchAccount({
+        publicKey,
+        tokenId,
+      });
+      return result;
+      /*
+      if (result.account !== undefined) return result;
+      if (force !== true) return result;
+      console.log(
+        "Cannot fetch account",
+        typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
+        result
+      );
+      */
+    } catch (error) {
+<span class="cstat-no" title="statement not covered" >      console.log("Error in fetchAccount:", error);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    await sleep(1000 * 10);</span>
   }
-&nbsp;
-  toFields(): Field[] {
-    return [
-      this.oldOwner,
-      this.newOwner,
-      this.name,
-      this.escrow,
-      ...this.version.toFields(),
-      ...this.price.toFields(),
-      this.tokenId,
-    ];
-  }
+<span class="cstat-no" title="statement not covered" >  console.log("Timeout in fetchAccount");</span>
+<span class="cstat-no" title="statement not covered" >  return result;</span>
 }
 &nbsp;
-/**
- * EscrowApproval is the data for approval of the escrow change
- * @property name The name of the NFT
- * @property escrow The escrow of the NFT - Poseidon hash of the escrow public key
- * @property owner The owner of the NFT - Poseidon hash of the owner public key
- * @property version The new version of the NFT, increases by one with the changing of the metadata or owner
- */
-class EscrowApproval extends Struct({
-  name: Field,
-  escrow: Field,
-  owner: Field,
-  version: UInt64,
-}) {
-  constructor(value: {
-    name: Field;
-    escrow: Field;
-    owner: Field;
-    version: UInt64;
-  }) {
-    super(value);
+export async function <span class="fstat-no" title="function not covered" >fetchMinaActions(</span>
+  publicKey: PublicKey,
+  fromActionState: Field,
+  endActionState?: Field
+) {
+  const timeout = <span class="cstat-no" title="statement not covered" >1000 * 60 * 600;</span> // 10 hours
+  const startTime = <span class="cstat-no" title="statement not covered" >Date.now();</span>
+<span class="cstat-no" title="statement not covered" >  while (Date.now() - startTime &lt; timeout) {</span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+      let actions = <span class="cstat-no" title="statement not covered" >await Mina.fetchActions(publicKey, {</span>
+        fromActionState,
+        endActionState,
+      });
+<span class="cstat-no" title="statement not covered" >      if (Array.isArray(actions)) <span class="cstat-no" title="statement not covered" >return actions;</span></span>
+      else <span class="cstat-no" title="statement not covered" >console.log("Cannot fetch actions - wrong format");</span>
+    } catch (error: any) {
+<span class="cstat-no" title="statement not covered" >      console.log(</span>
+        "Error in fetchMinaActions",
+        error.toString().substring(0, 300)
+      );
+    }
+<span class="cstat-no" title="statement not covered" >    await sleep(1000 * 60 * 2);</span>
   }
+<span class="cstat-no" title="statement not covered" >  console.log("Timeout in fetchMinaActions");</span>
+<span class="cstat-no" title="statement not covered" >  return undefined;</span>
+}
 &nbsp;
-  toFields() {
-    return [this.name, this.escrow, this.owner, ...this.version.toFields()];
+export async function <span class="fstat-no" title="function not covered" >checkMinaZkappTransaction(</span>hash: string) {
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const result = <span class="cstat-no" title="statement not covered" >await checkZkappTransaction(hash);</span>
+<span class="cstat-no" title="statement not covered" >    return result;</span>
+  } catch (error) {
+<span class="cstat-no" title="statement not covered" >    console.error("Error in checkZkappTransaction:", error);</span>
+<span class="cstat-no" title="statement not covered" >    return { success: false };</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -291,14 +309,14 @@ class EscrowApproval extends Struct({
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2024-03-20T19:24:35.438Z
             </div>
-        <script src="../../prettify.js"></script>
+        <script src="../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../sorter.js"></script>
+        <script src="../block-navigation.js"></script>
     </body>
 </html>
     

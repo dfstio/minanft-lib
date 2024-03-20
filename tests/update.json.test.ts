@@ -5,11 +5,7 @@ import { Account, PrivateKey, PublicKey, Mina, Poseidon } from "o1js";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { MinaNFTBadge } from "../src/minanftbadge";
-import {
-  makeString,
-  blockchain,
-  initBlockchain,
-} from "../utils/testhelpers";
+import { makeString, blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PINATA_JWT } from "../env.json";
@@ -17,7 +13,7 @@ import { PINATA_JWT } from "../env.json";
 const CONTRACTS_NUMBER = 1;
 const ITERATIONS_NUMBER = 1;
 const pinataJWT = ""; //PINATA_JWT;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
@@ -50,8 +46,8 @@ describe(`MinaNFT contract - load private metadata from json`, () => {
   const nftAddresses: PublicKey[] = [];
   const nfts: MinaNFT[] = [];
   const metadata: string[] = [];
-  const txs: Mina.TransactionId[] = [];
-  let badgeTx: Mina.TransactionId | undefined = undefined;
+  const txs: Mina.PendingTransaction[] = [];
+  let badgeTx: Mina.PendingTransaction | undefined = undefined;
   badgeOraclePrivateKey = PrivateKey.random();
   const badge = new MinaNFTBadge({
     name: `badgetest`,
@@ -103,7 +99,11 @@ describe(`MinaNFT contract - load private metadata from json`, () => {
       const nftPublicKey = nftPrivateKey.toPublicKey();
       const owner: PrivateKey = PrivateKey.random();
       const ownerHash = Poseidon.hash(owner.toPublicKey().toFields());
-      const nft = new MinaNFT({ name: `@test${i}`, address: nftPublicKey, owner: ownerHash});
+      const nft = new MinaNFT({
+        name: `@test${i}`,
+        address: nftPublicKey,
+        owner: ownerHash,
+      });
       nft.update({ key: `twitter`, value: `@builder${i}` });
       nft.updateText({
         key: `description`,
@@ -115,7 +115,6 @@ describe(`MinaNFT contract - load private metadata from json`, () => {
         text: `This is secret text of the NFT ${i}. Can be of any length, supports **markdown**.`,
         isPrivate: true,
       });
-
 
       const tx = await nft.mint({
         deployer,

@@ -11,7 +11,7 @@ import { MapData } from "../src/storage/map";
 
 const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "berkeley";
+const blockchainInstance: blockchain = "local";
 const includeFiles = false;
 const includeImage = false;
 
@@ -39,7 +39,7 @@ describe(`MinaNFT contract`, () => {
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-  /*
+
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
@@ -54,9 +54,8 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
   });
-*/
 
-  it(`should use existing NameService`, async () => {
+  it.skip(`should use existing NameService`, async () => {
     oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
     const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
     nameService = new MinaNFTNameService({

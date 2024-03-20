@@ -109,7 +109,7 @@ class MinaNFTBadge {
     deployer: PrivateKey,
     privateKey: PrivateKey | undefined = undefined,
     nonce?: number
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
@@ -145,7 +145,7 @@ class MinaNFTBadge {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "badge deploy", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       this.address = zkAppPublicKey;
       return tx;
     } else return undefined;
@@ -156,7 +156,7 @@ class MinaNFTBadge {
     nft: MinaNFT,
     oraclePrivateKey: PrivateKey,
     nonce?: number
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     if (this.address === undefined) {
       throw new Error("Badge not deployed");
     }
@@ -288,7 +288,7 @@ class MinaNFTBadge {
     transaction.sign([deployer]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "issue badge", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return tx;
     } else return undefined;
   }

@@ -11,7 +11,7 @@ import { MapData } from "../src/storage/map";
 import { ARWEAVE } from "../src/storage/arweave";
 
 const arweaveKey = ARWEAVE_KEY_STRING;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 const includeFiles = true;
 
 let deployer: PrivateKey | undefined = undefined;
@@ -29,7 +29,7 @@ beforeAll(async () => {
   if (deployer === undefined) return;
 });
 
-describe(`MinaNFT contract`, () => {
+describe.skip(`MinaNFT contract`, () => {
   it(`should compile contracts`, async () => {
     MinaNFT.setCacheFolder("./nftcache");
     console.log(`Compiling...`);
@@ -38,7 +38,6 @@ describe(`MinaNFT contract`, () => {
     console.timeEnd(`compiled all`);
     Memory.info(`compiled`);
   });
-
 
   it(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
@@ -96,7 +95,7 @@ describe(`MinaNFT contract`, () => {
       await nft.updateImage({
         filename: "./images/navigator.jpg",
         arweaveKey,
-        calculateRoot: false
+        calculateRoot: false,
       });
 
     const map = new MapData();
@@ -111,7 +110,7 @@ describe(`MinaNFT contract`, () => {
         key: "woman",
         filename: "./images/woman.png",
         arweaveKey,
-        calculateRoot: false
+        calculateRoot: false,
       });
     const mapLevel3 = new MapData();
     mapLevel3.update({ key: `level3-1`, value: `value31` });

@@ -33,7 +33,7 @@ class MinaNFTNameService {
     deployer: PrivateKey,
     privateKey: PrivateKey | undefined = undefined,
     nonce?: number
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const sender = deployer.toPublicKey();
 
     if (this.oraclePrivateKey === undefined)
@@ -70,7 +70,7 @@ class MinaNFTNameService {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "name service deploy", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       this.address = zkAppPublicKey;
       this.tokenId = zkApp.token.id;
       return tx;
@@ -81,7 +81,7 @@ class MinaNFTNameService {
     deployer: PrivateKey,
     privateKey: PrivateKey,
     nonce?: number
-  ): Promise<Mina.TransactionId | undefined> {
+  ): Promise<Mina.PendingTransaction | undefined> {
     const sender = deployer.toPublicKey();
 
     if (this.address === undefined) throw new Error("Address is not set");
@@ -119,7 +119,7 @@ class MinaNFTNameService {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "name service upgrade", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       this.address = zkAppPublicKey;
       this.tokenId = zkApp.token.id;
       return tx;

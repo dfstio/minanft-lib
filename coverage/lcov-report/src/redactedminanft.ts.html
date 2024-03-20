@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.4% </span>
+                <span class="strong">93.47% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>85/91</span>
+                <span class='fraction'>86/92</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.29% </span>
+                <span class="strong">95.34% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>81/85</span>
+                <span class='fraction'>82/86</span>
             </div>
         
             
@@ -57,7 +57,7 @@
         <template id="filterTemplate">
             <div class="quiet">
                 Filter:
-                <input oninput="onInput()" type="search" id="fileSearch">
+                <input type="search" id="fileSearch">
             </div>
         </template>
     </div>
@@ -256,23 +256,8 @@
 <a name='L191'></a><a href='#L191'>191</a>
 <a name='L192'></a><a href='#L192'>192</a>
 <a name='L193'></a><a href='#L193'>193</a>
-<a name='L194'></a><a href='#L194'>194</a>
-<a name='L195'></a><a href='#L195'>195</a>
-<a name='L196'></a><a href='#L196'>196</a>
-<a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a>
-<a name='L200'></a><a href='#L200'>200</a>
-<a name='L201'></a><a href='#L201'>201</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">6x</span>
+<a name='L194'></a><a href='#L194'>194</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
@@ -283,6 +268,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -464,15 +450,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export { RedactedMinaNFT };
-import {
-  verify,
-  Proof,
-  PrivateKey,
-  AccountUpdate,
-  fetchAccount,
-  Mina,
-  Account,
-} from "o1js";
+import { verify, Proof, PrivateKey, AccountUpdate, Mina, Account } from "o1js";
 import { BaseMinaNFT } from "./baseminanft";
 import { PrivateMetadata } from "./privatemetadata";
 import { MinaNFT } from "./minanft";
@@ -485,6 +463,7 @@ import {
 } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 import { Memory, sleep } from "./mina";
+import { fetchMinaAccount } from "./fetch";
 &nbsp;
 class RedactedMinaNFT extends BaseMinaNFT {
   nft: MinaNFT;
@@ -627,16 +606,16 @@ class RedactedMinaNFT extends BaseMinaNFT {
     deployer: PrivateKey,
     privateKey: PrivateKey,
     nonce?: number
-  ): Promise&lt;Mina.TransactionId | undefined&gt; {
+  ): Promise&lt;Mina.PendingTransaction | undefined&gt; {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = privateKey;
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     await MinaNFT.compileVerifier();
     console.log(
-      `deploying the MinaNFTVerifierBadge contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
+      `deploying the MinaNFTVerifier contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: zkAppPublicKey });
     const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 &nbsp;
@@ -658,7 +637,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "verifier deploy", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return tx;
     } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="else path not taken" >E</span>return undefined;</span>
   }
@@ -670,7 +649,7 @@ class RedactedMinaNFT extends BaseMinaNFT {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-02-01T17:30:56.069Z
+                at 2024-03-20T19:24:35.438Z
             </div>
         <script src="../prettify.js"></script>
         <script>

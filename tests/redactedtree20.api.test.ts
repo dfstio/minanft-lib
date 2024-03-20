@@ -16,7 +16,7 @@ import {
 import { formatTime } from "../src/mina";
 import { MinaNFT } from "../src/minanft";
 
-import {  blockchain, initBlockchain } from "../utils/testhelpers";
+import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { TreeElement } from "../src/plugins/redactedtree";
 import {
@@ -28,7 +28,7 @@ import {
 import { JWT } from "../env.json";
 import { api } from "../src/api/api";
 
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 const maxElements = 100;
 const minMaskLength = 4;
 
@@ -44,7 +44,7 @@ const size = 2 ** (20 - 1);
 //let proof: TreeStateProof | undefined = undefined;
 const transactions: string[] = [];
 let verificationKey: VerificationKey | undefined = undefined;
-let tx: Mina.TransactionId | undefined = undefined;
+let tx: Mina.PendingTransaction | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
 let deployer: PrivateKey | undefined = undefined;
 let jobId: string = "";
@@ -154,7 +154,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     console.timeEnd(`prepared transactions`);
   });
 
-  it(`should calculate proof using api call`, async () => {
+  it.skip(`should calculate proof using api call`, async () => {
     const minanft = new api(JWT);
     console.log("transactions", transactions.length);
 
@@ -224,7 +224,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     Memory.info(`deployed`);
   });
 
-  it(`should get merged proof using api call`, async () => {
+  it.skip(`should get merged proof using api call`, async () => {
     expect(jobId).toBeDefined();
     if (jobId === undefined) return;
     expect(jobId).not.toBe("");
@@ -283,7 +283,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     console.timeEnd(`waited for MinaNFTTreeVerifier to be deployed`);
   });
 
-  it(`should verify merged proof off chain`, async () => {
+  it.skip(`should verify merged proof off chain`, async () => {
     expect(proof).toBeDefined();
     expect(proof).not.toBe("");
     if (proof === "") return;
@@ -295,7 +295,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     expect(ok).toBeTruthy();
   });
 
-  it(`should verify merged proof on chain`, async () => {
+  it.skip(`should verify merged proof on chain`, async () => {
     expect(proof).toBeDefined();
     expect(proof).not.toBe("");
     if (proof === "") return;

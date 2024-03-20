@@ -6,7 +6,7 @@ import { JWT } from "../env.json";
 describe(`MinaNFT mint using api`, () => {
   it(`should get NFT address by api call - existing NFT `, async () => {
     const minanft = new api(JWT);
-    const result = await minanft.lookupName("@test_video");
+    const result = await minanft.lookupName("@upgrade");
     console.log("lookup result", result);
     expect(result.address).toBeDefined();
     if (result.address === undefined) return;

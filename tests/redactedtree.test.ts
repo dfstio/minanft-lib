@@ -21,7 +21,7 @@ import {
 } from "../src/plugins/redactedtree";
 import { Memory } from "../src/mina";
 
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 const height = 16;
 const maxElements = 100;
 const minMaskLength = 5;
@@ -46,7 +46,7 @@ const size = 2 ** (height - 1);
 const proofs: string[] = [];
 let mergedProof: string = "";
 let verificationKey: VerificationKey | undefined = undefined;
-let tx: Mina.TransactionId | undefined = undefined;
+let tx: Mina.PendingTransaction | undefined = undefined;
 let verifier: PublicKey | undefined = undefined;
 
 let deployer: PrivateKey | undefined = undefined;

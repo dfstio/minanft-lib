@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80.28% </span>
+                <span class="strong">80.41% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>114/142</span>
+                <span class='fraction'>115/143</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.83% </span>
+                <span class="strong">82.96% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>111/134</span>
+                <span class='fraction'>112/135</span>
             </div>
         
             
@@ -57,7 +57,7 @@
         <template id="filterTemplate">
             <div class="quiet">
                 Filter:
-                <input oninput="onInput()" type="search" id="fileSearch">
+                <input type="search" id="fileSearch">
             </div>
         </template>
     </div>
@@ -390,7 +390,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -402,6 +401,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -701,7 +701,6 @@ import {
   PrivateKey,
   PublicKey,
   AccountUpdate,
-  fetchAccount,
   MerkleMap,
   Signature,
   Account,
@@ -721,6 +720,7 @@ import {
 import { RedactedMinaNFT } from "./redactedminanft";
 import { MinaNFTContract } from "./contract/nft";
 import { sleep } from "./mina";
+import { fetchMinaAccount } from "./fetch";
 &nbsp;
 /**
  * interface for MinaNFTBadge constructor
@@ -752,7 +752,7 @@ class MinaNFTBadge {
 &nbsp;
   /**
    * Create MinaNFT object
-   * @param args {@link MinaNFTBadgeConstructor} 
+   * @param args {@link MinaNFTBadgeConstructor}
    */
   constructor(args: MinaNFTBadgeConstructor) {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (args.name.length &gt; 30)
@@ -782,7 +782,7 @@ class MinaNFTBadge {
     badgePublicKey: PublicKey
   ): Promise&lt;MinaNFTBadge | undefined&gt; {
     const zkApp = <span class="cstat-no" title="statement not covered" >new MinaNFTVerifierBadge(badgePublicKey);</span>
-<span class="cstat-no" title="statement not covered" >    await fetchAccount({ publicKey: badgePublicKey });</span>
+<span class="cstat-no" title="statement not covered" >    await fetchMinaAccount({ publicKey: badgePublicKey });</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!Mina.hasAccount(badgePublicKey)) <span class="cstat-no" title="statement not covered" >return undefined;</span></span>
     const name = <span class="cstat-no" title="statement not covered" >zkApp.name.get();</span>
     const owner = <span class="cstat-no" title="statement not covered" >zkApp.owner.get();</span>
@@ -806,7 +806,7 @@ class MinaNFTBadge {
     deployer: PrivateKey,
     privateKey: PrivateKey | undefined = undefined,
     nonce?: number
-  ): Promise&lt;Mina.TransactionId | undefined&gt; {
+  ): Promise&lt;Mina.PendingTransaction | undefined&gt; {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
@@ -814,8 +814,8 @@ class MinaNFTBadge {
     console.log(
       `deploying the MinaNFTVerifierBadge contract to an address ${zkAppPublicKey.toBase58()} using the deployer with public key ${sender.toBase58()}...`
     );
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: zkAppPublicKey });
     const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 &nbsp;
@@ -842,7 +842,7 @@ class MinaNFTBadge {
     transaction.sign([deployer, zkAppPrivateKey]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "badge deploy", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       this.address = zkAppPublicKey;
       return tx;
     } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="else path not taken" >E</span>return undefined;</span>
@@ -853,7 +853,7 @@ class MinaNFTBadge {
     nft: MinaNFT,
     oraclePrivateKey: PrivateKey,
     nonce?: number
-  ): Promise&lt;Mina.TransactionId | undefined&gt; {
+  ): Promise&lt;Mina.PendingTransaction | undefined&gt; {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (this.address === undefined) {
 <span class="cstat-no" title="statement not covered" >      throw new Error("Badge not deployed");</span>
     }
@@ -948,10 +948,10 @@ class MinaNFTBadge {
     console.timeEnd(logStr);
     const sender = deployer.toPublicKey();
 &nbsp;
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: nftAddress, tokenId: nftTokenId });
-    await fetchAccount({ publicKey: this.address });
-    await fetchAccount({ publicKey: nftAddress, tokenId });
+    await fetchMinaAccount({ publicKey: sender });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId: nftTokenId });
+    await fetchMinaAccount({ publicKey: this.address });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId });
     const hasAccount = Mina.hasAccount(nftAddress, tokenId);
     const deployNonce = nonce ?? <span class="branch-1 cbranch-no" title="branch not covered" >Number(Account(sender).nonce.get().toBigint());</span>
 &nbsp;
@@ -985,7 +985,7 @@ class MinaNFTBadge {
     transaction.sign([deployer]);
     const tx = await transaction.send();
     await MinaNFT.transactionInfo(tx, "issue badge", false);
-    if (tx.isSuccess) {
+    if (tx.status === "pending") {
       return tx;
     } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="else path not taken" >E</span>return undefined;</span>
   }
@@ -1002,8 +1002,8 @@ class MinaNFTBadge {
     const issuer = new MinaNFTVerifierBadge(this.address);
     const tokenId = issuer.token.id;
     const zkNFT = new MinaNFTContract(nftAddress, nft.tokenId);
-    await fetchAccount({ publicKey: nftAddress, tokenId });
-    await fetchAccount({ publicKey: nftAddress, tokenId: nft.tokenId });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId });
+    await fetchMinaAccount({ publicKey: nftAddress, tokenId: nft.tokenId });
     const hasAccount = Mina.hasAccount(nftAddress, tokenId);
     if (!hasAccount) return false;
     const version = zkNFT.version.get();
@@ -1018,7 +1018,7 @@ class MinaNFTBadge {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-02-01T17:30:56.069Z
+                at 2024-03-20T19:24:35.438Z
             </div>
         <script src="../prettify.js"></script>
         <script>

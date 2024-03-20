@@ -211,7 +211,7 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`verified`);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
-    expect(tx.isSuccess).toBe(true);
+    expect(tx.status).toBe("pending");
     expect(await MinaNFT.wait(tx)).toBe(true);
   });
 });
