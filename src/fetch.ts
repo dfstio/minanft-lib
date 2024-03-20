@@ -32,12 +32,27 @@ export async function fetchMinaAccount(params: {
         result
       );
       */
-    } catch (error) {
-      console.log("Error in fetchAccount:", error);
+    } catch (error: any) {
+      if (force === true) console.log("Error in fetchAccount:", error);
+      else {
+        console.log(
+          "fetchMinaAccount error",
+          typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
+          tokenId?.toString(),
+          force,
+          error
+        );
+        return result;
+      }
     }
     await sleep(1000 * 10);
   }
-  console.log("Timeout in fetchAccount");
+  console.log(
+    "fetchMinaAccount timeout",
+    typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
+    tokenId?.toString(),
+    force
+  );
   return result;
 }
 

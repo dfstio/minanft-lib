@@ -1496,6 +1496,7 @@ class MinaNFT extends BaseMinaNFT {
     const sender = deployer.toPublicKey();
     const zkAppPrivateKey = privateKey ?? PrivateKey.random();
     this.address = zkAppPrivateKey.toPublicKey();
+    console.log("Deploying NFT to address", this.address.toBase58());
     //const zkApp = new MinaNFTContract(this.address);
 
     const root = skipCalculatingMetadataRoot
@@ -1547,8 +1548,8 @@ class MinaNFT extends BaseMinaNFT {
     const tokenId = zkApp.token.id;
     this.tokenId = tokenId;
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
-    await fetchMinaAccount({ publicKey: this.address, tokenId });
-    await fetchMinaAccount({ publicKey: sender });
+    //await fetchMinaAccount({ publicKey: this.address, tokenId });
+    await fetchMinaAccount({ publicKey: sender, force: true });
     const account = Account(sender);
     const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
     const hasAccount = Mina.hasAccount(this.address, tokenId);
