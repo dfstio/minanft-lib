@@ -9,7 +9,7 @@ import { MINANFT_NAME_SERVICE_SK } from "../env.json";
 import config from "../src/config";
 const { MINANFT_NAME_SERVICE } = config;
 
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "berkeley";
 
 let deployer: PrivateKey | undefined = undefined;
 
@@ -40,7 +40,7 @@ describe(`Upgrade MinaNFT name service contract`, () => {
     Memory.info(`compiled`);
   });
 
-  it(`should deploy NameService`, async () => {
+  it.skip(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     const oraclePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_SK);

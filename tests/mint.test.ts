@@ -11,7 +11,7 @@ import { MapData } from "../src/storage/map";
 
 const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const blockchainInstance: blockchain = "berkeley";
 const includeFiles = false;
 const includeImage = false;
 
@@ -40,7 +40,7 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`compiled`);
   });
 
-  it(`should deploy NameService`, async () => {
+  it.skip(`should deploy NameService`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     oraclePrivateKey = PrivateKey.random();
@@ -55,7 +55,7 @@ describe(`MinaNFT contract`, () => {
     nameService = names;
   });
 
-  it.skip(`should use existing NameService`, async () => {
+  it(`should use existing NameService`, async () => {
     oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
     const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
     nameService = new MinaNFTNameService({
@@ -120,13 +120,19 @@ describe(`MinaNFT contract`, () => {
     nft.updateMap({ key: `level 2 and 3 data`, map });
 
     //console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
-    const tx = await nft.mint({ nameService, deployer, owner, pinataJWT });
-    console.log(`tx:`, tx);
+    const tx = await nft.mint({
+      nameService,
+      deployer,
+      owner,
+      pinataJWT,
+      privateKey: nftPrivateKey,
+    });
+    console.log(`tx:`, tx?.hash);
     expect(tx).toBeDefined();
     if (tx === undefined) return;
     Memory.info(`minted`);
     expect(await MinaNFT.wait(tx)).toBe(true);
-    //await sleep(60000);
+    await sleep(60000);
     expect(await nft.checkState()).toBe(true);
   });
 });
