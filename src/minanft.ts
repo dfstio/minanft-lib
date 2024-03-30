@@ -1312,13 +1312,26 @@ class MinaNFT extends BaseMinaNFT {
     if (pinataJWT !== undefined) {
       console.log("Pinning to IPFS...");
       const ipfs = new IPFS(pinataJWT);
-      const hash = await ipfs.pinString(
+      let hash = await ipfs.pinString(
         this.exportToString({
           increaseVersion: true,
           includePrivateData: false,
         })
       );
-      if (hash === undefined) return undefined;
+      if (hash === undefined) {
+        console.error("Pinning to IPFS failed. Retrying...");
+        await sleep(10000);
+        hash = await ipfs.pinString(
+          this.exportToString({
+            increaseVersion: true,
+            includePrivateData: false,
+          })
+        );
+      }
+      if (hash === undefined) {
+        console.error("Pinning to IPFS failed");
+        return undefined;
+      }
       const hashStr = "i:" + hash;
       const ipfs_fields = MinaNFT.stringToFields(hashStr);
       if (ipfs_fields.length !== 2) throw new Error("IPFS hash encoding error");
