@@ -58,7 +58,7 @@ class IPFS {
       if (this.auth === "Bearer ")
         //for running tests
         return `QmaRZUgm2GYCCjsDCa5eJk4rjRogTgY6dCyXRQmnhvFmjj`;
-
+      // TODO: add retry logic
       const response = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
         formData,
