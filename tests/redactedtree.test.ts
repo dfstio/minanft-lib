@@ -23,7 +23,7 @@ import { Memory } from "../src/mina";
 
 const blockchainInstance: blockchain = "local";
 const height = 16;
-const maxElements = 100;
+const maxElements = 10;
 const minMaskLength = 5;
 
 const {

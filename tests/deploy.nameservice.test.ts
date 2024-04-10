@@ -23,7 +23,7 @@ let nameServicePrivateKey: PrivateKey | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  const data = await initBlockchain(useLocalBlockchain ? "local" : "berkeley");
+  const data = await initBlockchain(useLocalBlockchain ? "local" : "devnet");
   expect(data).toBeDefined();
   if (data === undefined) return;
 

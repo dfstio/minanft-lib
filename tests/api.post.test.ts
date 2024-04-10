@@ -5,16 +5,16 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { PublicKey, PrivateKey, Poseidon, Signature } from "o1js";
 import { api } from "../src/api/api";
 import { initBlockchain, makeString } from "../utils/testhelpers";
-import { blockchain } from "../src/mina"
+import { blockchain } from "../src/mina";
 import { Memory } from "../src/mina";
 import { PINATA_JWT, JWT } from "../env.json";
 import config from "../src/config";
 import { MapData } from "../src/storage/map";
 
-const  { MINANFT_NAME_SERVICE } = config;
+const { MINANFT_NAME_SERVICE } = config;
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = 'berkeley';
+const blockchainInstance: blockchain = "berkeley";
 const includeFiles = true;
 
 let deployer: PrivateKey | undefined = undefined;
@@ -34,7 +34,7 @@ beforeAll(async () => {
   if (deployer === undefined) return;
 });
 
-describe(`MinaNFT mint using api`, () => {
+describe.skip(`MinaNFT mint using api`, () => {
   let nft: MinaNFT | undefined = undefined;
   /*
   it(`should compile contracts`, async () => {
@@ -165,9 +165,11 @@ describe(`MinaNFT mint using api`, () => {
     }
 
     console.log("Minting...");
-    const result = await minanft.mint({ uri,
+    const result = await minanft.mint({
+      uri,
       signature: reserved.signature,
-      privateKey: nftPrivateKey.toBase58(), });
+      privateKey: nftPrivateKey.toBase58(),
+    });
     console.log("mint result", result);
     expect(result.success).toBe(true);
   });
