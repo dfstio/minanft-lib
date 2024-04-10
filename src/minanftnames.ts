@@ -59,9 +59,9 @@ class MinaNFTNameService {
         memo: "minanft.io",
         nonce: deployNonce,
       },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
+        await zkApp.deploy({});
         zkApp.oracle.set(oracle);
         zkApp.account.zkappUri.set("https://minanft.io");
         zkApp.account.tokenSymbol.set("NFT");
@@ -72,7 +72,7 @@ class MinaNFTNameService {
     await MinaNFT.transactionInfo(tx, "name service deploy", false);
     if (tx.status === "pending") {
       this.address = zkAppPublicKey;
-      this.tokenId = zkApp.token.id;
+      this.tokenId = zkApp.deriveTokenId();
       return tx;
     } else return undefined;
   }
@@ -111,7 +111,7 @@ class MinaNFTNameService {
         memo: "minanft.io",
         nonce: deployNonce,
       },
-      () => {
+      async () => {
         const update = AccountUpdate.createSigned(zkAppPublicKey);
         update.account.verificationKey.set(verificationKey);
       }
@@ -121,7 +121,7 @@ class MinaNFTNameService {
     await MinaNFT.transactionInfo(tx, "name service upgrade", false);
     if (tx.status === "pending") {
       this.address = zkAppPublicKey;
-      this.tokenId = zkApp.token.id;
+      this.tokenId = zkApp.deriveTokenId();
       return tx;
     } else return undefined;
   }

@@ -4,7 +4,8 @@ import {
   method,
   DeployArgs,
   Permissions,
-  SmartContract,
+  TokenContract,
+  AccountUpdateForest,
   PublicKey,
   Field,
   Signature,
@@ -38,20 +39,9 @@ class MinaNFTVerifierBadgeEvent extends Struct({
   }) {
     super(args);
   }
-
-  toFields() {
-    return [
-      ...this.address.toFields(),
-      this.owner,
-      this.name,
-      this.data.data,
-      this.data.kind,
-      this.key,
-    ];
-  }
 }
 
-class MinaNFTVerifierBadge extends SmartContract {
+class MinaNFTVerifierBadge extends TokenContract {
   @state(Field) name = State<Field>();
   @state(Field) owner = State<Field>();
   @state(Field) verifiedKey = State<Field>();
@@ -64,7 +54,7 @@ class MinaNFTVerifierBadge extends SmartContract {
     revoke: PublicKey,
   };
 
-  deploy(args: DeployArgs) {
+  async deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
@@ -72,7 +62,16 @@ class MinaNFTVerifierBadge extends SmartContract {
     });
   }
 
-  @method issueBadge(
+  async approveBase(forest: AccountUpdateForest) {
+    // https://discord.com/channels/484437221055922177/1215258350577647616
+    // this.checkZeroBalanceChange(forest);
+    //forest.isEmpty().assertEquals(Bool(true));
+    throw Error(
+      "transfers of tokens are not allowed, change the owner instead"
+    );
+  }
+
+  @method async issueBadge(
     nft: PublicKey,
     nftTokenId: Field,
     badgeEvent: MinaNFTVerifierBadgeEvent,
@@ -85,22 +84,22 @@ class MinaNFTVerifierBadge extends SmartContract {
     https://github.com/o1-labs/o1js/issues/1245
    
     const minanft = new MinaNFTContract(nft, nftTokenId);
-    badgeEvent.owner.assertEquals(minanft.owner.getAndAssertEquals());
+    badgeEvent.owner.assertEquals(minanft.owner.getAndRequireEquals());
     badgeEvent.address.assertEquals(nft);
-    badgeEvent.name.assertEquals(minanft.name.getAndAssertEquals());
-    badgeEvent.version.assertEquals(minanft.version.getAndAssertEquals());
+    badgeEvent.name.assertEquals(minanft.name.getAndRequireEquals());
+    badgeEvent.version.assertEquals(minanft.version.getAndRequireEquals());
     Metadata.assertEquals(
-      minanft.metadata.getAndAssertEquals(),
+      minanft.metadata.getAndRequireEquals(),
       proof.publicInput.originalRoot
     );
     */
 
     badgeProof.publicInput.data.kind.assertEquals(
-      this.verifiedKind.getAndAssertEquals(),
+      this.verifiedKind.getAndRequireEquals(),
       "Kind mismatch"
     );
     badgeProof.publicInput.key.assertEquals(
-      this.verifiedKey.getAndAssertEquals(),
+      this.verifiedKey.getAndRequireEquals(),
       "Key mismatch"
     );
 
@@ -111,15 +110,19 @@ class MinaNFTVerifierBadge extends SmartContract {
     Metadata.assertEquals(badgeProof.publicInput.data, badgeEvent.data);
 
     signature
-      .verify(this.oracle.getAndAssertEquals(), badgeEvent.toFields())
+      .verify(
+        this.oracle.getAndRequireEquals(),
+        MinaNFTVerifierBadgeEvent.toFields(badgeEvent)
+      )
       .assertEquals(true);
     proof.verify();
     badgeProof.verify();
 
     // Issue verification badge
-    const account = Account(nft, this.token.id);
-    const tokenBalance = account.balance.getAndAssertEquals();
-    this.token.mint({
+    const tokenId = this.deriveTokenId();
+    const account = Account(nft, tokenId);
+    const tokenBalance = account.balance.getAndRequireEquals();
+    this.internal.mint({
       address: nft,
       amount: badgeEvent.version.sub(tokenBalance),
     });
@@ -128,26 +131,28 @@ class MinaNFTVerifierBadge extends SmartContract {
     this.emitEvent("issue", badgeEvent);
   }
 
-  @method revokeBadge(nft: PublicKey, signature: Signature) {
-    const oracle = this.oracle.getAndAssertEquals();
+  @method async revokeBadge(nft: PublicKey, signature: Signature) {
+    const oracle = this.oracle.getAndRequireEquals();
     signature.verify(oracle, nft.toFields());
 
-    const account = Account(nft, this.token.id);
-    const tokenBalance = account.balance.getAndAssertEquals();
+    const tokenId = this.deriveTokenId();
+    const account = Account(nft, tokenId);
+    const tokenBalance = account.balance.getAndRequireEquals();
 
     // Revoke verification badge
-    this.token.burn({ address: nft, amount: tokenBalance });
+    this.internal.burn({ address: nft, amount: tokenBalance });
 
     // Emit event
     this.emitEvent("revoke", nft);
   }
 
-  @method verifyBadge(nft: PublicKey, nftTokenId: Field) {
-    const account = Account(nft, this.token.id);
-    const tokenBalance = account.balance.getAndAssertEquals();
+  @method async verifyBadge(nft: PublicKey, nftTokenId: Field) {
+    const tokenId = this.deriveTokenId();
+    const account = Account(nft, tokenId);
+    const tokenBalance = account.balance.getAndRequireEquals();
 
     const minanft = new MinaNFTContract(nft, nftTokenId);
-    const version = minanft.version.getAndAssertEquals();
+    const version = minanft.version.getAndRequireEquals();
 
     version.assertEquals(tokenBalance);
   }

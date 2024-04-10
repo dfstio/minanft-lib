@@ -31,7 +31,7 @@ class KeyValue extends SmartContract {
   @state(Field) value = State<Field>();
 
   @method update(value: Field) {
-    this.key.getAndAssertEquals();
+    this.key.getAndRequireEquals();
     Field(0).assertNotEquals(this.key.get());
     this.value.set(value);
   }

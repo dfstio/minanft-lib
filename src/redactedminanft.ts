@@ -142,9 +142,13 @@ class RedactedMinaNFT extends BaseMinaNFT {
       });
       transactions.push(
         JSON.stringify({
-          element: element.toFields().map((f) => f.toJSON()),
-          originalWitness: originalWitness.toFields().map((f) => f.toJSON()),
-          redactedWitness: redactedWitness.toFields().map((f) => f.toJSON()),
+          element: MapElement.toFields(element).map((f) => f.toJSON()),
+          originalWitness: MetadataWitness.toFields(originalWitness).map((f) =>
+            f.toJSON()
+          ),
+          redactedWitness: MetadataWitness.toFields(redactedWitness).map((f) =>
+            f.toJSON()
+          ),
         })
       );
     });
@@ -176,9 +180,9 @@ class RedactedMinaNFT extends BaseMinaNFT {
         memo: "minanft.io",
         nonce: deployNonce,
       },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
+        await zkApp.deploy({});
         zkApp.account.tokenSymbol.set("VERIFY");
         zkApp.account.zkappUri.set("https://minanft.io/@verifier");
       }

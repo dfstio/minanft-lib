@@ -19,17 +19,6 @@ class Metadata extends Struct({
     state1.data.assertEquals(state2.data);
     state1.kind.assertEquals(state2.kind);
   }
-
-  toFields(): Field[] {
-    return [this.data, this.kind];
-  }
-
-  static fromFields(fields: Field[]): Metadata {
-    return new Metadata({
-      data: fields[0],
-      kind: fields[1],
-    });
-  }
 }
 
 /**
@@ -50,17 +39,6 @@ class MetadataWitness extends Struct({
     state1.data.assertEquals(state2.data);
     state1.kind.assertEquals(state2.kind);
   }
-
-  toFields(): Field[] {
-    return [...this.data.toFields(), ...this.kind.toFields()];
-  }
-
-  static fromFields(fields: Field[]): MetadataWitness {
-    return new MetadataWitness({
-      data: MerkleMapWitness.fromFields(fields.slice(0, fields.length / 2)),
-      kind: MerkleMapWitness.fromFields(fields.slice(fields.length / 2)),
-    });
-  }
 }
 
 /**
@@ -74,9 +52,6 @@ class Storage extends Struct({
 }) {
   constructor(value: { hashString: [Field, Field] }) {
     super(value);
-  }
-  toFields(): Field[] {
-    return this.hashString;
   }
 }
 
@@ -109,42 +84,5 @@ class Update extends Struct({
     verifier: PublicKey;
   }) {
     super(value);
-  }
-
-  toFields(): Field[] {
-    const verifier = this.verifier.toFields();
-    return [
-      this.oldRoot.data,
-      this.oldRoot.kind,
-      this.newRoot.data,
-      this.newRoot.kind,
-      ...this.storage.toFields(),
-      this.name,
-      this.owner,
-      this.version.toFields()[0],
-      verifier[0],
-      verifier[1],
-    ];
-  }
-
-  static fromFields(fields: Field[]): Update {
-    const verifier = PublicKey.fromFields(fields.slice(fields.length - 2));
-    return new Update({
-      oldRoot: new Metadata({
-        data: fields[0],
-        kind: fields[1],
-      }),
-      newRoot: new Metadata({
-        data: fields[2],
-        kind: fields[3],
-      }),
-      storage: new Storage({
-        hashString: [fields[4], fields[5]],
-      }),
-      name: fields[6],
-      owner: fields[7],
-      version: new UInt64(fields[8]),
-      verifier,
-    });
   }
 }

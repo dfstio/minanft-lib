@@ -180,15 +180,15 @@ describe(`MinaNFT contract`, () => {
         });
         const signature1 = Signature.create(
           escrowPrivateKey1,
-          escrowData.toFields()
+          EscrowTransfer.toFields(escrowData)
         );
         const signature2 = Signature.create(
           escrowPrivateKey2,
-          escrowData.toFields()
+          EscrowTransfer.toFields(escrowData)
         );
         const signature3 = Signature.create(
           escrowPrivateKey3,
-          escrowData.toFields()
+          EscrowTransfer.toFields(escrowData)
         );
         const tx = await nft[i].transfer({
           deployer,

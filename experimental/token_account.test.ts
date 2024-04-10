@@ -49,7 +49,7 @@ class TokenAccount extends SmartContract {
   @state(Field) value = State<Field>();
 
   @method empty() {
-    this.value.getAndAssertEquals();
+    this.value.getAndRequireEquals();
   }
 }
 

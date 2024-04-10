@@ -103,7 +103,7 @@ class Token2 extends SmartContract {
 
   isNFT(address: PublicKey) {
     const account = Account(address, this.token.id);
-    const tokenBalance = account.balance.getAndAssertEquals();
+    const tokenBalance = account.balance.getAndRequireEquals();
     tokenBalance.assertEquals(UInt64.from(1_000_000_000));
   }
 
@@ -160,7 +160,7 @@ class TokenAccount2 extends SmartContract {
   @state(Field) value8 = State<Field>();
 
   @method update(value1: Field, value2: Field) {
-    const oldValue1 = this.value1.getAndAssertEquals();
+    const oldValue1 = this.value1.getAndRequireEquals();
     oldValue1.assertEquals(value1.sub(Field(1)));
     this.value1.set(value1);
     this.value2.set(value2);

@@ -75,43 +75,23 @@ class MetadataUpdate extends Struct({
   oldValue: Metadata,
   newValue: Metadata,
   witness: MetadataWitness,
-}) {
-  toFields(): Field[] {
-    return [
-      ...this.oldRoot.toFields(),
-      ...this.newRoot.toFields(),
-      this.key,
-      ...this.oldValue.toFields(),
-      ...this.newValue.toFields(),
-      ...this.witness.toFields(),
-    ];
-  }
-
-  static fromFields(fields: Field[]): MetadataUpdate {
-    return new MetadataUpdate({
-      oldRoot: Metadata.fromFields(fields.slice(0, 2)),
-      newRoot: Metadata.fromFields(fields.slice(2, 4)),
-      key: fields[4],
-      oldValue: Metadata.fromFields(fields.slice(5, 7)),
-      newValue: Metadata.fromFields(fields.slice(7, 9)),
-      witness: MetadataWitness.fromFields(fields.slice(9)),
-    });
-  }
-}
+}) {}
 
 class MetadataTransition extends Struct({
   oldRoot: Metadata,
   newRoot: Metadata,
 }) {
   static create(update: MetadataUpdate) {
+    // TODO: remove comments from key validation after https://github.com/o1-labs/o1js/issues/1552
+
     const [dataWitnessRootBefore, dataWitnessKey] =
       update.witness.data.computeRootAndKey(update.oldValue.data);
     update.oldRoot.data.assertEquals(dataWitnessRootBefore);
-    dataWitnessKey.assertEquals(update.key);
+    //dataWitnessKey.assertEquals(update.key);
     const [kindWitnessRootBefore, kindWitnessKey] =
       update.witness.kind.computeRootAndKey(update.oldValue.kind);
     update.oldRoot.kind.assertEquals(kindWitnessRootBefore);
-    kindWitnessKey.assertEquals(update.key);
+    //kindWitnessKey.assertEquals(update.key);
 
     const [dataWitnessRootAfter, _] = update.witness.data.computeRootAndKey(
       update.newValue.data
@@ -145,17 +125,6 @@ class MetadataTransition extends Struct({
     Metadata.assertEquals(transition1.oldRoot, transition2.oldRoot);
     Metadata.assertEquals(transition1.newRoot, transition2.newRoot);
   }
-
-  toFields(): Field[] {
-    return [...this.oldRoot.toFields(), ...this.newRoot.toFields()];
-  }
-
-  static fromFields(fields: Field[]): MetadataTransition {
-    return new MetadataTransition({
-      oldRoot: Metadata.fromFields(fields.slice(0, fields.length / 2)),
-      newRoot: Metadata.fromFields(fields.slice(fields.length / 2)),
-    });
-  }
 }
 
 const MinaNFTMetadataUpdate = ZkProgram({
@@ -166,7 +135,7 @@ const MinaNFTMetadataUpdate = ZkProgram({
     update: {
       privateInputs: [MetadataUpdate],
 
-      method(state: MetadataTransition, update: MetadataUpdate) {
+      async method(state: MetadataTransition, update: MetadataUpdate) {
         const computedState = MetadataTransition.create(update);
         MetadataTransition.assertEquals(computedState, state);
       },
@@ -175,7 +144,7 @@ const MinaNFTMetadataUpdate = ZkProgram({
     merge: {
       privateInputs: [SelfProof, SelfProof],
 
-      method(
+      async method(
         newState: MetadataTransition,
         proof1: SelfProof<MetadataTransition, void>,
         proof2: SelfProof<MetadataTransition, void>

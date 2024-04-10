@@ -12,36 +12,7 @@ class MapElement extends Struct({
   redactedRoot: Metadata,
   key: Field,
   value: Metadata,
-}) {
-  public toFields(): Field[] {
-    return [
-      this.originalRoot.data,
-      this.originalRoot.kind,
-      this.redactedRoot.data,
-      this.redactedRoot.kind,
-      this.key,
-      this.value.data,
-      this.value.kind,
-    ];
-  }
-  static fromFields(fields: Field[]): MapElement {
-    return new MapElement({
-      originalRoot: new Metadata({
-        data: fields[0],
-        kind: fields[1],
-      }),
-      redactedRoot: new Metadata({
-        data: fields[2],
-        kind: fields[3],
-      }),
-      key: fields[4],
-      value: new Metadata({
-        data: fields[5],
-        kind: fields[6],
-      }),
-    });
-  }
-}
+}) {}
 
 class RedactedMinaNFTMapState extends Struct({
   originalRoot: Metadata, // root of the original Map
@@ -54,25 +25,26 @@ class RedactedMinaNFTMapState extends Struct({
     originalWitness: MetadataWitness,
     redactedWitness: MetadataWitness
   ) {
+    // TODO: remove comments from key validation after https://github.com/o1-labs/o1js/issues/1552
     const [originalDataWitnessRoot, originalDataWitnessKey] =
       originalWitness.data.computeRootAndKey(element.value.data);
     element.originalRoot.data.assertEquals(originalDataWitnessRoot);
-    originalDataWitnessKey.assertEquals(element.key);
+    //originalDataWitnessKey.assertEquals(element.key);
 
     const [originalKindWitnessRoot, originalKindWitnessKey] =
       originalWitness.kind.computeRootAndKey(element.value.kind);
     element.originalRoot.kind.assertEquals(originalKindWitnessRoot);
-    originalKindWitnessKey.assertEquals(element.key);
+    //originalKindWitnessKey.assertEquals(element.key);
 
     const [redactedDataWitnessRoot, redactedDataWitnessKey] =
       redactedWitness.data.computeRootAndKey(element.value.data);
     element.redactedRoot.data.assertEquals(redactedDataWitnessRoot);
-    redactedDataWitnessKey.assertEquals(element.key);
+    //redactedDataWitnessKey.assertEquals(element.key);
 
     const [redactedKindWitnessRoot, redactedKindWitnessKey] =
       redactedWitness.kind.computeRootAndKey(element.value.kind);
     element.redactedRoot.kind.assertEquals(redactedKindWitnessRoot);
-    redactedKindWitnessKey.assertEquals(element.key);
+    //redactedKindWitnessKey.assertEquals(element.key);
 
     return new RedactedMinaNFTMapState({
       originalRoot: element.originalRoot,
@@ -120,7 +92,7 @@ const RedactedMinaNFTMapCalculation = ZkProgram({
     create: {
       privateInputs: [MapElement, MetadataWitness, MetadataWitness],
 
-      method(
+      async method(
         state: RedactedMinaNFTMapState,
         element: MapElement,
         originalWitness: MetadataWitness,
@@ -138,7 +110,7 @@ const RedactedMinaNFTMapCalculation = ZkProgram({
     merge: {
       privateInputs: [SelfProof, SelfProof],
 
-      method(
+      async method(
         newState: RedactedMinaNFTMapState,
         proof1: SelfProof<RedactedMinaNFTMapState, void>,
         proof2: SelfProof<RedactedMinaNFTMapState, void>

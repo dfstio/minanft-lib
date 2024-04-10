@@ -79,7 +79,7 @@ const RedactedMinaNFTTreeCalculation20 = ZkProgram({
     create: {
       privateInputs: [TreeElement, MerkleTreeWitness20, MerkleTreeWitness20],
 
-      method(
+      async method(
         state: RedactedMinaNFTTreeState20,
         element: TreeElement,
         originalWitness: MerkleTreeWitness20,
@@ -97,7 +97,7 @@ const RedactedMinaNFTTreeCalculation20 = ZkProgram({
     merge: {
       privateInputs: [SelfProof, SelfProof],
 
-      method(
+      async method(
         newState: RedactedMinaNFTTreeState20,
         proof1: SelfProof<RedactedMinaNFTTreeState20, void>,
         proof2: SelfProof<RedactedMinaNFTTreeState20, void>
@@ -119,7 +119,7 @@ class RedactedMinaNFTTreeStateProof20 extends ZkProgram.Proof(
 ) {}
 
 class MinaNFTTreeVerifier20 extends SmartContract {
-  deploy(args: DeployArgs) {
+  async deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
@@ -130,7 +130,7 @@ class MinaNFTTreeVerifier20 extends SmartContract {
     });
   }
 
-  @method verifyRedactedTree(proof: RedactedMinaNFTTreeStateProof20) {
+  @method async verifyRedactedTree(proof: RedactedMinaNFTTreeStateProof20) {
     proof.verify();
   }
 }

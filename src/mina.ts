@@ -1,5 +1,4 @@
 export {
-  blockchain,
   initBlockchain,
   Memory,
   makeString,
@@ -7,96 +6,155 @@ export {
   accountBalance,
   accountBalanceMina,
   formatTime,
-  MinaNetwork,
+  MinaNetworkInstance,
+  currentNetwork,
+  getNetworkIdHash,
+  getDeployer,
 };
 
-import { Mina, PublicKey, PrivateKey, UInt64 } from "o1js";
 import {
-  MinaNetworkURL,
-  Berkeley,
-  Devnet,
-  Zeko,
-  TestWorld2,
-  Lightnet as Lightnet,
-} from "./networks";
-import { fetchMinaAccount } from "./fetch";
+  Mina,
+  PublicKey,
+  PrivateKey,
+  UInt64,
+  fetchAccount,
+  Field,
+  CircuitString,
+} from "o1js";
+import { networks, blockchain, MinaNetwork, Local } from "./networks";
 
-type blockchain =
-  | "local"
-  | "berkeley"
-  | "devnet"
-  | "zeko"
-  | "lighnet"
-  | "mainnet"
-  | "testworld2";
-
-interface MinaNetwork {
+interface MinaNetworkInstance {
   keys: {
     publicKey: PublicKey;
     privateKey: PrivateKey;
   }[];
-  url?: MinaNetworkURL;
+  network: MinaNetwork;
+  networkIdHash: Field;
 }
 
-function initBlockchain(instance: blockchain): MinaNetwork {
-  if (instance === "local") {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
-    Mina.setActiveInstance(Local);
-    return { keys: Local.testAccounts };
-  } else if (instance === "berkeley") {
-    const network = Mina.Network({
-      mina: Berkeley.mina,
-      archive: Berkeley.archive,
-    });
-    Mina.setActiveInstance(network);
-    return { keys: [], url: Berkeley };
-  } else if (instance === "devnet") {
-    const network = Mina.Network({
-      mina: Devnet.mina,
-      archive: Devnet.archive,
-    });
-    Mina.setActiveInstance(network);
-    return { keys: [], url: Devnet };
-  } else if (instance === "zeko") {
-    const network = Mina.Network({
-      mina: Zeko.mina,
-    });
-    Mina.setActiveInstance(network);
-    return { keys: [], url: Zeko };
-  } else if (instance === "testworld2") {
-    const network = Mina.Network({
-      mina: TestWorld2.mina,
-      archive: TestWorld2.archive,
-    });
-    Mina.setActiveInstance(network);
-    return { keys: [], url: TestWorld2 };
-  } else if (instance === "lighnet") {
-    const network = Mina.Network({
-      mina: Lightnet.mina,
-      archive: Lightnet.archive,
-      lightnetAccountManager: Lightnet.accountManager,
-    });
-    Mina.setActiveInstance(network);
-    return { keys: [], url: Lightnet };
-  } else {
-    throw new Error("Mainnet is not supported yet by zkApps");
+let currentNetwork: MinaNetworkInstance | undefined = undefined;
+
+function getNetworkIdHash(): Field {
+  if (currentNetwork === undefined) {
+    throw new Error("Network is not initialized");
+  }
+  return currentNetwork.networkIdHash;
+}
+
+function getDeployer(): PrivateKey {
+  if (currentNetwork === undefined) {
+    throw new Error("Network is not initialized");
+  }
+  return currentNetwork.keys[0].privateKey;
+}
+
+/*function getNetworkIdHash(params: {
+  chainId?: blockchain;
+  verbose?: boolean;
+}): Field {
+  const { chainId, verbose } = params;
+  if (chainId !== undefined) {
+    if (verbose) console.log(`Chain ID: ${chainId}`);
+    return CircuitString.fromString(chainId).hash();
+  }
+  const networkId = Mina.getNetworkId();
+  if (verbose) console.log(`Network ID: ${networkId}`);
+  if (networkId === "testnet")
+    throw new Error(
+      "Network ID is not set, please call initBlockchain() first"
+    );
+
+  if (networkId === "mainnet")
+    return CircuitString.fromString("mainnet").hash();
+  else {
+    if (
+      networkId.custom === undefined ||
+      typeof networkId.custom !== "string"
+    ) {
+      throw new Error(
+        "Network ID is not set, please call initBlockchain() first"
+      );
+    }
+    return CircuitString.fromString(networkId.custom).hash();
   }
 }
+*/
 
-async function accountBalance(
-  address: PublicKey,
-  force: boolean = false
-): Promise<UInt64> {
-  await fetchMinaAccount({ publicKey: address, force });
+function initBlockchain(
+  instance: blockchain,
+  deployersNumber: number = 0
+): MinaNetworkInstance {
+  if (instance === "mainnet") {
+    throw new Error("Mainnet is not supported yet by zkApps");
+  }
+
+  if (instance === "local") {
+    const local = Mina.LocalBlockchain({
+      proofsEnabled: true,
+    });
+    Mina.setActiveInstance(local);
+    currentNetwork = {
+      keys: local.testAccounts,
+      network: Local,
+      networkIdHash: CircuitString.fromString("local").hash(),
+    };
+    return currentNetwork;
+  }
+
+  const network = networks.find((n) => n.chainId === instance);
+  if (network === undefined) {
+    throw new Error("Unknown network");
+  }
+
+  const networkInstance = Mina.Network({
+    mina: network.mina,
+    archive: network.archive,
+    lightnetAccountManager: network.accountManager,
+  });
+  Mina.setActiveInstance(networkInstance);
+
+  const keys: {
+    publicKey: PublicKey;
+    privateKey: PrivateKey;
+  }[] = [];
+
+  if (deployersNumber > 0) {
+    if (instance === "lighnet") {
+      throw new Error(
+        "Use await Lightnet.acquireKeyPair() to get keys for Lightnet"
+      );
+    } else {
+      const deployers = process.env.DEPLOYERS;
+      if (
+        deployers === undefined ||
+        Array.isArray(deployers) === false ||
+        deployers.length < deployersNumber
+      )
+        throw new Error("Deployers are not set");
+      for (let i = 0; i < deployersNumber; i++) {
+        const privateKey = PrivateKey.fromBase58(deployers[i]);
+        const publicKey = privateKey.toPublicKey();
+        keys.push({ publicKey, privateKey });
+      }
+    }
+  }
+
+  currentNetwork = {
+    keys,
+    network,
+    networkIdHash: CircuitString.fromString(instance).hash(),
+  };
+  return currentNetwork;
+}
+
+async function accountBalance(address: PublicKey): Promise<UInt64> {
+  await fetchAccount({ publicKey: address });
   if (Mina.hasAccount(address)) return Mina.getBalance(address);
   else return UInt64.from(0);
 }
 
-async function accountBalanceMina(
-  address: PublicKey,
-  force: boolean = false
-): Promise<number> {
-  return Number((await accountBalance(address, force)).toBigInt()) / 1e9;
+async function accountBalanceMina(address: PublicKey): Promise<number> {
+  return Number((await accountBalance(address)).toBigInt()) / 1e9;
 }
 
 function sleep(ms: number) {
@@ -107,7 +165,7 @@ function makeString(length: number): string {
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   let outString: string = ``;
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-  const inOptions: string = `abcdefghijklmnopqrstuvwxyz0123456789`;
+  const inOptions: string = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`;
 
   for (let i = 0; i < length; i++) {
     outString += inOptions.charAt(Math.floor(Math.random() * inOptions.length));
@@ -121,9 +179,17 @@ function formatTime(ms: number): string {
   if (ms < 1000) return ms.toString() + " ms";
   if (ms < 60 * 1000)
     return parseInt((ms / 1000).toString()).toString() + " sec";
-  if (ms < 60 * 60 * 1000)
-    return parseInt((ms / 1000 / 60).toString()).toString() + " min";
-  return parseInt((ms / 1000 / 60 / 60).toString()).toString() + " h";
+  if (ms < 60 * 60 * 1000) {
+    const minutes = parseInt((ms / 1000 / 60).toString());
+    const seconds = parseInt(((ms - minutes * 60 * 1000) / 1000).toString());
+    return minutes.toString() + " min " + seconds.toString() + " sec";
+  } else {
+    const hours = parseInt((ms / 1000 / 60 / 60).toString());
+    const minutes = parseInt(
+      ((ms - hours * 60 * 60 * 1000) / 1000 / 60).toString()
+    );
+    return hours.toString() + " h " + minutes.toString() + " min";
+  }
 }
 
 class Memory {

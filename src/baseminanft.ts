@@ -18,19 +18,6 @@ import { PrivateMetadata } from "./privatemetadata";
 import { sleep } from "./mina";
 import { Storage } from "./contract/metadata";
 
-
-// Dummy class to overcome o1js compile bug - fixed now
-/*
-class Key extends SmartContract {
-  @state(Field) key = State<Field>();
-
-  @method mint(key: Field) {
-    this.key.assertEquals(Field(0));
-    this.key.set(key);
-  }
-}
-*/
-
 /**
  * Base class for MinaNFT
  */
@@ -229,10 +216,10 @@ class BaseMinaNFT {
   /**
    * Sets a cache folder for prover keys
    * @param folder folder for prover keys
-   * default is "./nftcache"
+   * default is "./cache"
    */
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-  public static setCacheFolder(folder: string = "./nftcache"): void {
+  public static setCacheFolder(folder: string = "./cache"): void {
     MinaNFT.cache = Cache.FileSystem(folder);
   }
 
@@ -263,8 +250,9 @@ class BaseMinaNFT {
     if (MinaNFT.namesVerificationKey == undefined) {
       console.time("MinaNFTNameServiceContract compiled");
       await sleep(100); // alow GC to run
-      const { verificationKey } =
-        await MinaNFTNameServiceContract.compile(options);
+      const { verificationKey } = await MinaNFTNameServiceContract.compile(
+        options
+      );
       console.timeEnd("MinaNFTNameServiceContract compiled");
       MinaNFT.namesVerificationKey = verificationKey as VerificationKey;
     }
@@ -281,8 +269,9 @@ class BaseMinaNFT {
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
       await sleep(100); // alow GC to run
-      const { verificationKey } =
-        await RedactedMinaNFTMapCalculation.compile(options);
+      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile(
+        options
+      );
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }
@@ -305,16 +294,18 @@ class BaseMinaNFT {
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
       await sleep(100); // alow GC to run
-      const { verificationKey } =
-        await RedactedMinaNFTMapCalculation.compile(options);
+      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile(
+        options
+      );
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }
     if (MinaNFT.badgeVerificationKey === undefined) {
       console.time("MinaNFTBadgeCalculation compiled");
       await sleep(100); // alow GC to run
-      const { verificationKey } =
-        await MinaNFTBadgeCalculation.compile(options);
+      const { verificationKey } = await MinaNFTBadgeCalculation.compile(
+        options
+      );
       console.timeEnd("MinaNFTBadgeCalculation compiled");
       MinaNFT.badgeVerificationKey = verificationKey;
     }
@@ -353,8 +344,9 @@ class BaseMinaNFT {
     if (MinaNFT.redactedMapVerificationKey === undefined) {
       console.time("RedactedMinaNFTMapCalculation compiled");
       await sleep(100); // alow GC to run
-      const { verificationKey } =
-        await RedactedMinaNFTMapCalculation.compile(options);
+      const { verificationKey } = await RedactedMinaNFTMapCalculation.compile(
+        options
+      );
       console.timeEnd("RedactedMinaNFTMapCalculation compiled");
       MinaNFT.redactedMapVerificationKey = verificationKey;
     }

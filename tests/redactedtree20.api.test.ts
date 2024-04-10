@@ -208,9 +208,9 @@ describe.skip(`MinaNFT Redacted Merkle Tree calculations`, () => {
     const zkApp = new MinaNFTTreeVerifier20(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee() },
-      () => {
+      async () => {
         AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
+        await zkApp.deploy({});
       }
     );
     await transaction.prove();
@@ -314,8 +314,8 @@ describe.skip(`MinaNFT Redacted Merkle Tree calculations`, () => {
     const zkApp = new MinaNFTTreeVerifier20(verifier);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee() },
-      () => {
-        zkApp.verifyRedactedTree(calculatedProof);
+      async () => {
+        await zkApp.verifyRedactedTree(calculatedProof);
       }
     );
     await transaction.prove();

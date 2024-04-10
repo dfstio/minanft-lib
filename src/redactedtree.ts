@@ -156,9 +156,9 @@ class RedactedTree {
         memo: "minanft.io",
         nonce: deployNonce,
       },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
+        await zkApp.deploy({});
         zkApp.account.tokenSymbol.set("VERIFY");
         zkApp.account.zkappUri.set("https://minanft.io/@treeverifier");
       }

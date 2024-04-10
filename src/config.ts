@@ -1,13 +1,4 @@
 const config = {
-  /*
-  MINAURL: "https://proxy.berkeley.minaexplorer.com/graphql",
-  MINAURL2: "https://api.minascan.io/node/berkeley/v1/graphql",
-  TESTWORLD2: "https://proxy.testworld.minaexplorer.com/graphql",
-  TESTWORLD2_ARCHIVE: "https://archive.testworld.minaexplorer.com",
-  ARCHIVEURL: "https://archive.berkeley.minaexplorer.com",
-  ARCHIVEURL2: "https://api.minascan.io/archive/berkeley/v1/graphql",
-  MINAEXPLORER: "https://berkeley.minaexplorer.com",
-  */
   MINAFEE: "200000000",
   MINNFTAPIAUTH:
     "AkRjS8yioA7i1CwvB3nOvcyLYh6sNMi4em7C0ybmYy67lhDC2KxEQtm1z45llEAR",
