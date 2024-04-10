@@ -10,11 +10,11 @@ export {
 
 import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
 import {
-  blockchain,
   initBlockchain as initBlockchainMina,
   accountBalance,
   accountBalanceMina,
 } from "../src/mina";
+import { blockchain } from "../src/networks";
 import { Memory } from "../src/mina";
 
 import { DEPLOYER, DEPLOYERS } from "../env.json";
@@ -70,9 +70,8 @@ async function initBlockchain(
 
   for (let i = 0; i < deployersNumber; i++) {
     const balanceDeployer =
-      Number(
-        (await accountBalance(deployers[i].toPublicKey(), true)).toBigInt()
-      ) / 1e9;
+      Number((await accountBalance(deployers[i].toPublicKey())).toBigInt()) /
+      1e9;
     if (balanceDeployer <= 5) {
       console.log(
         `Balance of the Deployer`,

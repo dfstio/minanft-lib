@@ -58,12 +58,12 @@ class Token extends SmartContract {
   }
 
   @method update(value: Field) {
-    this.value.getAndAssertEquals();
+    this.value.getAndRequireEquals();
     this.value.set(value);
   }
 
   @method upgrade(verificationKey: VerificationKey, signature: Signature) {
-    const version = this.version.getAndAssertEquals();
+    const version = this.version.getAndRequireEquals();
     signature
       .verify(this.address, [verificationKey.hash, version])
       .assertEquals(true);
@@ -89,14 +89,14 @@ class Token2 extends SmartContract {
     });
   }
   @method update(value1: Field, value2: Field) {
-    this.value1.getAndAssertEquals();
-    this.value2.getAndAssertEquals();
+    this.value1.getAndRequireEquals();
+    this.value2.getAndRequireEquals();
     this.value1.set(value1);
     this.value2.set(value2);
   }
 
   @method upgrade(verificationKey: VerificationKey, signature: Signature) {
-    const version = this.version.getAndAssertEquals();
+    const version = this.version.getAndRequireEquals();
     signature.verify(this.address, [verificationKey.hash, version]);
     this.account.verificationKey.set(verificationKey);
     this.version.set(version.add(Field(1)));

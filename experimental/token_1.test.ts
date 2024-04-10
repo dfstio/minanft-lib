@@ -30,31 +30,28 @@ class Token extends SmartContract {
   @state(PublicKey) listed = State<PublicKey>();
   @state(UInt64) amount = State<UInt64>();
 
-
   @method mint(address: PublicKey) {
     const account = Account(address, this.token.id);
-    const balance = account.balance.getAndAssertEquals();
-    const amount = this.amount.getAndAssertEquals();
+    const balance = account.balance.getAndRequireEquals();
+    const amount = this.amount.getAndRequireEquals();
     balance.assertEquals(UInt64.from(0));
-    this.token.mint({ address, amount});
+    this.token.mint({ address, amount });
   }
 }
 
 class Hacker extends SmartContract {
-
   @method mint(address: PublicKey) {
-    this.token.mint({ address, amount: 1});
+    this.token.mint({ address, amount: 1 });
   }
 
   @method steal(token: PublicKey, address: PublicKey) {
-    
     const account = Account(address, this.token.id);
-    const balance = account.balance.getAndAssertEquals();
+    const balance = account.balance.getAndRequireEquals();
     const balance1 = balance.add(UInt64.from(1));
     balance1.assertGreaterThan(balance);
-    
+
     const tokenApp = new Token(token);
-    tokenApp.mint( address);
+    tokenApp.mint(address);
   }
 }
 
@@ -73,10 +70,12 @@ beforeAll(async () => {
     deployer = privateKey;
   } else {
     const network = Mina.Network({
-      mina: TESTNET
+      mina: TESTNET,
     });
     Mina.setActiveInstance(network);
-    deployer = PrivateKey.fromBase58("EKEugRbaLrY1WLJqWhhzQWme381CUR2975fA1oKQb2ynaMiJFrTA");
+    deployer = PrivateKey.fromBase58(
+      "EKEugRbaLrY1WLJqWhhzQWme381CUR2975fA1oKQb2ynaMiJFrTA"
+    );
   }
   await Token.compile();
   await Hacker.compile();
@@ -100,7 +99,7 @@ describe("Mint tokens", () => {
 
     const zkToken = new Token(zkAppTokenPublicKey);
     const zkHacker = new Hacker(zkAppHackerPublicKey);
-    
+
     const transaction = await Mina.transaction(
       { sender, fee: transactionFee },
       () => {
@@ -164,37 +163,43 @@ user: ${user!.toBase58()}
       await fetchAccount({ publicKey: token });
       await fetchAccount({ publicKey: userPublicKey });
       //await fetchAccount({ publicKey: userPublicKey, tokenId });
-      await fetchAccount({ publicKey: userPublicKey, tokenId: hackerTokenId});
+      await fetchAccount({ publicKey: userPublicKey, tokenId: hackerTokenId });
       await fetchAccount({ publicKey: hackerPublicKey });
       //let hasAccountHacker = Mina.hasAccount(userPublicKey, hackerTokenId);
       //let hasAccount = Mina.hasAccount(userPublicKey, tokenId);
       console.log("Iteration", i);
-        const transaction = await Mina.transaction(
-          { sender, fee: transactionFee },
-          () => {
-            if( i === 1) AccountUpdate.fundNewAccount(sender, 2);
-            if( i === 1) zkHacker.mint(userPublicKey);
-            if( i === 1) zkToken.mint(userPublicKey);
-            if( i > 1 ) zkHacker.steal(token!, userPublicKey);
-          }
-        );
-        await transaction.prove();
-        transaction.sign([deployer, tokenPrivateKey!, userPrivateKey!, hackerPrivateKey]); // 
-        const tx = await transaction.send();
-        //console.log(`Transaction ${i}:`, transaction.toPretty());
-        if (!useLocalBlockchain) {
-          await tx.wait({ maxAttempts: 120, interval: 60000 });
+      const transaction = await Mina.transaction(
+        { sender, fee: transactionFee },
+        () => {
+          if (i === 1) AccountUpdate.fundNewAccount(sender, 2);
+          if (i === 1) zkHacker.mint(userPublicKey);
+          if (i === 1) zkToken.mint(userPublicKey);
+          if (i > 1) zkHacker.steal(token!, userPublicKey);
         }
-
-      
-    }
-      console.log(`Fetching account...`);
-      await fetchAccount({ publicKey: userPublicKey, tokenId });
-      const hasAccount = Mina.hasAccount(userPublicKey, tokenId);
-      if (hasAccount) {
-        //balance = Mina.getBalance(hackerPublicKey, tokenId);
-        balance = Mina.getBalance(userPublicKey, tokenId);
-        console.log("Balance:", (balance.toBigInt()/BigInt(1_000_000_000)).toString());
+      );
+      await transaction.prove();
+      transaction.sign([
+        deployer,
+        tokenPrivateKey!,
+        userPrivateKey!,
+        hackerPrivateKey,
+      ]); //
+      const tx = await transaction.send();
+      //console.log(`Transaction ${i}:`, transaction.toPretty());
+      if (!useLocalBlockchain) {
+        await tx.wait({ maxAttempts: 120, interval: 60000 });
       }
+    }
+    console.log(`Fetching account...`);
+    await fetchAccount({ publicKey: userPublicKey, tokenId });
+    const hasAccount = Mina.hasAccount(userPublicKey, tokenId);
+    if (hasAccount) {
+      //balance = Mina.getBalance(hackerPublicKey, tokenId);
+      balance = Mina.getBalance(userPublicKey, tokenId);
+      console.log(
+        "Balance:",
+        (balance.toBigInt() / BigInt(1_000_000_000)).toString()
+      );
+    }
   });
 });

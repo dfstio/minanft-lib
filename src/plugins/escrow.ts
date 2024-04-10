@@ -35,7 +35,7 @@ class Escrow extends SmartContract {
     approveSale: EscrowTransfer,
   };
 
-  deploy(args: DeployArgs) {
+  async deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
@@ -44,7 +44,7 @@ class Escrow extends SmartContract {
     this.emitEvent("deploy", Field(0));
   }
 
-  @method deposit(deposited: EscrowDeposit, buyer: PublicKey) {
+  @method async deposit(deposited: EscrowDeposit, buyer: PublicKey) {
     deposited.data.newOwner.assertEquals(Poseidon.hash(buyer.toFields()));
     deposited.data.tokenId.assertEquals(Field(0)); // should be MINA
     //const senderUpdate = AccountUpdate.create(buyer);
@@ -53,13 +53,13 @@ class Escrow extends SmartContract {
     this.emitEvent("deposit", deposited.data);
   }
 
-  @method approveSale(deposited: EscrowDeposit, seller: PublicKey) {
+  @method async approveSale(deposited: EscrowDeposit, seller: PublicKey) {
     deposited.data.oldOwner.assertEquals(Poseidon.hash(seller.toFields()));
     deposited.data.tokenId.assertEquals(Field(0)); // should be MINA
     this.emitEvent("approveSale", deposited.data);
   }
 
-  @method transfer(
+  @method async transfer(
     nft: PublicKey,
     nameService: PublicKey,
     data: EscrowTransfer,
@@ -78,7 +78,7 @@ class Escrow extends SmartContract {
     data.oldOwner.assertEquals(Poseidon.hash(seller.toFields()));
     data.newOwner.assertEquals(Poseidon.hash(buyer.toFields()));
     const minanft = new MinaNFTNameServiceContract(nameService);
-    minanft.transfer(
+    await minanft.escrowTransfer(
       nft,
       data,
       signature1,

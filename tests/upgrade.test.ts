@@ -2,7 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 import { MinaNFT } from "../src/minanft";
 import { MinaNFTNameService } from "../src/minanftnames";
 import { PublicKey, PrivateKey } from "o1js";
-import { blockchain } from "../src/mina";
+import { blockchain } from "../src/networks";
 import { initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
 import { MINANFT_NAME_SERVICE_SK } from "../env.json";

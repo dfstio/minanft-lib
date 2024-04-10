@@ -38,14 +38,14 @@ class MinaNFTContract extends SmartContract {
    * @param owner owner's public key
    * @param proof {@link MinaNFTMetadataUpdateProof} - proof of the update of the metadata to be correctly inserted into the Merkle Map
    */
-  @method update(
+  @method async update(
     update: Update,
     signature: Signature,
     owner: PublicKey,
     proof: MinaNFTMetadataUpdateProof
   ) {
     // Check that the metadata is correct
-    const metadata = this.metadata.getAndAssertEquals();
+    const metadata = this.metadata.getAndRequireEquals();
     Metadata.assertEquals(metadata, update.oldRoot);
     Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
     Metadata.assertEquals(proof.publicInput.newRoot, update.newRoot);
@@ -53,15 +53,15 @@ class MinaNFTContract extends SmartContract {
     // Check that the proof verifies
     proof.verify();
 
-    signature.verify(owner, update.toFields()).assertEquals(true);
+    signature.verify(owner, Update.toFields(update)).assertEquals(true);
     update.owner.assertEquals(Poseidon.hash(owner.toFields()));
 
     this.owner
-      .getAndAssertEquals()
+      .getAndRequireEquals()
       .assertEquals(update.owner, "Owner mismatch");
-    this.name.getAndAssertEquals().assertEquals(update.name, "Name mismatch");
+    this.name.getAndRequireEquals().assertEquals(update.name, "Name mismatch");
 
-    const version = this.version.getAndAssertEquals();
+    const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(update.version);
 
@@ -79,7 +79,7 @@ class MinaNFTContract extends SmartContract {
    * @param escrow2 public key of the second escrow
    * @param escrow3 public key of the third escrow
    */
-  @method transfer(
+  @method async transfer(
     data: EscrowTransfer,
     signature1: Signature,
     signature2: Signature,
@@ -89,17 +89,16 @@ class MinaNFTContract extends SmartContract {
     escrow3: PublicKey
   ) {
     this.owner
-      .getAndAssertEquals()
+      .getAndRequireEquals()
       .assertEquals(data.oldOwner, "Owner mismatch");
-    this.escrow
-      .getAndAssertEquals()
-      .assertNotEquals(Field(0), "Escrow is not set");
-    this.escrow.assertEquals(data.escrow);
-    this.name.getAndAssertEquals().assertEquals(data.name, "Name mismatch");
-    const version = this.version.getAndAssertEquals();
+    const escrow = this.escrow.getAndRequireEquals();
+    escrow.assertNotEquals(Field(0), "Escrow is not set");
+    escrow.assertEquals(data.escrow);
+    this.name.getAndRequireEquals().assertEquals(data.name, "Name mismatch");
+    const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
-    const dataFields = data.toFields();
+    const dataFields = EscrowTransfer.toFields(data);
     signature1.verify(escrow1, dataFields).assertEquals(true);
     signature2.verify(escrow2, dataFields).assertEquals(true);
     signature3.verify(escrow3, dataFields).assertEquals(true);
@@ -121,7 +120,7 @@ class MinaNFTContract extends SmartContract {
    * @param signature signature of the owner
    * @param owner owner's public key
    */
-  @method approveEscrow(
+  @method async approveEscrow(
     data: EscrowApproval,
     signature: Signature,
     owner: PublicKey
@@ -129,10 +128,10 @@ class MinaNFTContract extends SmartContract {
     signature.verify(owner, data.toFields()).assertEquals(true);
     data.owner.assertEquals(Poseidon.hash(owner.toFields()));
 
-    this.owner.getAndAssertEquals().assertEquals(data.owner, "Owner mismatch");
-    this.name.getAndAssertEquals().assertEquals(data.name, "Name mismatch");
+    this.owner.getAndRequireEquals().assertEquals(data.owner, "Owner mismatch");
+    this.name.getAndRequireEquals().assertEquals(data.name, "Name mismatch");
 
-    const version = this.version.getAndAssertEquals();
+    const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
 

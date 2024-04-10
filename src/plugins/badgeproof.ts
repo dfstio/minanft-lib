@@ -57,7 +57,7 @@ const MinaNFTBadgeCalculation = ZkProgram({
     create: {
       privateInputs: [BadgeDataWitness],
 
-      method(state: BadgeData, badgeDataWitness: BadgeDataWitness) {
+      async method(state: BadgeData, badgeDataWitness: BadgeDataWitness) {
         const computedState = BadgeData.create(badgeDataWitness);
         BadgeData.assertEquals(computedState, state);
       },

@@ -1,30 +1,29 @@
 import { describe, expect, it } from "@jest/globals";
+import { PrivateKey, PublicKey } from "o1js";
 import {
-  PrivateKey, PublicKey
-} from "o1js";
-import {
-  blockchain,
   Memory,
   makeString,
   sleep,
   accountBalance,
   accountBalanceMina,
-  initBlockchain
+  initBlockchain,
 } from "../src/mina";
+import { blockchain } from "../src/networks";
 
 const useBlockchain: blockchain = "local";
 
-let deployers: {
-  publicKey: PublicKey;
-  privateKey: PrivateKey;
-}[] | undefined = undefined;
+let deployers:
+  | {
+      publicKey: PublicKey;
+      privateKey: PrivateKey;
+    }[]
+  | undefined = undefined;
 
 beforeAll(async () => {
   const data = initBlockchain(useBlockchain);
   expect(data).toBeDefined();
   if (data === undefined) return;
   deployers = data.keys;
-
 });
 
 describe("Check Mina utils", () => {

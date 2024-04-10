@@ -111,7 +111,7 @@ function MinaNFTTreeVerifierFunction(height: number) {
       create: {
         privateInputs: [TreeElement, MerkleTreeWitness, MerkleTreeWitness],
 
-        method(
+        async method(
           state: RedactedMinaNFTTreeState,
           element: TreeElement,
           originalWitness: MerkleTreeWitness,
@@ -129,7 +129,7 @@ function MinaNFTTreeVerifierFunction(height: number) {
       merge: {
         privateInputs: [SelfProof, SelfProof],
 
-        method(
+        async method(
           newState: RedactedMinaNFTTreeState,
           proof1: SelfProof<RedactedMinaNFTTreeState, void>,
           proof2: SelfProof<RedactedMinaNFTTreeState, void>
@@ -151,7 +151,7 @@ function MinaNFTTreeVerifierFunction(height: number) {
   ) {}
 
   class MinaNFTTreeVerifier extends SmartContract {
-    deploy(args: DeployArgs) {
+    async deploy(args: DeployArgs) {
       super.deploy(args);
       this.account.permissions.set({
         ...Permissions.default(),
@@ -162,7 +162,7 @@ function MinaNFTTreeVerifierFunction(height: number) {
       });
     }
 
-    @method verifyRedactedTree(proof: RedactedMinaNFTTreeStateProof) {
+    @method async verifyRedactedTree(proof: RedactedMinaNFTTreeStateProof) {
       proof.verify();
     }
   }

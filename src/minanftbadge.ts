@@ -130,9 +130,9 @@ class MinaNFTBadge {
         memo: "minanft.io",
         nonce: deployNonce,
       },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
+        await zkApp.deploy({});
         zkApp.name.set(MinaNFT.stringToField(this.name));
         zkApp.owner.set(MinaNFT.stringToField(this.owner));
         zkApp.verifiedKey.set(MinaNFT.stringToField(this.verifiedKey));
@@ -243,10 +243,13 @@ class MinaNFTBadge {
       badgeState,
       badgeDataWitness
     );
-    const signature = Signature.create(oraclePrivateKey, badgeEvent.toFields());
+    const signature = Signature.create(
+      oraclePrivateKey,
+      MinaNFTVerifierBadgeEvent.toFields(badgeEvent)
+    );
 
     const issuer = new MinaNFTVerifierBadge(this.address);
-    const tokenId = issuer.token.id;
+    const tokenId = issuer.deriveTokenId();
 
     console.timeEnd(logStr);
     const sender = deployer.toPublicKey();
@@ -271,9 +274,9 @@ class MinaNFTBadge {
         memo: "minanft.io",
         nonce: deployNonce,
       },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        issuer.issueBadge(
+        await issuer.issueBadge(
           nftAddress,
           nftTokenId,
           badgeEvent,
@@ -303,7 +306,7 @@ class MinaNFTBadge {
     if (nft.tokenId === undefined) throw new Error("NFT tokenId not set");
     const nftAddress: PublicKey = nft.address;
     const issuer = new MinaNFTVerifierBadge(this.address);
-    const tokenId = issuer.token.id;
+    const tokenId = issuer.deriveTokenId();
     const zkNFT = new MinaNFTContract(nftAddress, nft.tokenId);
     await fetchMinaAccount({ publicKey: nftAddress, tokenId });
     await fetchMinaAccount({ publicKey: nftAddress, tokenId: nft.tokenId });

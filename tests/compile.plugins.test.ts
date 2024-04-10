@@ -10,7 +10,7 @@ beforeAll(async () => {
 });
 
 describe("Compile contracts", () => {
-  MinaNFT.setCacheFolder("./nftcache");
+  MinaNFT.setCacheFolder("./cache");
   Memory.info("before compile");
 
   it("should compile a Escrow contract", async () => {

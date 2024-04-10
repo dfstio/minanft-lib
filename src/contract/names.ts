@@ -1,7 +1,7 @@
 export { MinaNFTNameServiceContract, NFTMintData, MintData };
 import {
   method,
-  SmartContract,
+  TokenContract,
   AccountUpdate,
   PublicKey,
   state,
@@ -15,6 +15,7 @@ import {
   UInt64,
   Signature,
   Struct,
+  AccountUpdateForest,
 } from "o1js";
 import { MinaNFTContract } from "./nft";
 import { Update } from "./metadata";
@@ -68,7 +69,7 @@ class MintData extends Struct({
  * MinaNFTNameServiceContract is a smart contract that implements the Mina NFT Name Service standard.
  * @property oracle The oracle of the contract - the public key used to sign name allowances
  */
-class MinaNFTNameServiceContract extends SmartContract {
+class MinaNFTNameServiceContract extends TokenContract {
   @state(PublicKey) oracle = State<PublicKey>();
 
   init() {
@@ -78,11 +79,11 @@ class MinaNFTNameServiceContract extends SmartContract {
     mint: NFTMintData,
     upgrade: PublicKey,
     update: Update,
-    transfer: EscrowTransfer,
+    escrowTransfer: EscrowTransfer,
     approveEscrow: EscrowApproval,
   };
 
-  deploy(args: DeployArgs) {
+  async deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
@@ -90,8 +91,17 @@ class MinaNFTNameServiceContract extends SmartContract {
     });
   }
 
-  @method setOracle(newOracle: PublicKey, signature: Signature) {
-    const oracle = this.oracle.getAndAssertEquals();
+  async approveBase(forest: AccountUpdateForest) {
+    // https://discord.com/channels/484437221055922177/1215258350577647616
+    // this.checkZeroBalanceChange(forest);
+    //forest.isEmpty().assertEquals(Bool(true));
+    throw Error(
+      "transfers of tokens are not allowed, change the owner instead"
+    );
+  }
+
+  @method async setOracle(newOracle: PublicKey, signature: Signature) {
+    const oracle = this.oracle.getAndRequireEquals();
     signature
       .verify(oracle, [...newOracle.toFields(), ...this.address.toFields()])
       .assertEquals(true);
@@ -99,8 +109,9 @@ class MinaNFTNameServiceContract extends SmartContract {
   }
 
   isNFT(address: PublicKey) {
-    const account = Account(address, this.token.id);
-    const tokenBalance = account.balance.getAndAssertEquals();
+    const tokenId = this.deriveTokenId();
+    const account = Account(address, tokenId);
+    const tokenBalance = account.balance.getAndRequireEquals();
     tokenBalance.assertEquals(UInt64.from(1_000_000_000));
   }
 
@@ -110,17 +121,18 @@ class MinaNFTNameServiceContract extends SmartContract {
    * @param vk the verification key of the new MinaNFTContract
    * @param signature the signature of the name service allowing the upgrading of the NFT
    */
-  @method upgrade(
+  @method async upgrade(
     address: PublicKey,
     vk: VerificationKey,
     signature: Signature
   ) {
     this.isNFT(address);
-    const oracle = this.oracle.getAndAssertEquals();
+    const oracle = this.oracle.getAndRequireEquals();
     signature
       .verify(oracle, [...address.toFields(), vk.hash])
       .assertEquals(true);
-    const update = AccountUpdate.createSigned(address, this.token.id);
+    const tokenId = this.deriveTokenId();
+    const update = AccountUpdate.createSigned(address, tokenId);
     update.body.update.verificationKey = { isSome: Bool(true), value: vk };
     this.emitEvent("upgrade", address);
   }
@@ -129,8 +141,8 @@ class MinaNFTNameServiceContract extends SmartContract {
    * Mints the NFT
    * @param data the {@link MintData} of the NFT
    */
-  @method mint(data: MintData) {
-    const oracle = this.oracle.getAndAssertEquals();
+  @method async mint(data: MintData) {
+    const oracle = this.oracle.getAndRequireEquals();
     data.signature
       .verify(oracle, [
         ...data.nft.address.toFields(),
@@ -141,8 +153,9 @@ class MinaNFTNameServiceContract extends SmartContract {
       .assertEquals(true);
     data.nft.verifier.assertEquals(this.address);
     data.nft.name.assertEquals(data.nft.initialState[0]);
-    this.token.mint({ address: data.nft.address, amount: 1_000_000_000 });
-    const update = AccountUpdate.createSigned(data.nft.address, this.token.id);
+    this.internal.mint({ address: data.nft.address, amount: 1_000_000_000 });
+    const tokenId = this.deriveTokenId();
+    const update = AccountUpdate.createSigned(data.nft.address, tokenId);
     update.body.update.verificationKey = {
       isSome: Bool(true),
       value: data.verificationKey,
@@ -177,7 +190,7 @@ class MinaNFTNameServiceContract extends SmartContract {
    * @param owner owner's public key
    * @param proof {@link MinaNFTMetadataUpdateProof} - proof of the update of the metadata to be correctly inserted into the Merkle Map
    */
-  @method update(
+  @method async update(
     address: PublicKey,
     update: Update,
     signature: Signature,
@@ -186,8 +199,9 @@ class MinaNFTNameServiceContract extends SmartContract {
   ) {
     this.isNFT(address);
     this.address.assertEquals(update.verifier);
-    const nft = new MinaNFTContract(address, this.token.id);
-    nft.update(update, signature, owner, proof);
+    const tokenId = this.deriveTokenId();
+    const nft = new MinaNFTContract(address, tokenId);
+    await nft.update(update, signature, owner, proof);
     this.emitEvent("update", update);
   }
 
@@ -202,7 +216,7 @@ class MinaNFTNameServiceContract extends SmartContract {
    * @param escrow2 public key of the second escrow
    * @param escrow3 public key of the third escrow
    */
-  @method transfer(
+  @method async escrowTransfer(
     address: PublicKey,
     data: EscrowTransfer,
     signature1: Signature,
@@ -214,8 +228,9 @@ class MinaNFTNameServiceContract extends SmartContract {
   ) {
     // TODO: Return back after bug resolution https://github.com/o1-labs/o1js/issues/1245
     this.isNFT(address);
-    const nft = new MinaNFTContract(address, this.token.id);
-    nft.transfer(
+    const tokenId = this.deriveTokenId();
+    const nft = new MinaNFTContract(address, tokenId);
+    await nft.transfer(
       data,
       signature1,
       signature2,
@@ -224,7 +239,7 @@ class MinaNFTNameServiceContract extends SmartContract {
       escrow2,
       escrow3
     );
-    this.emitEvent("transfer", data);
+    this.emitEvent("escrowTransfer", data);
   }
   /**
    * Approve setting of the new escrow
@@ -233,15 +248,16 @@ class MinaNFTNameServiceContract extends SmartContract {
    * @param signature signature of the owner
    * @param owner owner's public key
    */
-  @method approveEscrow(
+  @method async approveEscrow(
     address: PublicKey,
     data: EscrowApproval,
     signature: Signature,
     owner: PublicKey
   ) {
     this.isNFT(address);
-    const nft = new MinaNFTContract(address, this.token.id);
-    nft.approveEscrow(data, signature, owner);
+    const tokenId = this.deriveTokenId();
+    const nft = new MinaNFTContract(address, tokenId);
+    await nft.approveEscrow(data, signature, owner);
     this.emitEvent("approveEscrow", data);
   }
 }

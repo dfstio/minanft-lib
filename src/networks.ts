@@ -1,16 +1,48 @@
-export { MinaNetworkURL, Berkeley, Devnet, Zeko, Lightnet, TestWorld2 };
+export {
+  blockchain,
+  MinaNetwork,
+  networks,
+  Mainnet,
+  Berkeley,
+  Devnet,
+  Zeko,
+  TestWorld2,
+  Lightnet,
+  Local,
+};
 
-interface MinaNetworkURL {
+type blockchain =
+  | "local"
+  | "berkeley"
+  | "devnet"
+  | "lighnet"
+  | "mainnet"
+  | "testworld2"
+  | "zeko";
+
+interface MinaNetwork {
   mina: string[];
   archive: string[];
-  chainId?: string;
+  chainId: blockchain;
   name?: string;
   accountManager?: string;
   explorerAccountUrl?: string;
   explorerTransactionUrl?: string;
 }
 
-const Berkeley: MinaNetworkURL = {
+const Mainnet: MinaNetwork = {
+  mina: [],
+  archive: [],
+  chainId: "mainnet",
+};
+
+const Local: MinaNetwork = {
+  mina: [],
+  archive: [],
+  chainId: "local",
+};
+
+const Berkeley: MinaNetwork = {
   mina: [
     "https://api.minascan.io/node/berkeley/v1/graphql",
     "https://proxy.berkeley.minaexplorer.com/graphql",
@@ -25,16 +57,14 @@ const Berkeley: MinaNetworkURL = {
   name: "Berkeley",
 };
 
-const Devnet: MinaNetworkURL = {
+const Devnet: MinaNetwork = {
   mina: [
-    "https://mina-devnet-graphql.aurowallet.com/graphql",
-    //"https://api.minascan.io/node/devnet/v1/graphql",
-    //"https://devnet.graphql.minaexplorer.com/",
-    //"https://proxy.devnet.minaexplorer.com/graphql",
+    "https://api.minascan.io/node/devnet/v1/graphql",
+    "https://proxy.devnet.minaexplorer.com/graphql",
   ],
   archive: [
     "https://api.minascan.io/archive/devnet/v1/graphql",
-    //"https://archive.devnet.minaexplorer.com",
+    "https://archive.devnet.minaexplorer.com",
   ],
   explorerAccountUrl: "https://minascan.io/devnet/account/",
   explorerTransactionUrl: "https://minascan.io/devnet/tx/",
@@ -42,12 +72,13 @@ const Devnet: MinaNetworkURL = {
   name: "Devnet",
 };
 
-const Zeko: MinaNetworkURL = {
+const Zeko: MinaNetwork = {
   mina: ["http://sequencer-zeko-dev.dcspark.io/graphql"],
   archive: [],
+  chainId: "zeko",
 };
 
-const TestWorld2: MinaNetworkURL = {
+const TestWorld2: MinaNetwork = {
   mina: ["https://api.minascan.io/node/testworld/v1/graphql"],
   archive: ["https://archive.testworld.minaexplorer.com"],
   explorerAccountUrl: "https://minascan.io/testworld/account/",
@@ -56,8 +87,20 @@ const TestWorld2: MinaNetworkURL = {
   name: "TestWorld2",
 };
 
-const Lightnet: MinaNetworkURL = {
+const Lightnet: MinaNetwork = {
   mina: ["http://localhost:8080/graphql"],
   archive: ["http://localhost:8282"],
   accountManager: "http://localhost:8181",
+  chainId: "lighnet",
+  name: "Lightnet",
 };
+
+const networks: MinaNetwork[] = [
+  Mainnet,
+  Local,
+  Berkeley,
+  Devnet,
+  Zeko,
+  TestWorld2,
+  Lightnet,
+];

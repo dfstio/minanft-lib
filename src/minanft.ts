@@ -54,7 +54,8 @@ import {
   MinaNFTCommitData,
 } from "./update";
 import { MapData } from "./storage/map";
-import { blockchain, initBlockchain, MinaNetwork, sleep } from "./mina";
+import { initBlockchain, MinaNetworkInstance, sleep } from "./mina";
+import { blockchain } from "./networks";
 import config from "./config";
 import { MinaNFTNameService } from "./minanftnames";
 const { MINAFEE, MINANFT_NAME_SERVICE } = config;
@@ -135,7 +136,7 @@ class MinaNFT extends BaseMinaNFT {
       this.nameService = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
     }
     const nameService = new MinaNFTNameServiceContract(this.nameService);
-    this.tokenId = nameService.token.id;
+    this.tokenId = nameService.deriveTokenId();
   }
 
   /**
@@ -155,7 +156,7 @@ class MinaNFT extends BaseMinaNFT {
       this.nameService = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
     }
     const nameService = new MinaNFTNameServiceContract(this.nameService);
-    const tokenId = nameService.token.id;
+    const tokenId = nameService.deriveTokenId();
     const nft = new MinaNFTContract(this.address, tokenId);
     await fetchMinaAccount({ publicKey: this.address, tokenId });
     if (!Mina.hasAccount(this.address, tokenId)) {
@@ -189,7 +190,7 @@ class MinaNFT extends BaseMinaNFT {
 
     const nameStr = MinaNFT.stringFromField(name);
     if (nameStr !== this.name) throw new Error("NFT name mismatch");
-    const storageStr = MinaNFT.stringFromFields(storage.toFields());
+    const storageStr = MinaNFT.stringFromFields(Storage.toFields(storage));
     this.storage = storageStr;
     this.owner = owner;
     this.escrow = escrow;
@@ -344,7 +345,7 @@ class MinaNFT extends BaseMinaNFT {
     const nameService = new MinaNFTNameServiceContract(
       params.nameServiceAddress
     );
-    const tokenId = nameService.token.id;
+    const tokenId = nameService.deriveTokenId();
     const skipCalculatingMetadataRoot: boolean =
       params.skipCalculatingMetadataRoot ?? false;
 
@@ -558,7 +559,7 @@ class MinaNFT extends BaseMinaNFT {
    * Initialize Mina o1js library
    * @param chain blockchain to initialize
    */
-  public static minaInit(chain: blockchain): MinaNetwork {
+  public static minaInit(chain: blockchain): MinaNetworkInstance {
     return initBlockchain(chain);
   }
 
@@ -779,7 +780,7 @@ class MinaNFT extends BaseMinaNFT {
 
     const address: PublicKey = this.address;
     const nameService = new MinaNFTNameServiceContract(this.nameService);
-    const tokenId = nameService.token.id;
+    const tokenId = nameService.deriveTokenId();
     await fetchMinaAccount({ publicKey: address, tokenId });
     if (!Mina.hasAccount(address, tokenId)) {
       console.error("NFT contract is not deployed");
@@ -822,7 +823,9 @@ class MinaNFT extends BaseMinaNFT {
     }
 
     const oldStorage = zkApp.storage.get();
-    const storage: string = MinaNFT.stringFromFields(oldStorage.toFields());
+    const storage: string = MinaNFT.stringFromFields(
+      Storage.toFields(oldStorage)
+    );
     if (this.storage !== storage) {
       throw new Error("Storage mismatch");
     }
@@ -947,7 +950,7 @@ class MinaNFT extends BaseMinaNFT {
     //console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
-    const tokenId = zkApp.token.id;
+    const tokenId = zkApp.deriveTokenId();
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     const zkAppNFT = new MinaNFTContract(address, tokenId);
     await fetchMinaAccount({ publicKey: this.address, tokenId });
@@ -974,14 +977,17 @@ class MinaNFT extends BaseMinaNFT {
       name: MinaNFT.stringToField(this.name),
       owner,
     });
-    const signature = Signature.create(ownerPrivateKey, update.toFields());
+    const signature = Signature.create(
+      ownerPrivateKey,
+      Update.toFields(update)
+    );
 
     //console.log("Sending update...");
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
-      () => {
+      async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        zkApp.update(address, update, signature, ownerPublicKey, proof!);
+        await zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
     let sentTx: Mina.PendingTransaction | undefined = undefined;
@@ -1089,18 +1095,21 @@ class MinaNFT extends BaseMinaNFT {
         ownerPrivateKey.toPublicKey().toBase58() !== ownerPublicKey.toBase58()
       )
         throw new Error("Owner privateKey mismatch");
-      const signature = Signature.create(ownerPrivateKey, update.toFields());
+      const signature = Signature.create(
+        ownerPrivateKey,
+        Update.toFields(update)
+      );
       signatureStr = signature.toBase58();
     }
 
     const transactionsStr: string[] = transactions.map((t) =>
       JSON.stringify({
-        state: t.state.toFields().map((f) => f.toJSON()),
-        update: t.update.toFields().map((f) => f.toJSON()),
+        state: MetadataTransition.toFields(t.state).map((f) => f.toJSON()),
+        update: MetadataUpdate.toFields(t.update).map((f) => f.toJSON()),
       })
     );
     const updateStr: string = JSON.stringify({
-      update: update.toFields().map((f) => f.toJSON()),
+      update: Update.toFields(update).map((f) => f.toJSON()),
     });
 
     const addressStr: string = address.toBase58();
@@ -1210,7 +1219,7 @@ class MinaNFT extends BaseMinaNFT {
     console.log("Commiting updates to blockchain...");
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
-    const tokenId = zkApp.token.id;
+    const tokenId = zkApp.deriveTokenId();
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     await fetchMinaAccount({ publicKey: address, tokenId });
     await fetchMinaAccount({ publicKey: sender });
@@ -1222,9 +1231,9 @@ class MinaNFT extends BaseMinaNFT {
     //console.log("Sending update...");
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
-      () => {
+      async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        zkApp.update(address, update, signature, ownerPublicKey, proof!);
+        await zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
     let sentTx: Mina.PendingTransaction | undefined = undefined;
@@ -1558,7 +1567,7 @@ class MinaNFT extends BaseMinaNFT {
     });
 
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
-    const tokenId = zkApp.token.id;
+    const tokenId = zkApp.deriveTokenId();
     this.tokenId = tokenId;
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     //await fetchMinaAccount({ publicKey: this.address, tokenId });
@@ -1569,9 +1578,9 @@ class MinaNFT extends BaseMinaNFT {
 
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        zkApp.mint(mintData);
+        await zkApp.mint(mintData);
       }
     );
     await sleep(100); // alow GC to run
@@ -1671,7 +1680,7 @@ class MinaNFT extends BaseMinaNFT {
     }
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
-    const tokenId = zkApp.token.id;
+    const tokenId = zkApp.deriveTokenId();
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: address, tokenId });
     const account = Account(sender);
@@ -1680,8 +1689,8 @@ class MinaNFT extends BaseMinaNFT {
       throw new Error("NFT is not deployed, no account exists");
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
-      () => {
-        zkApp.transfer(
+      async () => {
+        await zkApp.escrowTransfer(
           address,
           data,
           signature1,
@@ -1750,7 +1759,7 @@ class MinaNFT extends BaseMinaNFT {
     }
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
-    const tokenId = zkApp.token.id;
+    const tokenId = zkApp.deriveTokenId();
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     await fetchMinaAccount({ publicKey: address, tokenId });
     await fetchMinaAccount({ publicKey: sender });
@@ -1758,8 +1767,8 @@ class MinaNFT extends BaseMinaNFT {
     const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
-      () => {
-        zkApp.approveEscrow(address, data, signature, ownerPublicKey);
+      async () => {
+        await zkApp.approveEscrow(address, data, signature, ownerPublicKey);
       }
     );
     await sleep(100); // alow GC to run
@@ -1800,12 +1809,12 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: address });
     const zkApp = new MinaNFTVerifier(verifier);
     const zkAppNFT = new MinaNFTNameServiceContract(nameServiceAddress);
-    const tokenId = zkAppNFT.token.id;
+    const tokenId = zkAppNFT.deriveTokenId();
 
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
-      () => {
-        zkApp.verifyRedactedMetadata(address, tokenId, proof);
+      async () => {
+        await zkApp.verifyRedactedMetadata(address, tokenId, proof);
       }
     );
     await sleep(100); // alow GC to run

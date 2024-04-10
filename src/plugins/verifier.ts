@@ -14,7 +14,7 @@ import { MinaNFTContract } from "../contract/nft";
 import { Metadata } from "../contract/metadata";
 
 class MinaNFTVerifier extends SmartContract {
-  deploy(args: DeployArgs) {
+  async deploy(args: DeployArgs) {
     super.deploy(args);
     this.account.permissions.set({
       ...Permissions.default(),
@@ -25,7 +25,7 @@ class MinaNFTVerifier extends SmartContract {
     });
   }
 
-  @method verifyRedactedMetadata(
+  @method async verifyRedactedMetadata(
     nft: PublicKey,
     tokenId: Field,
     proof: RedactedMinaNFTMapStateProof

@@ -35,7 +35,7 @@ class Counter extends SmartContract {
   @state(UInt64) counter = State<UInt64>();
 
   @method increaseCounter() {
-    const counter = this.counter.getAndAssertEquals();
+    const counter = this.counter.getAndRequireEquals();
     const newCounter = counter.add(UInt64.from(1));
     this.counter.set(newCounter);
   }
@@ -44,10 +44,10 @@ class Counter extends SmartContract {
 class Token extends SmartContract {
   @method mint(address: PublicKey, balance: UInt64) {
     const account = Account(address, this.token.id);
-    const tokenBalance = account.balance.getAndAssertEquals();
+    const tokenBalance = account.balance.getAndRequireEquals();
     tokenBalance.assertEquals(balance);
     const app = new Counter(address);
-    const key = app.counter.getAndAssertEquals();
+    const key = app.counter.getAndRequireEquals();
     key.assertEquals(balance);
     app.increaseCounter();
     this.token.mint({ address, amount: 1 });

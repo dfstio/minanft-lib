@@ -70,7 +70,7 @@ class TokenAccount extends SmartContract {
   @state(Field) value = State<Field>();
 
   @method update(value: Field) {
-    const oldValue = this.value.getAndAssertEquals();
+    const oldValue = this.value.getAndRequireEquals();
     oldValue.assertEquals(value.sub(Field(1)));
     this.value.set(value);
   }

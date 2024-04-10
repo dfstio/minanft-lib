@@ -27,7 +27,7 @@ class KeyValue extends SmartContract {
   @state(Field) value = State<Field>();
 
   @method update(value: Field) {
-    this.key.getAndAssertEquals();
+    this.key.getAndRequireEquals();
     Field(0).assertNotEquals(this.key.get());
     this.value.set(value);
   }
@@ -41,7 +41,7 @@ beforeAll(async () => {
     deployer = privateKey;
   } else {
     const network = Mina.Network({
-        mina: TESTNET,
+      mina: TESTNET,
     });
     Mina.setActiveInstance(network);
     deployer = PrivateKey.fromBase58(DEPLOYER);
@@ -105,28 +105,28 @@ describe("Deploy and set initial values", () => {
     let value1: Field = Field(0);
     let startFee = transactionFee;
 
-    for( let i = 0; i < 1000; i++) {
-          value1 = Field(i+10);
+    for (let i = 0; i < 1000; i++) {
+      value1 = Field(i + 10);
 
-          const transaction1 = await Mina.transaction(
-            { sender, fee: startFee + i  * 1_000_000},
-            () => {
-              zkApp.update(value1);
-            }
-          );
+      const transaction1 = await Mina.transaction(
+        { sender, fee: startFee + i * 1_000_000 },
+        () => {
+          zkApp.update(value1);
+        }
+      );
 
-          await transaction1.prove();
-          transaction1.sign([deployer]);
+      await transaction1.prove();
+      transaction1.sign([deployer]);
 
-          //console.log("Sending the update transaction...");
-          tx = await transaction1.send();
-          if (!useLocal) await MinaNFT.transactionInfo(tx, "update", false);
-          if( tx.isSuccess === false ) {
-            await sleep(10000); // 10 seconds
-            await fetchAccount({ publicKey: sender });
-            await fetchAccount({ publicKey: zkAppPublicKey });
-            startFee = transactionFee - i * 1_000_000;
-          }
+      //console.log("Sending the update transaction...");
+      tx = await transaction1.send();
+      if (!useLocal) await MinaNFT.transactionInfo(tx, "update", false);
+      if (tx.isSuccess === false) {
+        await sleep(10000); // 10 seconds
+        await fetchAccount({ publicKey: sender });
+        await fetchAccount({ publicKey: zkAppPublicKey });
+        startFee = transactionFee - i * 1_000_000;
+      }
     }
     await MinaNFT.wait(tx);
     await fetchAccount({ publicKey: zkAppPublicKey });

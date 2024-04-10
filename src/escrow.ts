@@ -56,9 +56,9 @@ class MinaNFTEscrow {
     const zkApp = new Escrow(zkAppPublicKey);
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
-      () => {
+      async () => {
         if (!hasAccount) AccountUpdate.fundNewAccount(sender);
-        zkApp.deploy({});
+        await zkApp.deploy({});
         zkApp.account.tokenSymbol.set("ESCROW");
         zkApp.account.zkappUri.set("https://minanft.io/@escrow");
       }
@@ -86,15 +86,18 @@ class MinaNFTEscrow {
     await MinaNFT.compileEscrow();
     const sender = buyer.toPublicKey();
     const zkApp = new Escrow(this.address);
-    const signature: Signature = Signature.create(buyer, data.toFields());
+    const signature: Signature = Signature.create(
+      buyer,
+      EscrowTransfer.toFields(data)
+    );
     const deposited: EscrowDeposit = { data, signature } as EscrowDeposit;
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.address });
 
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
-      () => {
-        zkApp.deposit(deposited, buyer.toPublicKey());
+      async () => {
+        await zkApp.deposit(deposited, buyer.toPublicKey());
         const senderUpdate = AccountUpdate.create(buyer.toPublicKey());
         senderUpdate.requireSignature();
         senderUpdate.send({ to: escrow, amount: data.price });
@@ -123,7 +126,10 @@ class MinaNFTEscrow {
     await MinaNFT.compileEscrow();
     const sender = seller.toPublicKey();
     const zkApp = new Escrow(this.address);
-    const signature: Signature = Signature.create(seller, data.toFields());
+    const signature: Signature = Signature.create(
+      seller,
+      EscrowTransfer.toFields(data)
+    );
     //console.log("signature length", signature.toFields().length);
     const deposited: EscrowDeposit = { data, signature } as EscrowDeposit;
     await fetchAccount({ publicKey: sender });
@@ -131,8 +137,8 @@ class MinaNFTEscrow {
 
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
-      () => {
-        zkApp.approveSale(deposited, seller.toPublicKey());
+      async () => {
+        await zkApp.approveSale(deposited, seller.toPublicKey());
       }
     );
     await sleep(100); // alow GC to run
@@ -173,7 +179,10 @@ class MinaNFTEscrow {
     await MinaNFT.compileEscrow();
     const sender = escrow.toPublicKey();
     const zkApp = new Escrow(this.address);
-    const signature: Signature = Signature.create(escrow, data.toFields());
+    const signature: Signature = Signature.create(
+      escrow,
+      EscrowTransfer.toFields(data)
+    );
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: this.address });
     await fetchAccount({ publicKey: nameService });
@@ -206,8 +215,8 @@ class MinaNFTEscrow {
 
     const transaction = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io" },
-      () => {
-        zkApp.transfer(
+      async () => {
+        await zkApp.transfer(
           nft,
           nameService,
           data,

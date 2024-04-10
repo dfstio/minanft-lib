@@ -28,7 +28,7 @@ class Counter extends SmartContract {
   @state(UInt64) counter = State<UInt64>();
 
   @method increaseCounter() {
-    const counter = this.counter.getAndAssertEquals();
+    const counter = this.counter.getAndRequireEquals();
     this.counter.set(counter.add(UInt64.from(1)));
   }
 }
@@ -38,8 +38,8 @@ class Counter2 extends SmartContract {
   @state(UInt64) counter2 = State<UInt64>();
 
   @method increaseCounter() {
-    const counter = this.counter.getAndAssertEquals();
-    const counter2 = this.counter.getAndAssertEquals();
+    const counter = this.counter.getAndRequireEquals();
+    const counter2 = this.counter.getAndRequireEquals();
     this.counter.set(counter.add(UInt64.from(1)));
     this.counter2.set(counter2.add(UInt64.from(1)));
   }
@@ -116,21 +116,21 @@ using the deployer with public key ${sender.toBase58()}:
     // on wrongCounter2PublicKey the Counter code is deployed
     // but we use a Counter2 code to call it
     const zkCounter2 = new Counter2(wrongCounter2PublicKey);
-      await fetchAccount({ publicKey: sender });
-      await fetchAccount({ publicKey: wrongCounter2PublicKey });
+    await fetchAccount({ publicKey: sender });
+    await fetchAccount({ publicKey: wrongCounter2PublicKey });
 
-      const transaction = await Mina.transaction(
-        { sender, fee: transactionFee },
-        () => {
-          zkCounter2.increaseCounter();
-        }
-      );
-      await transaction.prove();
-      transaction.sign([deployer, counterPrivateKey]);
-      const tx = await transaction.send();
-      console.log(`Transaction`, transaction.toPretty());
-      if (!useLocalBlockchain) {
-        await tx.wait({ maxAttempts: 120, interval: 60000 });
+    const transaction = await Mina.transaction(
+      { sender, fee: transactionFee },
+      () => {
+        zkCounter2.increaseCounter();
       }
+    );
+    await transaction.prove();
+    transaction.sign([deployer, counterPrivateKey]);
+    const tx = await transaction.send();
+    console.log(`Transaction`, transaction.toPretty());
+    if (!useLocalBlockchain) {
+      await tx.wait({ maxAttempts: 120, interval: 60000 });
+    }
   });
 });

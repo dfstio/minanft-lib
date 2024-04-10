@@ -5,7 +5,7 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { PublicKey, PrivateKey, Poseidon, Signature } from "o1js";
 import { api } from "../src/api/api";
 import { initBlockchain, makeString } from "../utils/testhelpers";
-import { blockchain } from "../src/mina";
+import { blockchain } from "../src/networks";
 import { Memory } from "../src/mina";
 import { PINATA_JWT, JWT } from "../env.json";
 import config from "../src/config";
