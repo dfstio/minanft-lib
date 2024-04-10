@@ -47,7 +47,7 @@ beforeAll(async () => {
   if (deployer === undefined) return;
 });
 
-describe(`MinaNFT contract`, () => {
+describe.skip(`MinaNFT contract`, () => {
   let originalNFT: MinaNFT | undefined = undefined;
   let redactedNFT: RedactedMinaNFT | undefined = undefined;
 

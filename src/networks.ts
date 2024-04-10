@@ -1,4 +1,4 @@
-export { MinaNetworkURL, Berkeley, Zeko, Lightnet, TestWorld2 };
+export { MinaNetworkURL, Berkeley, Devnet, Zeko, Lightnet, TestWorld2 };
 
 interface MinaNetworkURL {
   mina: string[];
@@ -23,6 +23,23 @@ const Berkeley: MinaNetworkURL = {
   explorerTransactionUrl: "https://minascan.io/berkeley/tx/",
   chainId: "berkeley",
   name: "Berkeley",
+};
+
+const Devnet: MinaNetworkURL = {
+  mina: [
+    "https://mina-devnet-graphql.aurowallet.com/graphql",
+    //"https://api.minascan.io/node/devnet/v1/graphql",
+    //"https://devnet.graphql.minaexplorer.com/",
+    //"https://proxy.devnet.minaexplorer.com/graphql",
+  ],
+  archive: [
+    "https://api.minascan.io/archive/devnet/v1/graphql",
+    //"https://archive.devnet.minaexplorer.com",
+  ],
+  explorerAccountUrl: "https://minascan.io/devnet/account/",
+  explorerTransactionUrl: "https://minascan.io/devnet/tx/",
+  chainId: "devnet",
+  name: "Devnet",
 };
 
 const Zeko: MinaNetworkURL = {

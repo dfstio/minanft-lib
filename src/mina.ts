@@ -14,6 +14,7 @@ import { Mina, PublicKey, PrivateKey, UInt64 } from "o1js";
 import {
   MinaNetworkURL,
   Berkeley,
+  Devnet,
   Zeko,
   TestWorld2,
   Lightnet as Lightnet,
@@ -23,6 +24,7 @@ import { fetchMinaAccount } from "./fetch";
 type blockchain =
   | "local"
   | "berkeley"
+  | "devnet"
   | "zeko"
   | "lighnet"
   | "mainnet"
@@ -48,6 +50,13 @@ function initBlockchain(instance: blockchain): MinaNetwork {
     });
     Mina.setActiveInstance(network);
     return { keys: [], url: Berkeley };
+  } else if (instance === "devnet") {
+    const network = Mina.Network({
+      mina: Devnet.mina,
+      archive: Devnet.archive,
+    });
+    Mina.setActiveInstance(network);
+    return { keys: [], url: Devnet };
   } else if (instance === "zeko") {
     const network = Mina.Network({
       mina: Zeko.mina,

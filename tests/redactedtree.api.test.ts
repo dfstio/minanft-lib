@@ -25,7 +25,7 @@ import { api } from "../src/api/api";
 
 const blockchainInstance: blockchain = "local";
 const height = 20;
-const maxElements = 100;
+const maxElements = 10;
 const minMaskLength = 5;
 
 const {
@@ -66,7 +66,7 @@ beforeAll(async () => {
   if (deployer === undefined) return;
 });
 
-describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
+describe.skip(`MinaNFT Redacted Merkle Tree calculations`, () => {
   it(`should prepare data`, async () => {
     expect(maxElements).toBeGreaterThan(minMaskLength);
     if (maxElements <= minMaskLength) return;

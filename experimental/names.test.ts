@@ -3,7 +3,7 @@ import { Mina, Field, Poseidon, PrivateKey, UInt32 } from "o1js";
 import { MinaNFT } from "../src/minanft";
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hour
-const names = ["DFST", "NAME", "NAMES", "NFT", "MINANFT"];
+const names = ["DFST", "NAME", "NAMES", "MINANFT", "CrisF"]; //"NFT",
 const lNames = [
   "minanft",
   "socialcap",
@@ -12,6 +12,8 @@ const lNames = [
   "mario",
   "worker",
   "cloud",
+  "crisf",
+  "cris",
 ];
 
 describe("Names", () => {
