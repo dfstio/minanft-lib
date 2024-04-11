@@ -15,7 +15,7 @@ const { MINANFT_NAME_SERVICE, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = true;
+const useLocalBlockchain: boolean = false;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -44,7 +44,7 @@ beforeAll(async () => {
 
 describe(`Deploy MinaNFT Name Service contract`, () => {
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();

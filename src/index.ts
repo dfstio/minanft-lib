@@ -9,6 +9,7 @@ export * from "./baseminanft";
 export * from "./privatemetadata";
 export * from "./baseminanftobject";
 export * from "./contract/nft";
+export * from "./contract/transfer";
 export * from "./contract/names";
 export * from "./contract/escrow";
 export * from "./contract/metadata";
@@ -35,7 +36,7 @@ const NAMES_ORACLE = "B62qids6rU9iqjvBV4DHxW8z67mgHFws1rPmFoqpcyRq2arYxUw6sZu";
 const MINANFT_NAME_SERVICE =
   "B62qrryunX2LzaZ1sGtqfJqzSdNdN7pVSZw8YtnxQNxrrF9Vt56bNFT";
 const VERIFICATION_KEY_HASH =
-  "12918718041206381953113767780922616497686048895186232679441072502504245959135";
+  "14969286650042431830377273885790005239485927337964560228219347032689819548527";
 const VERIFIER = "B62qqzwDxiH172SXE4SUVYsNV2FteL2UeYFsjRqF4Qf42KnE1q1VNFT";
 
 export { NAMES_ORACLE, MINANFT_NAME_SERVICE, VERIFICATION_KEY_HASH, VERIFIER };

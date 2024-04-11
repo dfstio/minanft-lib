@@ -148,9 +148,14 @@ function initBlockchain(
 }
 
 async function accountBalance(address: PublicKey): Promise<UInt64> {
-  await fetchAccount({ publicKey: address });
-  if (Mina.hasAccount(address)) return Mina.getBalance(address);
-  else return UInt64.from(0);
+  try {
+    await fetchAccount({ publicKey: address });
+    if (Mina.hasAccount(address)) return Mina.getBalance(address);
+    else return UInt64.from(0);
+  } catch (error: any) {
+    //console.error(error);
+    return UInt64.from(0);
+  }
 }
 
 async function accountBalanceMina(address: PublicKey): Promise<number> {

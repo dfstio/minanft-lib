@@ -9,6 +9,7 @@ import {
 } from "o1js";
 import { DEPLOYER, DEPLOYERS_API, CONTRACT_DEPLOYER_SK } from "../env.json";
 import { MinaNFT } from "../src/minanft";
+import { accountBalanceMina } from "../src/mina";
 
 const keys: string[] = [];
 
@@ -39,27 +40,46 @@ describe("deployers", () => {
           .toBase58()} is`,
         balanceContractDeployer.toLocaleString(`en`)
       );
-      return;
-      for (let i = 0; i < DEPLOYERS_API.length; i++) {
-        if (keys.includes(DEPLOYERS_API[i])) {
-          console.log(`Duplicate key ${DEPLOYERS_API[i]}`);
-        } else {
-          keys.push(DEPLOYERS_API[i]);
-        }
+      const length = DEPLOYERS_API.length > 60 ? 60 : DEPLOYERS_API.length;
+      for (let i = 0; i < length; i++) {
         const privateKey = PrivateKey.fromBase58(DEPLOYERS_API[i]);
-        const balanceDeployer =
-          Number((await accountBalance(privateKey.toPublicKey())).toBigInt()) /
-          1e9;
+        const publicKey = privateKey.toPublicKey();
+        const balanceDeployer = await accountBalanceMina(publicKey);
 
-        if (balanceDeployer < 100)
+        if (balanceDeployer === 0) {
           console.log(
             `Balance of the Deployer`,
             i,
-            privateKey.toPublicKey().toBase58(),
+            privateKey.toBase58(),
             `is`,
             balanceDeployer.toLocaleString(`en`)
-            //privateKey.toPublicKey().toBase58()
           );
+          /*
+          try {
+            await Mina.faucet(publicKey);
+          } catch (e) {
+            console.log(e);
+          }
+          await sleep(1000 * (600 + Math.floor(Math.random() * 600)));
+          const balanceDeployer = await accountBalanceMina(publicKey);
+          
+          console.log(
+            `Balance of the Deployer`,
+            publicKey.toBase58(),
+            `is`,
+            balanceDeployer.toLocaleString(`en`)
+          );
+          */
+        }
+
+        console.log(
+          `Balance of the Deployer`,
+          i,
+          privateKey.toPublicKey().toBase58(),
+          `is`,
+          balanceDeployer.toLocaleString(`en`)
+          //privateKey.toPublicKey().toBase58()
+        );
       }
     },
     1000 * (60 * 60 * 24)

@@ -3,7 +3,7 @@ import { Mina } from "o1js";
 import { MinaNFT } from "../src/minanft";
 import { Memory } from "../src/mina";
 
-const cacheDir = "./nftcache";
+const cacheDir = "./cache";
 
 beforeAll(async () => {
   const Local = Mina.LocalBlockchain({ proofsEnabled: true });
@@ -25,7 +25,7 @@ describe("Compile contracts", () => {
     expect(MinaNFT.verificationKey).toBeDefined();
     // also in index.ts
     expect(MinaNFT.verificationKey?.hash.toJSON()).toBe(
-      "12918718041206381953113767780922616497686048895186232679441072502504245959135"
+      "14969286650042431830377273885790005239485927337964560228219347032689819548527"
     );
   });
 

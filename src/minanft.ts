@@ -58,6 +58,10 @@ import { initBlockchain, MinaNetworkInstance, sleep } from "./mina";
 import { blockchain } from "./networks";
 import config from "./config";
 import { MinaNFTNameService } from "./minanftnames";
+import {
+  EscrowTransferVerification,
+  EscrowTransferApproval,
+} from "./contract/transfer";
 const { MINAFEE, MINANFT_NAME_SERVICE } = config;
 
 /**
@@ -987,7 +991,7 @@ class MinaNFT extends BaseMinaNFT {
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        // BUG await zkApp.update(address, update, signature, ownerPublicKey, proof!);
+        await zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
     let sentTx: Mina.PendingTransaction | undefined = undefined;
@@ -1233,8 +1237,7 @@ class MinaNFT extends BaseMinaNFT {
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        //BUG
-        //await zkApp.update(address, update, signature, ownerPublicKey, proof!);
+        await zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
     let sentTx: Mina.PendingTransaction | undefined = undefined;
@@ -1691,7 +1694,6 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
-        /* BUG
         await zkApp.escrowTransfer(
           address,
           data,
@@ -1702,7 +1704,6 @@ class MinaNFT extends BaseMinaNFT {
           escrow2,
           escrow3
         );
-        */
       }
     );
     await sleep(100); // alow GC to run
@@ -1760,6 +1761,16 @@ class MinaNFT extends BaseMinaNFT {
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
     const tokenId = zkApp.deriveTokenId();
+    console.time("Calculated approval proof");
+    const proof = await EscrowTransferVerification.check(
+      new EscrowTransferApproval({
+        approval: data,
+        owner: Poseidon.hash(ownerPublicKey.toFields()),
+      }),
+      signature,
+      ownerPublicKey
+    );
+    console.timeEnd("Calculated approval proof");
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     await fetchMinaAccount({ publicKey: address, tokenId });
     await fetchMinaAccount({ publicKey: sender });
@@ -1768,7 +1779,7 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
-        await zkApp.approveEscrow(address, signature, ownerPublicKey); //data,
+        await zkApp.approveEscrow(address, proof);
       }
     );
     await sleep(100); // alow GC to run

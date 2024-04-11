@@ -78,7 +78,6 @@ class Escrow extends SmartContract {
     data.oldOwner.assertEquals(Poseidon.hash(seller.toFields()));
     data.newOwner.assertEquals(Poseidon.hash(buyer.toFields()));
     const minanft = new MinaNFTNameServiceContract(nameService);
-    /* BUG
     await minanft.escrowTransfer(
       nft,
       data,
@@ -89,7 +88,7 @@ class Escrow extends SmartContract {
       escrow2,
       escrow3
     );
-    */
+
     //this.send({ to: seller, amount });
     this.emitEvent("transfer", data);
   }

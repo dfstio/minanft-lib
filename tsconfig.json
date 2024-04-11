@@ -12,7 +12,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
@@ -23,19 +23,19 @@
   },
   "include": ["src/**/*"],
   "exclude": [
-    "dist/**", 
-    "tests/**", 
-    "docs/**", 
-    "experimental/**", 
-    "mycache/**", 
-    "nftcache/**", 
-    "experimental/**", 
-    "node_modules", 
+    "dist/**",
+    "tests/**",
+    "docs/**",
+    "experimental/**",
+    "mycache/**",
+    "cache/**",
+    "experimental/**",
+    "node_modules",
     "deprecated/**",
     "images/**"
   ],
   "ts-node": {
-    "esm": true, // «———— enabling ESM for ts-node  
-    "experimentalSpecifierResolution": "node" 
-  }, 
+    "esm": true, // «———— enabling ESM for ts-node
+    "experimentalSpecifierResolution": "node"
+  }
 }

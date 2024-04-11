@@ -48,10 +48,7 @@ const useLocalBlockchain: boolean = true;
 let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  const data = await initBlockchain(
-    useLocalBlockchain ? "local" : "berkeley",
-    0
-  );
+  const data = await initBlockchain(useLocalBlockchain ? "local" : "devnet", 0);
   expect(data).toBeDefined();
   if (data === undefined) return;
 
@@ -60,8 +57,6 @@ beforeAll(async () => {
     ? d
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 
-  //MinaNFT.minaInit("testworld2");
-  //deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;
   const balanceDeployer =
@@ -124,7 +119,7 @@ describe(`Deploying contracts`, () => {
   });
 
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();
@@ -134,50 +129,6 @@ describe(`Deploying contracts`, () => {
     Memory.info(`compiled`);
   });
 
-  /* - moved to mint.test
-  it(`should mint minanft NFT`, async () => {
-    expect(deployer).toBeDefined();
-    if (deployer === undefined) return;
-    const ownerPrivateKey = PrivateKey.fromBase58(MINANFT_NFT_OWNER_SK);
-    const ownerPublicKey = ownerPrivateKey.toPublicKey();
-    const owner = Poseidon.hash(ownerPublicKey.toFields());
-
-    const nft = new MinaNFT(`@minanft`);
-    nft.updateText({
-      key: `description`,
-      text: "MinaNFT is a NFT standard for Mina Protocol, available for everyone to use at https://minanft.io and @MinaNFT_bot (telegram)",
-    });
-    nft.update({ key: `twitter`, value: `@minanft` });
-    nft.update({ key: `github`, value: `https://github.com/dfstio` });
-    nft.update({ key: `telegram`, value: `@MinaNFT_bot` });
-    nft.update({ key: `discord`, value: `https://discord.gg/s4aM63bF` });
-    nft.update({ key: `weblink`, value: `https://minanft.io` });
-
-    await nft.updateImage({
-      filename: "./logo/minanft.jpg",
-      pinataJWT,
-    });
-
-    console.log(`json:`, JSON.stringify(nft.toJSON(), null, 2));
-    const tx = await nft.mint({
-      deployer,
-      owner,
-      pinataJWT,
-      privateKey: PrivateKey.fromBase58(MINANFT_NFT_ADDRESS_SK),
-    });
-    expect(tx).toBeDefined();
-    if (tx === undefined) return;
-    Memory.info(`minted`);
-    if (!useLocalBlockchain) expect(await MinaNFT.wait(tx)).toBe(true);
-    expect(await nft.checkState()).toBe(true);
-    expect(nft.address).toBeDefined();
-    if (nft.address === undefined) return;
-    expect(nft.address?.toJSON()).toBe(
-      PublicKey.fromBase58(MINANFT_NFT_ADDRESS).toJSON()
-    );
-    console.log(`NFT minanft minted to the address:`, nft.address.toJSON());
-  });
-*/
   it(`should deploy Escrow contract`, async () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;

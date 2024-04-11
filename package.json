@@ -13,7 +13,7 @@
     "web3",
     "zero knowledge"
   ],
-  "version": "1.8.6",
+  "version": "1.9.0",
   "homepage": "https://docs.minanft.io",
   "repository": "git@dfstio.github.com:dfstio/minanft-lib.git",
   "main": "src/index.ts",
@@ -26,7 +26,7 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "login": "yarn npm login",
-    "publish": "cd dist && yarn npm publish --access public"
+    "publish": "yarn compile && cd dist && yarn npm publish --access public && cd .."
   },
   "dependencies": {
     "arweave": "^1.15.0",
@@ -52,7 +52,8 @@
     "testTimeout": 10800000,
     "verbose": true,
     "roots": [
-      "tests"
+      "tests",
+      "experimental"
     ],
     "setupFilesAfterEnv": [
       "./jest-config.ts"

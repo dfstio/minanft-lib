@@ -9,7 +9,7 @@ import { MapData } from "../src/storage/map";
 import { Memory } from "../src/mina";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -32,7 +32,7 @@ beforeAll(async () => {
 
 describe(`MinaNFT contract`, () => {
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();

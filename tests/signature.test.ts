@@ -1,20 +1,13 @@
-// https://github.com/o1-labs/o1js/issues/1551
+// https://github.com/o1-labs/o1js/issues/1561
 
 import { describe, expect, it } from "@jest/globals";
 import {
   Cache,
   Field,
-  SelfProof,
-  ZkProgram,
-  Struct,
-  Poseidon,
   PublicKey,
   PrivateKey,
   AccountUpdate,
-  UInt64,
-  UInt8,
   Signature,
-  MerkleMapWitness,
   Bool,
   SmartContract,
   method,

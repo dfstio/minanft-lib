@@ -9,7 +9,7 @@ import { MapData } from "../src/storage/map";
 import { Memory } from "../src/mina";
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = 'local';
+const blockchainInstance: blockchain = "local";
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -32,7 +32,7 @@ beforeAll(async () => {
 
 describe(`MinaNFT contract`, () => {
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();
@@ -68,7 +68,12 @@ describe(`MinaNFT contract`, () => {
     const ownerPublicKey = ownerPrivateKey.toPublicKey();
     const owner = Poseidon.hash(ownerPublicKey.toFields());
 
-    const nft = new MinaNFT({ name: nftName, address: nftPublicKey, owner, nameService: nameService.address });
+    const nft = new MinaNFT({
+      name: nftName,
+      address: nftPublicKey,
+      owner,
+      nameService: nameService.address,
+    });
     nft.updateText({
       key: `description`,
       text: "This is my long description of the NFT. Can be of any length, supports markdown.",
@@ -80,14 +85,14 @@ describe(`MinaNFT contract`, () => {
     await nft.updateImage({
       filename: "./images/navigator.jpg",
       pinataJWT,
-      calculateRoot: false
+      calculateRoot: false,
     });
 
     await nft.updateFile({
       key: "sea",
       filename: "./images/image.jpg",
       pinataJWT,
-      calculateRoot: false
+      calculateRoot: false,
     });
 
     const map = new MapData();
@@ -102,7 +107,7 @@ describe(`MinaNFT contract`, () => {
       key: "woman",
       filename: "./images/woman.png",
       pinataJWT,
-      calculateRoot: false
+      calculateRoot: false,
     });
 
     const mapLevel3 = new MapData();

@@ -10,11 +10,11 @@ import {
   PublicKey,
   Poseidon,
   Bool,
-  Provable,
 } from "o1js";
 import { Update, Metadata, Storage } from "./metadata";
 import { MinaNFTMetadataUpdateProof } from "./update";
 import { EscrowTransfer, EscrowApproval } from "./escrow";
+import { EscrowTransferProof } from "./transfer";
 
 /**
  * MinaNFTContract is a smart contract that implements the Mina NFT standard.
@@ -48,18 +48,18 @@ class MinaNFTContract extends SmartContract {
     proof: MinaNFTMetadataUpdateProof
   ) {
     // Check that the metadata is correct
-    //const metadata = this.metadata.getAndRequireEquals();
-    //Metadata.assertEquals(metadata, update.oldRoot);
-    //Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
-    //Metadata.assertEquals(proof.publicInput.newRoot, update.newRoot);
-    /*
+    const metadata = this.metadata.getAndRequireEquals();
+    Metadata.assertEquals(metadata, update.oldRoot);
+    Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
+    Metadata.assertEquals(proof.publicInput.newRoot, update.newRoot);
+
     // Check that the proof verifies
     proof.verify();
-    */
-    //signature.verify(owner, Update.toFields(update)).assertEquals(Bool(true));
-    signature.verify(owner, [Field(30)]).assertEquals(Bool(true));
-    //update.owner.assertEquals(Poseidon.hash(owner.toFields()));
-    /*
+
+    signature.verify(owner, Update.toFields(update)).assertEquals(Bool(true));
+    //signature.verify(owner, [Field(30)]).assertEquals(Bool(true));
+    update.owner.assertEquals(Poseidon.hash(owner.toFields()));
+
     this.owner
       .getAndRequireEquals()
       .assertEquals(update.owner, "Owner mismatch");
@@ -68,7 +68,7 @@ class MinaNFTContract extends SmartContract {
     const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(update.version);
- */
+
     this.metadata.set(update.newRoot);
     this.version.set(update.version);
     this.storage.set(update.storage);
@@ -84,7 +84,6 @@ class MinaNFTContract extends SmartContract {
    * @param escrow2 public key of the second escrow
    * @param escrow3 public key of the third escrow
    */
-  /*
   @method async escrowTransfer(
     data: EscrowTransfer,
     signature1: Signature,
@@ -120,38 +119,27 @@ class MinaNFTContract extends SmartContract {
     this.version.set(newVersion);
     this.escrow.set(Field(0));
   }
- */
+
   /**
    * Approve setting of the new escrow
    * @param data {@link EscrowApproval} - data for the approval
    * @param signature signature of the owner
    * @param owner owner's public key
    */
-  @method async approveEscrow(
-    //data: EscrowApproval,
-    signature: Signature,
-    owner: PublicKey
-  ) {
-    /*
-    signature
-      .verify(owner, EscrowApproval.toFields(data))
-      .assertEquals(Bool(true));
-    */
-    Provable.log("owner", owner);
-    Provable.log("signature", signature);
-    signature.verify(owner, [Field(2)]).assertEquals(Bool(true));
-    /*
-    data.owner.assertEquals(Poseidon.hash(owner.toFields()));
-
-    this.owner.getAndRequireEquals().assertEquals(data.owner, "Owner mismatch");
-    this.name.getAndRequireEquals().assertEquals(data.name, "Name mismatch");
+  @method async approveEscrow(proof: EscrowTransferProof) {
+    proof.verify();
+    this.owner
+      .getAndRequireEquals()
+      .assertEquals(proof.publicInput.owner, "Owner mismatch");
+    this.name
+      .getAndRequireEquals()
+      .assertEquals(proof.publicInput.approval.name, "Name mismatch");
 
     const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
-    newVersion.assertEquals(data.version);
+    newVersion.assertEquals(proof.publicInput.approval.version);
 
-    this.version.set(data.version);
-    this.escrow.set(data.escrow);
-    */
+    this.version.set(proof.publicInput.approval.version);
+    this.escrow.set(proof.publicInput.approval.escrow);
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "minanft",
-  "version": "1.8.6",
+  "version": "1.9.0",
   "description": "MinaNFT Typescript/JavaScript integration library",
   "author": "dfst.io",
   "license": "Apache-2.0",
@@ -29,7 +29,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.14.0"
   },
   "keywords": [
     "javascript",
@@ -45,6 +45,6 @@
     "mime": "^3.0.0"
   },
   "peerDependencies": {
-    "o1js": "^0.17.0"
+    "o1js": "^0.18.0"
   }
 }

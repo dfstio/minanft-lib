@@ -21,6 +21,7 @@ import { MinaNFTContract } from "./nft";
 import { Update } from "./metadata";
 import { MinaNFTMetadataUpdateProof } from "./update";
 import { EscrowTransfer, EscrowApproval } from "./escrow";
+import { EscrowTransferProof } from "./transfer";
 
 /**
  * NFTMintData is the data for the minting of the NFT
@@ -190,7 +191,6 @@ class MinaNFTNameServiceContract extends TokenContract {
    * @param owner owner's public key
    * @param proof {@link MinaNFTMetadataUpdateProof} - proof of the update of the metadata to be correctly inserted into the Merkle Map
    */
-  /*
   @method async update(
     address: PublicKey,
     update: Update,
@@ -205,7 +205,6 @@ class MinaNFTNameServiceContract extends TokenContract {
     await nft.update(update, signature, owner, proof);
     this.emitEvent("update", update);
   }
-  */
 
   /**
    * Transfer the NFT to new owner
@@ -218,7 +217,6 @@ class MinaNFTNameServiceContract extends TokenContract {
    * @param escrow2 public key of the second escrow
    * @param escrow3 public key of the third escrow
    */
-  /*
   @method async escrowTransfer(
     address: PublicKey,
     data: EscrowTransfer,
@@ -244,7 +242,6 @@ class MinaNFTNameServiceContract extends TokenContract {
     );
     this.emitEvent("escrowTransfer", data);
   }
-  */
   /**
    * Approve setting of the new escrow
    * @param address address of the NFT
@@ -252,16 +249,11 @@ class MinaNFTNameServiceContract extends TokenContract {
    * @param signature signature of the owner
    * @param owner owner's public key
    */
-  @method async approveEscrow(
-    address: PublicKey,
-    //data: EscrowApproval,
-    signature: Signature,
-    owner: PublicKey
-  ) {
-    //this.isNFT(address);
+  @method async approveEscrow(address: PublicKey, proof: EscrowTransferProof) {
+    this.isNFT(address);
     const tokenId = this.deriveTokenId();
     const nft = new MinaNFTContract(address, tokenId);
-    await nft.approveEscrow(signature, owner);
-    //this.emitEvent("approveEscrow", data);
+    await nft.approveEscrow(proof);
+    this.emitEvent("approveEscrow", proof.publicInput.approval);
   }
 }
