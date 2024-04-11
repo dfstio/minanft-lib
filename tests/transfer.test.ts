@@ -16,15 +16,19 @@ import { MinaNFTNameService } from "../src/minanftnames";
 import { EscrowTransfer, EscrowApproval } from "../src/contract/escrow";
 import { blockchain, initBlockchain } from "../utils/testhelpers";
 import { Memory } from "../src/mina";
+import { MinaNFTContract } from "../src/contract/nft";
+import { MinaNFTNameServiceContract } from "../src/contract/names";
+import { EscrowTransferVerification } from "../src/contract/transfer";
 import { PINATA_JWT } from "../env.json";
 
-const CONTRACTS_NUMBER = 1;
-const ITERATIONS_NUMBER = 1;
+const CONTRACTS_NUMBER = 2;
+const ITERATIONS_NUMBER = 2;
 const pinataJWT = ""; //PINATA_JWT;
 const blockchainInstance: blockchain = "local";
 
 let nameService: MinaNFTNameService | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
+let tokenId: Field | undefined = undefined;
 
 let deployer: PrivateKey | undefined = undefined;
 let nonce: number = 0;
@@ -40,7 +44,46 @@ describe(`MinaNFT contract`, () => {
   });
 
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    console.time("methods analyzed");
+    const methods = [
+      {
+        name: "EscrowTransferVerification",
+        result: await EscrowTransferVerification.analyzeMethods(),
+        skip: true,
+      },
+      {
+        name: "MinaNFTContract",
+        result: await MinaNFTContract.analyzeMethods(),
+        skip: false,
+      },
+      {
+        name: "MinaNFTNameServiceContract",
+        result: await MinaNFTNameServiceContract.analyzeMethods(),
+        skip: false,
+      },
+    ];
+
+    console.timeEnd("methods analyzed");
+    const maxRows = 2 ** 16;
+    for (const contract of methods) {
+      // calculate the size of the contract - the sum or rows for each method
+      const size = Object.values(contract.result).reduce(
+        (acc, method) => acc + method.rows,
+        0
+      );
+      // calculate percentage rounded to 0 decimal places
+      const percentage = Math.round((size / maxRows) * 100);
+
+      console.log(
+        `method's total size for a ${contract.name} is ${size} rows (${percentage}% of max ${maxRows} rows)`
+      );
+      if (contract.skip !== true)
+        for (const method in contract.result) {
+          console.log(method, `rows:`, (contract.result as any)[method].rows);
+        }
+    }
+
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();
@@ -78,6 +121,12 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`names service deployed`);
     expect(await MinaNFT.wait(tx)).toBe(true);
     nameService = names;
+    expect(nameService).toBeDefined();
+    expect(nameService.address).toBeDefined();
+    if (nameService.address === undefined)
+      throw new Error(`NameService address is undefined`);
+    const contract = new MinaNFTNameServiceContract(nameService.address);
+    tokenId = contract.deriveTokenId();
   });
 
   it(`should mint NFTs`, async () => {
@@ -114,6 +163,9 @@ describe(`MinaNFT contract`, () => {
     for (let i = 0; i < CONTRACTS_NUMBER; i++) {
       expect(await MinaNFT.wait(txs[i])).toBe(true);
       expect(await nft[i].checkState()).toBe(true);
+      const contract = new MinaNFTContract(nft[i].address, tokenId);
+      const escrow = contract.escrow.get();
+      expect(escrow.toJSON()).toBe("0");
     }
   });
 
@@ -131,7 +183,18 @@ describe(`MinaNFT contract`, () => {
           version: nft[i].version.add(UInt64.from(1)),
           owner: Poseidon.hash(owners[i].toPublicKey().toFields()),
         });
-        const signature = Signature.create(owners[i], data.toFields());
+        //console.log("owner public key", owners[i].toPublicKey().toBase58());
+        //console.log("owner private key", owners[i].toBase58());
+        const signature = Signature.create(
+          owners[i],
+          EscrowApproval.toFields(data)
+          //[Field(2)]
+        );
+        const ok = signature
+          .verify(owners[i].toPublicKey(), EscrowApproval.toFields(data))
+          .toBoolean();
+        if (!ok) console.error("signature ok:", ok);
+        expect(ok).toBe(true);
 
         try {
           const tx = await nft[i].approve({
@@ -156,9 +219,11 @@ describe(`MinaNFT contract`, () => {
       for (let i = 0; i < CONTRACTS_NUMBER; i++) {
         expect(await MinaNFT.wait(txs[i])).toBe(true);
         expect(await nft[i].checkState()).toBe(true);
+        const contract = new MinaNFTContract(nft[i].address, tokenId);
+        const escrow = contract.escrow.get();
+        expect(escrow.toJSON()).toBe(escrow.toJSON());
       }
     });
-
     it(`should transfer NFTs, iteration ${iteration}`, async () => {
       console.log(`Transferring, iteration ${iteration}...`);
       expect(deployer).toBeDefined();

@@ -88,6 +88,7 @@ class Escrow extends SmartContract {
       escrow2,
       escrow3
     );
+
     //this.send({ to: seller, amount });
     this.emitEvent("transfer", data);
   }

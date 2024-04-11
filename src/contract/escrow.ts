@@ -54,8 +54,4 @@ class EscrowApproval extends Struct({
   }) {
     super(value);
   }
-
-  toFields() {
-    return [this.name, this.escrow, this.owner, ...this.version.toFields()];
-  }
 }

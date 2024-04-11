@@ -11,7 +11,8 @@ import { MapData } from "../src/storage/map";
 
 const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "local";
+const useLocalBlockchain = false;
+const blockchainInstance: blockchain = useLocalBlockchain ? "local" : "devnet";
 const includeFiles = false;
 const includeImage = false;
 
@@ -32,7 +33,7 @@ beforeAll(async () => {
 
 describe(`MinaNFT contract`, () => {
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();
@@ -40,29 +41,31 @@ describe(`MinaNFT contract`, () => {
     Memory.info(`compiled`);
   });
 
-  it(`should deploy NameService`, async () => {
-    expect(deployer).toBeDefined();
-    if (deployer === undefined) return;
-    oraclePrivateKey = PrivateKey.random();
-    const names = new MinaNFTNameService({
-      oraclePrivateKey,
+  if (useLocalBlockchain) {
+    it(`should deploy NameService`, async () => {
+      expect(deployer).toBeDefined();
+      if (deployer === undefined) return;
+      oraclePrivateKey = PrivateKey.random();
+      const names = new MinaNFTNameService({
+        oraclePrivateKey,
+      });
+      const tx = await names.deploy(deployer);
+      expect(tx).toBeDefined();
+      if (tx === undefined) return;
+      Memory.info(`names service deployed`);
+      expect(await MinaNFT.wait(tx)).toBe(true);
+      nameService = names;
     });
-    const tx = await names.deploy(deployer);
-    expect(tx).toBeDefined();
-    if (tx === undefined) return;
-    Memory.info(`names service deployed`);
-    expect(await MinaNFT.wait(tx)).toBe(true);
-    nameService = names;
-  });
-
-  it.skip(`should use existing NameService`, async () => {
-    oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
-    const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
-    nameService = new MinaNFTNameService({
-      oraclePrivateKey,
-      address: nameServiceAddress,
+  } else {
+    it(`should use existing NameService`, async () => {
+      oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
+      const nameServiceAddress = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
+      nameService = new MinaNFTNameService({
+        oraclePrivateKey,
+        address: nameServiceAddress,
+      });
     });
-  });
+  }
 
   it(`should mint NFT`, async () => {
     expect(deployer).toBeDefined();

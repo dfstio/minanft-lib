@@ -17,6 +17,7 @@ import { Escrow } from "./plugins/escrow";
 import { PrivateMetadata } from "./privatemetadata";
 import { sleep } from "./mina";
 import { Storage } from "./contract/metadata";
+import { EscrowTransferVerification } from "./contract/transfer";
 
 /**
  * Base class for MinaNFT
@@ -32,6 +33,7 @@ class BaseMinaNFT {
   static badgeVerifierVerificationKey: VerificationKey | undefined;
   static badgeVerificationKey: VerificationKey | undefined;
   static escrowVerificationKey: VerificationKey | undefined;
+  static transferVerificationKey: VerificationKey | undefined;
   static cache: Cache | undefined;
 
   constructor() {
@@ -233,10 +235,19 @@ class BaseMinaNFT {
     if (MinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
       await sleep(100); // alow GC to run
-      //await Key.compile(options);
       const { verificationKey } = await MinaNFTMetadataUpdate.compile(options);
       console.timeEnd("MinaNFTMetadataUpdate compiled");
       MinaNFT.updateVerificationKey = verificationKey;
+    }
+
+    if (MinaNFT.transferVerificationKey === undefined) {
+      console.time("EscrowTransferVerification compiled");
+      await sleep(100); // alow GC to run
+      const { verificationKey } = await EscrowTransferVerification.compile(
+        options
+      );
+      console.timeEnd("EscrowTransferVerification compiled");
+      MinaNFT.transferVerificationKey = verificationKey;
     }
 
     if (MinaNFT.verificationKey == undefined) {

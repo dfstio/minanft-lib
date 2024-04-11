@@ -21,6 +21,7 @@ import { MinaNFTContract } from "./nft";
 import { Update } from "./metadata";
 import { MinaNFTMetadataUpdateProof } from "./update";
 import { EscrowTransfer, EscrowApproval } from "./escrow";
+import { EscrowTransferProof } from "./transfer";
 
 /**
  * NFTMintData is the data for the minting of the NFT
@@ -230,7 +231,7 @@ class MinaNFTNameServiceContract extends TokenContract {
     this.isNFT(address);
     const tokenId = this.deriveTokenId();
     const nft = new MinaNFTContract(address, tokenId);
-    await nft.transfer(
+    await nft.escrowTransfer(
       data,
       signature1,
       signature2,
@@ -248,16 +249,11 @@ class MinaNFTNameServiceContract extends TokenContract {
    * @param signature signature of the owner
    * @param owner owner's public key
    */
-  @method async approveEscrow(
-    address: PublicKey,
-    data: EscrowApproval,
-    signature: Signature,
-    owner: PublicKey
-  ) {
+  @method async approveEscrow(address: PublicKey, proof: EscrowTransferProof) {
     this.isNFT(address);
     const tokenId = this.deriveTokenId();
     const nft = new MinaNFTContract(address, tokenId);
-    await nft.approveEscrow(data, signature, owner);
-    this.emitEvent("approveEscrow", data);
+    await nft.approveEscrow(proof);
+    this.emitEvent("approveEscrow", proof.publicInput.approval);
   }
 }

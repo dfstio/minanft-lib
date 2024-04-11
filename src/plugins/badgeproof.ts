@@ -20,20 +20,22 @@ class BadgeData extends Struct({
   data: Metadata,
   key: Field,
 }) {
+  // TODO: remove comments from key validation after https://github.com/o1-labs/o1js/issues/1552
+
   static create(badgeDataWitness: BadgeDataWitness) {
     const [dataWitnessRootBefore, dataWitnessKey] =
       badgeDataWitness.witness.data.computeRootAndKey(
         badgeDataWitness.value.data
       );
     badgeDataWitness.root.data.assertEquals(dataWitnessRootBefore);
-    dataWitnessKey.assertEquals(badgeDataWitness.key);
+    //dataWitnessKey.assertEquals(badgeDataWitness.key);
 
     const [kindWitnessRootBefore, kindWitnessKey] =
       badgeDataWitness.witness.kind.computeRootAndKey(
         badgeDataWitness.value.kind
       );
     badgeDataWitness.root.kind.assertEquals(kindWitnessRootBefore);
-    kindWitnessKey.assertEquals(badgeDataWitness.key);
+    //kindWitnessKey.assertEquals(badgeDataWitness.key);
 
     return new BadgeData({
       root: badgeDataWitness.root,

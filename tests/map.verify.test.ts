@@ -48,7 +48,7 @@ describe(`MinaNFT contract`, () => {
   let redactedNFT: RedactedMinaNFT | undefined = undefined;
 
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();

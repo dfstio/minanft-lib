@@ -58,6 +58,10 @@ import { initBlockchain, MinaNetworkInstance, sleep } from "./mina";
 import { blockchain } from "./networks";
 import config from "./config";
 import { MinaNFTNameService } from "./minanftnames";
+import {
+  EscrowTransferVerification,
+  EscrowTransferApproval,
+} from "./contract/transfer";
 const { MINAFEE, MINANFT_NAME_SERVICE } = config;
 
 /**
@@ -1732,13 +1736,11 @@ class MinaNFT extends BaseMinaNFT {
     } = approvalData;
     if (this.address === undefined) {
       throw new Error("NFT contract is not deployed");
-      return;
     }
     const address: PublicKey = this.address;
 
     if (this.isMinted === false) {
       throw new Error("NFT is not minted");
-      return undefined;
     }
 
     if (nameService === undefined)
@@ -1750,7 +1752,6 @@ class MinaNFT extends BaseMinaNFT {
     await MinaNFT.compile();
     if (MinaNFT.verificationKey === undefined) {
       throw new Error("Compilation error");
-      return undefined;
     }
 
     this.nameService = nameService.address;
@@ -1760,6 +1761,16 @@ class MinaNFT extends BaseMinaNFT {
     const sender = deployer.toPublicKey();
     const zkApp = new MinaNFTNameServiceContract(nameService.address);
     const tokenId = zkApp.deriveTokenId();
+    console.time("Calculated approval proof");
+    const proof = await EscrowTransferVerification.check(
+      new EscrowTransferApproval({
+        approval: data,
+        owner: Poseidon.hash(ownerPublicKey.toFields()),
+      }),
+      signature,
+      ownerPublicKey
+    );
+    console.timeEnd("Calculated approval proof");
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     await fetchMinaAccount({ publicKey: address, tokenId });
     await fetchMinaAccount({ publicKey: sender });
@@ -1768,7 +1779,7 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
-        await zkApp.approveEscrow(address, data, signature, ownerPublicKey);
+        await zkApp.approveEscrow(address, proof);
       }
     );
     await sleep(100); // alow GC to run
