@@ -15,7 +15,7 @@ const { MINANFT_NAME_SERVICE } = config;
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
 beforeAll(async () => {
-  MinaNFT.minaInit('berkeley');
+  MinaNFT.minaInit("berkeley");
   const deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 
   expect(deployer).toBeDefined();
@@ -29,7 +29,7 @@ beforeAll(async () => {
 describe(`Deploy MinaNFT Name Service contract`, () => {
   /*
   it(`should compile contracts`, async () => {
-    MinaNFT.setCacheFolder("./nftcache");
+    MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
     console.time(`compiled all`);
     await MinaNFT.compile();
@@ -37,8 +37,7 @@ describe(`Deploy MinaNFT Name Service contract`, () => {
     Memory.info(`compiled`);
   });
   */
-  
-  
+
   it(`should get Name Service contract events`, async () => {
     const address = PublicKey.fromBase58(MINANFT_NAME_SERVICE);
     console.log("Address", address.toBase58());

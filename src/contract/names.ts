@@ -190,6 +190,7 @@ class MinaNFTNameServiceContract extends TokenContract {
    * @param owner owner's public key
    * @param proof {@link MinaNFTMetadataUpdateProof} - proof of the update of the metadata to be correctly inserted into the Merkle Map
    */
+  /*
   @method async update(
     address: PublicKey,
     update: Update,
@@ -204,6 +205,7 @@ class MinaNFTNameServiceContract extends TokenContract {
     await nft.update(update, signature, owner, proof);
     this.emitEvent("update", update);
   }
+  */
 
   /**
    * Transfer the NFT to new owner
@@ -216,6 +218,7 @@ class MinaNFTNameServiceContract extends TokenContract {
    * @param escrow2 public key of the second escrow
    * @param escrow3 public key of the third escrow
    */
+  /*
   @method async escrowTransfer(
     address: PublicKey,
     data: EscrowTransfer,
@@ -230,7 +233,7 @@ class MinaNFTNameServiceContract extends TokenContract {
     this.isNFT(address);
     const tokenId = this.deriveTokenId();
     const nft = new MinaNFTContract(address, tokenId);
-    await nft.transfer(
+    await nft.escrowTransfer(
       data,
       signature1,
       signature2,
@@ -241,6 +244,7 @@ class MinaNFTNameServiceContract extends TokenContract {
     );
     this.emitEvent("escrowTransfer", data);
   }
+  */
   /**
    * Approve setting of the new escrow
    * @param address address of the NFT
@@ -250,14 +254,14 @@ class MinaNFTNameServiceContract extends TokenContract {
    */
   @method async approveEscrow(
     address: PublicKey,
-    data: EscrowApproval,
+    //data: EscrowApproval,
     signature: Signature,
     owner: PublicKey
   ) {
-    this.isNFT(address);
+    //this.isNFT(address);
     const tokenId = this.deriveTokenId();
     const nft = new MinaNFTContract(address, tokenId);
-    await nft.approveEscrow(data, signature, owner);
-    this.emitEvent("approveEscrow", data);
+    await nft.approveEscrow(signature, owner);
+    //this.emitEvent("approveEscrow", data);
   }
 }

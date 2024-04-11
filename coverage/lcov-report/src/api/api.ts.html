@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">29.23% </span>
+                <span class="strong">20% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/65</span>
+                <span class='fraction'>13/65</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.25% </span>
+                <span class="strong">9.3% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/43</span>
+                <span class='fraction'>4/43</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">36.36% </span>
+                <span class="strong">18.18% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/11</span>
+                <span class='fraction'>2/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">30.15% </span>
+                <span class="strong">20.63% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/63</span>
+                <span class='fraction'>13/63</span>
             </div>
         
             
@@ -465,8 +465,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -508,7 +508,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -516,9 +516,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -577,7 +577,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -588,7 +588,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -799,16 +799,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -881,7 +881,7 @@ export class api {
     * @param data.name The name of the NFT
     * @param data.publicKey The public key of the NFT
     */
-  public async reserveName(data: { name: string; publicKey: string }): Promise&lt;{
+  public <span class="fstat-no" title="function not covered" >async </span>reserveName(data: { name: string; publicKey: string }): Promise&lt;{
     success: boolean;
     error?: string;
     price: object;
@@ -889,7 +889,7 @@ export class api {
     signature?: string;
     reason?: string;
   }&gt; {
-    const result = await this.apiHub("reserveName", {
+    const result = <span class="cstat-no" title="statement not covered" >await this.apiHub("reserveName", {</span>
       transactions: [],
       developer: "@dfst",
       name: "reserveName",
@@ -897,15 +897,15 @@ export class api {
       args: [data.name, data.publicKey],
     });
     const reserved =
-      result.data === undefined ? <span class="branch-0 cbranch-no" title="branch not covered" >{ success: false } </span>: result.data;
-    const price: object = reserved.price ? JSON.parse(reserved.price) : <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
-    return {
+<span class="cstat-no" title="statement not covered" >      result.data === undefined ? { success: false } : result.data;</span>
+    const price: object = <span class="cstat-no" title="statement not covered" >reserved.price ? JSON.parse(reserved.price) : {};</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
       success: result.success,
       error: result.error,
       price: price,
-      isReserved: reserved.success ?? <span class="branch-1 cbranch-no" title="branch not covered" >false,</span>
+      isReserved: reserved.success ?? false,
       signature: reserved.signature,
-      reason: reserved.reason ?? <span class="branch-1 cbranch-no" title="branch not covered" >reserved.toString(),</span>
+      reason: reserved.reason ?? reserved.toString(),
     };
   }
 &nbsp;
@@ -948,7 +948,7 @@ export class api {
    * @returns { success: boolean, error?: string, jobId?: string }
    * where jonId is the jobId of the minting transaction
    */
-  public async mint(data: {
+  public <span class="fstat-no" title="function not covered" >async </span>mint(data: {
     uri: string;
     signature: string;
     privateKey: string;
@@ -958,7 +958,7 @@ export class api {
     error?: string;
     jobId?: string;
   }&gt; {
-    const result = await this.apiHub("mint_v3", {
+    const result = <span class="cstat-no" title="statement not covered" >await this.apiHub("mint_v3", {</span>
       transactions: [data.uri],
       developer: "@dfst",
       name: "nft",
@@ -969,7 +969,7 @@ export class api {
         (data.useArweave ?? false).toString(),
       ],
     });
-    return { success: result.success, jobId: result.data, error: result.error };
+<span class="cstat-no" title="statement not covered" >    return { success: result.success, jobId: result.data, error: result.error };</span>
   }
 &nbsp;
   /**
@@ -1213,7 +1213,7 @@ export class api {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-10T16:51:44.809Z
+                at 2024-04-10T20:07:27.197Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

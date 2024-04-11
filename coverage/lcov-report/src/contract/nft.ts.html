@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>59/59</span>
+                <span class='fraction'>60/60</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>53/53</span>
+                <span class='fraction'>54/54</span>
             </div>
         
             
@@ -204,8 +204,7 @@
 <a name='L139'></a><a href='#L139'>139</a>
 <a name='L140'></a><a href='#L140'>140</a>
 <a name='L141'></a><a href='#L141'>141</a>
-<a name='L142'></a><a href='#L142'>142</a>
-<a name='L143'></a><a href='#L143'>143</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">25x</span>
+<a name='L142'></a><a href='#L142'>142</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -231,12 +230,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">410x</span>
-<span class="cline-any cline-yes">410x</span>
-<span class="cline-any cline-yes">410x</span>
-<span class="cline-any cline-yes">410x</span>
-<span class="cline-any cline-yes">410x</span>
-<span class="cline-any cline-yes">410x</span>
+<span class="cline-any cline-yes">391x</span>
+<span class="cline-any cline-yes">391x</span>
+<span class="cline-any cline-yes">391x</span>
+<span class="cline-any cline-yes">391x</span>
+<span class="cline-any cline-yes">391x</span>
+<span class="cline-any cline-yes">391x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -295,32 +294,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">51x</span>
+<span class="cline-any cline-yes">48x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48x</span>
+<span class="cline-any cline-yes">48x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
-<span class="cline-any cline-yes">51x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">47x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -387,14 +385,14 @@ class MinaNFTContract extends SmartContract {
    * @param owner owner's public key
    * @param proof {@link MinaNFTMetadataUpdateProof} - proof of the update of the metadata to be correctly inserted into the Merkle Map
    */
-  @method update(
+  @method async update(
     update: Update,
     signature: Signature,
     owner: PublicKey,
     proof: MinaNFTMetadataUpdateProof
   ) {
     // Check that the metadata is correct
-    const metadata = this.metadata.getAndAssertEquals();
+    const metadata = this.metadata.getAndRequireEquals();
     Metadata.assertEquals(metadata, update.oldRoot);
     Metadata.assertEquals(metadata, proof.publicInput.oldRoot);
     Metadata.assertEquals(proof.publicInput.newRoot, update.newRoot);
@@ -402,15 +400,15 @@ class MinaNFTContract extends SmartContract {
     // Check that the proof verifies
     proof.verify();
 &nbsp;
-    signature.verify(owner, update.toFields()).assertEquals(true);
+    signature.verify(owner, Update.toFields(update)).assertEquals(true);
     update.owner.assertEquals(Poseidon.hash(owner.toFields()));
 &nbsp;
     this.owner
-      .getAndAssertEquals()
+      .getAndRequireEquals()
       .assertEquals(update.owner, "Owner mismatch");
-    this.name.getAndAssertEquals().assertEquals(update.name, "Name mismatch");
+    this.name.getAndRequireEquals().assertEquals(update.name, "Name mismatch");
 &nbsp;
-    const version = this.version.getAndAssertEquals();
+    const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(update.version);
 &nbsp;
@@ -428,7 +426,7 @@ class MinaNFTContract extends SmartContract {
    * @param escrow2 public key of the second escrow
    * @param escrow3 public key of the third escrow
    */
-  @method transfer(
+  @method async transfer(
     data: EscrowTransfer,
     signature1: Signature,
     signature2: Signature,
@@ -438,17 +436,16 @@ class MinaNFTContract extends SmartContract {
     escrow3: PublicKey
   ) {
     this.owner
-      .getAndAssertEquals()
+      .getAndRequireEquals()
       .assertEquals(data.oldOwner, "Owner mismatch");
-    this.escrow
-      .getAndAssertEquals()
-      .assertNotEquals(Field(0), "Escrow is not set");
-    this.escrow.assertEquals(data.escrow);
-    this.name.getAndAssertEquals().assertEquals(data.name, "Name mismatch");
-    const version = this.version.getAndAssertEquals();
+    const escrow = this.escrow.getAndRequireEquals();
+    escrow.assertNotEquals(Field(0), "Escrow is not set");
+    escrow.assertEquals(data.escrow);
+    this.name.getAndRequireEquals().assertEquals(data.name, "Name mismatch");
+    const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
-    const dataFields = data.toFields();
+    const dataFields = EscrowTransfer.toFields(data);
     signature1.verify(escrow1, dataFields).assertEquals(true);
     signature2.verify(escrow2, dataFields).assertEquals(true);
     signature3.verify(escrow3, dataFields).assertEquals(true);
@@ -470,7 +467,7 @@ class MinaNFTContract extends SmartContract {
    * @param signature signature of the owner
    * @param owner owner's public key
    */
-  @method approveEscrow(
+  @method async approveEscrow(
     data: EscrowApproval,
     signature: Signature,
     owner: PublicKey
@@ -478,10 +475,10 @@ class MinaNFTContract extends SmartContract {
     signature.verify(owner, data.toFields()).assertEquals(true);
     data.owner.assertEquals(Poseidon.hash(owner.toFields()));
 &nbsp;
-    this.owner.getAndAssertEquals().assertEquals(data.owner, "Owner mismatch");
-    this.name.getAndAssertEquals().assertEquals(data.name, "Name mismatch");
+    this.owner.getAndRequireEquals().assertEquals(data.owner, "Owner mismatch");
+    this.name.getAndRequireEquals().assertEquals(data.name, "Name mismatch");
 &nbsp;
-    const version = this.version.getAndAssertEquals();
+    const version = this.version.getAndRequireEquals();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     newVersion.assertEquals(data.version);
 &nbsp;
@@ -496,7 +493,7 @@ class MinaNFTContract extends SmartContract {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-10T16:51:44.809Z
+                at 2024-04-10T20:07:27.197Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

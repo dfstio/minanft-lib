@@ -27,7 +27,7 @@ describe("Compile Counter contract", () => {
     console.timeEnd("compiled Counter");
     console.log("verificationKey", verificationKey.hash.toJSON());
     await listFiles(cacheDir);
-    const files = await fs.readdir("./nftcache");
+    const files = await fs.readdir("./cache");
     await fs.writeFile("./json/nftfiles.json", JSON.stringify(files, null, 2));
   });
 });

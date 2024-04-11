@@ -987,7 +987,7 @@ class MinaNFT extends BaseMinaNFT {
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await zkApp.update(address, update, signature, ownerPublicKey, proof!);
+        // BUG await zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
     let sentTx: Mina.PendingTransaction | undefined = undefined;
@@ -1233,7 +1233,8 @@ class MinaNFT extends BaseMinaNFT {
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await zkApp.update(address, update, signature, ownerPublicKey, proof!);
+        //BUG
+        //await zkApp.update(address, update, signature, ownerPublicKey, proof!);
       }
     );
     let sentTx: Mina.PendingTransaction | undefined = undefined;
@@ -1690,6 +1691,7 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
+        /* BUG
         await zkApp.escrowTransfer(
           address,
           data,
@@ -1700,6 +1702,7 @@ class MinaNFT extends BaseMinaNFT {
           escrow2,
           escrow3
         );
+        */
       }
     );
     await sleep(100); // alow GC to run
@@ -1732,13 +1735,11 @@ class MinaNFT extends BaseMinaNFT {
     } = approvalData;
     if (this.address === undefined) {
       throw new Error("NFT contract is not deployed");
-      return;
     }
     const address: PublicKey = this.address;
 
     if (this.isMinted === false) {
       throw new Error("NFT is not minted");
-      return undefined;
     }
 
     if (nameService === undefined)
@@ -1750,7 +1751,6 @@ class MinaNFT extends BaseMinaNFT {
     await MinaNFT.compile();
     if (MinaNFT.verificationKey === undefined) {
       throw new Error("Compilation error");
-      return undefined;
     }
 
     this.nameService = nameService.address;
@@ -1768,7 +1768,7 @@ class MinaNFT extends BaseMinaNFT {
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {
-        await zkApp.approveEscrow(address, data, signature, ownerPublicKey);
+        await zkApp.approveEscrow(address, signature, ownerPublicKey); //data,
       }
     );
     await sleep(100); // alow GC to run
