@@ -32,22 +32,15 @@ const wallet = PublicKey.fromBase58(
 
 class SellParams extends Struct({
   address: PublicKey,
-  price: UInt32,
+  price: UInt64,
   signature: Signature,
   owner: PublicKey,
   nameService: PublicKey,
 }) {}
 
-class NFTBuyParams extends Struct({
-  price: UInt64,
-  buyer: PublicKey,
-  seller: PublicKey,
-}) {}
-
 class BuyParams extends Struct({
   address: PublicKey,
-  payment: UInt64,
-  commission: UInt64,
+  price: UInt64,
   buyer: PublicKey,
   seller: PublicKey,
 }) {}
@@ -66,10 +59,28 @@ class MintParams extends Struct({
   verificationKey: VerificationKey,
 }) {}
 
+class NFTparams extends Struct({
+  price: UInt64,
+  version: UInt32,
+}) {
+  pack() {
+    const version = this.version.value.toBits(32);
+    const price = this.price.value.toBits(64);
+    return Field.fromBits([...version, ...price]);
+  }
+  static unpack(packed: Field) {
+    const bits = packed.toBits();
+    const version = UInt32.from(0);
+    version.value = Field.fromBits(bits.slice(0, 32));
+    const price = UInt64.from(0);
+    price.value = Field.fromBits(bits.slice(32, 96));
+    return new NFTparams({ price, version });
+  }
+}
+
 class NFTContract extends SmartContract {
-  @state(UInt32) price = State<UInt32>();
   @state(PublicKey) owner = State<PublicKey>();
-  @state(UInt32) version = State<UInt32>();
+  @state(Field) data = State<Field>();
 
   async deploy(args: DeployArgs) {
     super.deploy(args);
@@ -83,51 +94,53 @@ class NFTContract extends SmartContract {
     const { address, price, signature, owner, nameService } = params;
     this.address.assertEquals(address);
     this.owner.getAndRequireEquals().assertEquals(owner);
-    const version = this.version.getAndRequireEquals();
+    const data = NFTparams.unpack(this.data.getAndRequireEquals());
     signature
       .verify(owner, [
         ...price.toFields(),
         ...this.address.toFields(),
         ...nameService.toFields(),
-        ...version.toFields(),
+        ...data.version.toFields(),
       ])
       .assertEquals(Bool(true));
-    this.price.set(price);
-    this.version.set(version.add(1));
+    this.data.set(
+      new NFTparams({ price, version: data.version.add(1) }).pack()
+    );
   }
 
-  @method async buy(params: NFTBuyParams) {
+  @method async buy(params: BuyParams) {
     const { price, buyer, seller } = params;
     this.owner.getAndRequireEquals().assertEquals(seller);
-    const currentPrice = this.price.getAndRequireEquals();
-    currentPrice.equals(UInt32.from(0)).assertEquals(Bool(false));
-    currentPrice
-      .toUInt64()
-      .mul(UInt64.from(1_000_000_000))
-      .equals(price)
-      .assertEquals(Bool(true));
+    const data = NFTparams.unpack(this.data.getAndRequireEquals());
+    data.price.equals(UInt64.from(0)).assertEquals(Bool(false));
+    data.price.equals(price).assertEquals(Bool(true));
 
     this.owner.set(buyer);
-    this.price.set(UInt32.from(0));
-    const version = this.version.getAndRequireEquals();
-    this.version.set(version.add(1));
+    this.data.set(
+      new NFTparams({
+        price: UInt64.from(0),
+        version: data.version.add(1),
+      }).pack()
+    );
   }
 
   @method async transferNFT(params: TransferParams) {
     const { signature, owner, newOwner, nameService } = params;
     this.owner.getAndRequireEquals().assertEquals(owner);
-    const version = this.version.getAndRequireEquals();
+    const data = NFTparams.unpack(this.data.getAndRequireEquals());
 
     signature
       .verify(owner, [
         ...newOwner.toFields(),
         ...this.address.toFields(),
         ...nameService.toFields(),
-        ...version.toFields(),
+        ...data.version.toFields(),
       ])
       .assertEquals(Bool(true));
     this.owner.set(newOwner);
-    this.version.set(version.add(1));
+    this.data.set(
+      new NFTparams({ price: data.price, version: data.version.add(1) }).pack()
+    );
   }
 }
 
@@ -169,9 +182,15 @@ class NameContract extends TokenContract {
     };
     const fields = owner.toFields();
     update.body.update.appState = [
-      { isSome: Bool(true), value: Field(0) },
       { isSome: Bool(true), value: fields[0] },
       { isSome: Bool(true), value: fields[1] },
+      {
+        isSome: Bool(true),
+        value: new NFTparams({
+          price: UInt64.from(0),
+          version: UInt32.from(1),
+        }).pack(),
+      },
       { isSome: Bool(true), value: Field(0) },
       { isSome: Bool(true), value: Field(0) },
       { isSome: Bool(true), value: Field(0) },
@@ -197,15 +216,15 @@ class NameContract extends TokenContract {
   }
 
   @method async buy(params: BuyParams) {
-    const { address, payment, commission, buyer, seller } = params;
-    const price = payment.add(commission);
-    commission.mul(UInt64.from(10)).assertEquals(price);
+    const { address, price, buyer, seller } = params;
+    const commission = price.div(UInt64.from(10));
+    const payment = price.sub(commission);
     const buyerUpdate = AccountUpdate.createSigned(buyer);
     buyerUpdate.send({ to: seller, amount: payment });
     buyerUpdate.send({ to: wallet, amount: commission });
     const tokenId = this.deriveTokenId();
     const nft = new NFTContract(address, tokenId);
-    await nft.buy({ price, buyer, seller });
+    await nft.buy(params);
   }
 
   @method async transferNFT(params: TransferParams) {
@@ -242,6 +261,31 @@ describe("Payment", () => {
   const nftPublicKey = nftPrivateKey.toPublicKey();
   const nft = new NFTContract(nftPublicKey, tokenId);
   const newOwner = PrivateKey.random().toPublicKey();
+  const price = UInt64.from(100_000_000_000);
+
+  it(`should test NFTparams`, async () => {
+    const price = UInt64.from(1);
+    const version = UInt32.from(1);
+    const params = new NFTparams({ price, version });
+    const packed = params.pack();
+    const unpacked = NFTparams.unpack(packed);
+    expect(unpacked.price.toBigInt()).toBe(BigInt(1));
+    expect(unpacked.version.toBigint()).toBe(BigInt(1));
+
+    for (let i = 0; i < 1000; i++) {
+      const price = UInt64.from(
+        Math.floor(Math.random() * Number(UInt64.MAXINT().toBigInt()))
+      );
+      const version = UInt32.from(
+        Math.floor(Math.random() * Number(UInt32.MAXINT().toBigint()))
+      );
+      const params = new NFTparams({ price, version });
+      const packed = params.pack();
+      const unpacked = NFTparams.unpack(packed);
+      expect(unpacked.price.toBigInt()).toBe(price.toBigInt());
+      expect(unpacked.version.toBigint()).toBe(version.toBigint());
+    }
+  });
 
   it(`should compile contracts`, async () => {
     const cache: Cache = Cache.FileSystem("./cache");
@@ -290,8 +334,7 @@ describe("Payment", () => {
     console.log("Wallet balance is", await accountBalanceMina(wallet));
 
     console.log("Selling...");
-    const price = UInt32.from(100);
-    const version = nft.version.get();
+    const version = NFTparams.unpack(nft.data.get()).version;
     const signature = Signature.create(owner.privateKey, [
       ...price.toFields(),
       ...nftPublicKey.toFields(),
@@ -310,7 +353,9 @@ describe("Payment", () => {
     tx.sign([owner.privateKey]);
     await tx.prove();
     await tx.send();
-    expect(nft.price.get().toBigint()).toBe(price.toBigint());
+    const data = NFTparams.unpack(nft.data.get());
+    expect(data.price.toBigInt()).toBe(price.toBigInt());
+    expect(data.version.toBigint()).toBe(version.toBigint() + BigInt(1));
     console.log("Wallet balance is", await accountBalanceMina(wallet));
   });
 
@@ -319,13 +364,10 @@ describe("Payment", () => {
     console.log("Wallet balance is", await accountBalanceMina(wallet));
     console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
     console.log("Buyer balance is", await accountBalanceMina(buyer.publicKey));
-    const payment = UInt64.from(90 * 1_000_000_000);
-    const commission = UInt64.from(10 * 1_000_000_000);
     const tx = await Mina.transaction({ sender: buyer.publicKey }, async () => {
       await zkApp.buy({
         address: nftPublicKey,
-        payment,
-        commission,
+        price,
         buyer: buyer.publicKey,
         seller: owner.publicKey,
       });
@@ -333,7 +375,8 @@ describe("Payment", () => {
     tx.sign([buyer.privateKey]);
     await tx.prove();
     await tx.send();
-    expect(nft.price.get().toBigint()).toBe(UInt32.from(0).toBigint());
+    const data = NFTparams.unpack(nft.data.get());
+    expect(data.price.toBigInt()).toBe(BigInt(0));
     expect(nft.owner.get().toBase58()).toBe(buyer.publicKey.toBase58());
     console.log("Wallet balance is", await accountBalanceMina(wallet));
     console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
@@ -343,7 +386,7 @@ describe("Payment", () => {
   it(`should transfer NFT`, async () => {
     expect(nft.owner.get().toBase58()).toBe(buyer.publicKey.toBase58());
     console.log("Transferring...");
-    const version = nft.version.get();
+    const version = NFTparams.unpack(nft.data.get()).version;
     const signature = Signature.create(buyer.privateKey, [
       ...newOwner.toFields(),
       ...nftPublicKey.toFields(),
