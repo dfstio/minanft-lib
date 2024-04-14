@@ -8,7 +8,15 @@ export {
   blockchain,
 };
 
-import { fetchAccount, PrivateKey, Mina, PublicKey, UInt64 } from "o1js";
+import {
+  fetchAccount,
+  PrivateKey,
+  Mina,
+  PublicKey,
+  UInt64,
+  SmartContract,
+  ZkProgram,
+} from "o1js";
 import {
   initBlockchain as initBlockchainMina,
   accountBalance,
