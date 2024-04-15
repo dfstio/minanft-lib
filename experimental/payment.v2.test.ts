@@ -399,13 +399,15 @@ describe("Payment", () => {
 
   it(`should compile contracts`, async () => {
     console.log("Compiling ...");
-    console.time("compiled");
+    console.time("compiled NameContract");
     const cache: Cache = Cache.FileSystem("./cache");
     verificationKey = (await NFTContract.compile({ cache })).verificationKey;
     await NameContract.compile({ cache });
+    console.timeEnd("compiled NameContract");
+    console.time("compiled TrustedUpdate");
     await MetadataUpdate.compile({ cache });
     await TrustedUpdate.compile({ cache });
-    console.timeEnd("compiled");
+    console.timeEnd("compiled TrustedUpdate");
 
     const methods = [
       {
@@ -469,7 +471,7 @@ describe("Payment", () => {
 
   it(`should min NFT`, async () => {
     console.log("Minting NFT...");
-
+    console.time("minted NFT");
     const tx = await Mina.transaction({ sender: owner.publicKey }, async () => {
       AccountUpdate.fundNewAccount(owner.publicKey);
       await zkApp.mint({
@@ -483,6 +485,7 @@ describe("Payment", () => {
     tx.sign([nftPrivateKey, owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.timeEnd("minted NFT");
   });
 
   it(`should update NFT using TrustedUpdate`, async () => {
