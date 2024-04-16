@@ -65,7 +65,6 @@ class TransferParams extends Struct({
 class MintParams extends Struct({
   name: Field,
   address: PublicKey,
-  owner: PublicKey,
   metadataParams: MetadataParams,
   verificationKey: VerificationKey,
 }) {}
@@ -185,13 +184,16 @@ class NameContract extends TokenContract {
   }
 
   @method async mint(params: MintParams) {
-    const { name, metadataParams, address, owner, verificationKey } = params;
+    const { name, metadataParams, address, verificationKey } = params;
+    const owner = this.sender.getAndRequireSignature();
     const ownerUpdate = AccountUpdate.createSigned(owner);
     ownerUpdate.send({ to: wallet, amount: MINT_FEE });
 
     this.internal.mint({ address, amount: 1_000_000_000 });
     const tokenId = this.deriveTokenId();
     const update = AccountUpdate.createSigned(address, tokenId);
+
+    //TODO: make verification key a constant
     update.body.update.verificationKey = {
       isSome: Bool(true),
       value: verificationKey,
@@ -456,7 +458,9 @@ describe("Payment", () => {
       await zkTrusted.deploy({});
       zkTrusted.contract.set(zkAppPublicKey);
     });
-    await tx.sign([deployer, zkAppPrivateKey, trusted.privateKey]).send();
+
+    tx.sign([zkAppPrivateKey, trusted.privateKey, deployer]);
+    await tx.send();
   });
 
   it(`should create wallet account`, async () => {
