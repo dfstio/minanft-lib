@@ -44,7 +44,7 @@ describe("deployers", () => {
           .toBase58()} is`,
         balanceContractDeployer.toLocaleString(`en`)
       );
-      const length = DEPLOYERS_API.length > 110 ? 110 : DEPLOYERS_API.length;
+      const length = DEPLOYERS_API.length > 150 ? 150 : DEPLOYERS_API.length;
       for (let i = 0; i < length; i++) {
         const privateKey = PrivateKey.fromBase58(DEPLOYERS_API[i]);
         const publicKey = privateKey.toPublicKey();
