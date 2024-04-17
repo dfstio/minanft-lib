@@ -29,6 +29,7 @@
     "publish": "yarn compile && cd dist && yarn npm publish --access public && cd .."
   },
   "dependencies": {
+    "@doot-oracles/client": "^1.1.2",
     "arweave": "^1.15.0",
     "axios": "^1.6.8",
     "form-data": "^4.0.0",

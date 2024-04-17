@@ -408,6 +408,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@doot-oracles/client@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@doot-oracles/client@npm:1.1.2"
+  dependencies:
+    axios: "npm:^1.6.5"
+  checksum: 10c0/d13912771e337692c8622b54dee1ae6fb569ee5bd6f6931ff99a29ac6e6d7c5f18e678efd80a803144d6c368d1a35051c3f5bf962c5480e232fd3e71b13eeda8
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -1465,7 +1474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.8":
+"axios@npm:^1.6.5, axios@npm:^1.6.8":
   version: 1.6.8
   resolution: "axios@npm:1.6.8"
   dependencies:
@@ -3335,6 +3344,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "minanft@workspace:."
   dependencies:
+    "@doot-oracles/client": "npm:^1.1.2"
     "@jest/globals": "npm:^29.7.0"
     "@types/jest": "npm:^29.5.12"
     "@types/mime": "npm:^3.0.4"
