@@ -119,7 +119,10 @@ describe("Signature", () => {
     const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
     const zkApp = new MyTokenContract(zkAppPublicKey);
     const tokenId = zkApp.deriveTokenId();
-    const tx1 = await Mina.transaction({ sender }, async () => {
+    const memo =
+      "Deploying MyTokenContract... jfeo jiewo jewio jiweo jwoi ijow ";
+    console.log("memo size", memo.length);
+    const tx1 = await Mina.transaction({ sender, memo }, async () => {
       AccountUpdate.fundNewAccount(sender);
       await zkApp.deploy({});
     });
