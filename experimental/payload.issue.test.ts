@@ -32,7 +32,7 @@ import { blockchain } from "../src/networks";
 import { DEPLOYER, GASTANKS } from "../env.json";
 import fs from "fs/promises";
 
-const chain: blockchain = "lighnet" as blockchain;
+const chain: blockchain = "devnet" as blockchain;
 
 const useLocalBlockchain = chain === "local";
 const useLighnet = chain === "lighnet";
@@ -636,7 +636,7 @@ describe("Payment", () => {
       null,
       2
     );
-    await fs.writeFile("./json/payload-issue-lightnet.json", data);
+    await fs.writeFile("./json/payload-issue-minaexplorer.json", data);
     await sendTx(tx, "trusted update");
 
     await fetchAccount({ publicKey: nftPublicKey, tokenId });
