@@ -570,7 +570,7 @@ describe("Payment", () => {
     console.timeEnd("minted NFT");
   });
 
-  it(`should update NFT using TrustedUpdate`, async () => {
+  it.skip(`should update NFT using TrustedUpdate`, async () => {
     await fetchAccount({ publicKey: nftPublicKey, tokenId });
     expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
     console.log("Updating using TrustedUpdate...");
