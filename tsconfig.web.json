@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2021",
     "outDir": "./dist/lib/web",
-    "lib": [
-      "ES2021",
-      "DOM"
-    ],
+    "lib": ["ES2021", "DOM"],
     "moduleResolution": "node",
     "strict": true /* Enable all strict type-checking options. */,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
@@ -23,7 +20,5 @@
     "allowJs": true,
     "sourceMap": true
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }
