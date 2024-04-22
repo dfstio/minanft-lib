@@ -10,6 +10,8 @@ export {
   MinaNFTCommit,
   MinaNFTPrepareCommit,
   MinaNFTCommitData,
+  RollupNFTCommit,
+  RollupNFTCommitData,
 };
 
 import { MinaNFTNameService } from "./minanftnames";
@@ -184,6 +186,18 @@ interface MinaNFTCommit {
 }
 
 /**
+ * RollupNFTCommit is the data for the commit of the NFT
+ * @property pinataJWT Pinata JWT token for uploading to the IPFS
+ * @property nameService The names service that will commit the NFT
+ * @property generateProofData True if the proof data should be generated
+ */
+interface RollupNFTCommit {
+  pinataJWT?: string;
+  arweaveKey?: string;
+  generateProofData?: boolean;
+}
+
+/**
  * MinaNFTPrepareCommit is the data for the commit of the NFT
  * @property ownerPrivateKey The private key of the owner
  * @property nameServiceAddress The names service address that will commit the NFT
@@ -208,6 +222,16 @@ interface MinaNFTPrepareCommit {
 interface MinaNFTCommitData {
   signature: string;
   address: string;
+  update: string;
+  transactions: string[];
+}
+
+/**
+ * RollupNFTCommitData is the data for the commit of the Rollup NFT
+ * @property update The update of the NFT
+ * @property transactions The transactions of the NFT to make an update
+ */
+interface RollupNFTCommitData {
   update: string;
   transactions: string[];
 }
