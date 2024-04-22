@@ -25,15 +25,17 @@ import {
   ZkProgram,
   fetchAccount,
   Transaction,
+  Lightnet,
 } from "o1js";
 import { initBlockchain, sleep } from "../src/mina";
 import { blockchain } from "../src/networks";
 import { DEPLOYER, GASTANKS } from "../env.json";
 import fs from "fs/promises";
 
-const chain: blockchain = "devnet" as blockchain;
+const chain: blockchain = "lighnet" as blockchain;
 
 const useLocalBlockchain = chain === "local";
+const useLighnet = chain === "lighnet";
 const isZeko = chain === "zeko";
 type keypair = { publicKey: PublicKey; privateKey: PrivateKey };
 const MINT_FEE = 10_000n;
@@ -386,6 +388,9 @@ describe("Payment", () => {
   const oracle = PrivateKey.randomKeypair();
 
   it(`should initialize blockchain`, async () => {
+    console.log("network:", chain);
+    console.log("Local blockchain:", useLocalBlockchain);
+    console.log("Lightnet:", useLighnet);
     if (useLocalBlockchain) {
       const local = Mina.LocalBlockchain({
         proofsEnabled: true,
@@ -396,8 +401,26 @@ describe("Payment", () => {
       owner2 = local.testAccounts[2];
       owner3 = local.testAccounts[3];
       owner4 = local.testAccounts[4];
+    } else if (useLighnet) {
+      const network = Mina.Network({
+        mina: "http://localhost:8080/graphql",
+        archive: "http://localhost:8282",
+        lightnetAccountManager: "http://localhost:8181",
+      });
+      Mina.setActiveInstance(network);
+
+      deployer = await Lightnet.acquireKeyPair();
+      owner1 = await Lightnet.acquireKeyPair();
+      owner2 = await Lightnet.acquireKeyPair();
+      owner3 = await Lightnet.acquireKeyPair();
+      owner4 = await Lightnet.acquireKeyPair();
+      console.log(
+        "Deployer balance is",
+        await accountBalanceMina(deployer.publicKey)
+      );
     } else {
-      await initBlockchain(chain);
+      const instance = await initBlockchain(chain);
+      console.log("Endpoint:", instance.network.mina);
       deployer = key(DEPLOYER);
       owner1 = key(GASTANKS[0]);
       owner2 = key(GASTANKS[1]);
@@ -532,16 +555,20 @@ describe("Payment", () => {
   });
 
   it(`should create wallet account`, async () => {
-    if (useLocalBlockchain) {
+    if (
+      (useLocalBlockchain || useLighnet) &&
+      0 === (await accountBalanceMina(wallet))
+    ) {
       const tx = await Mina.transaction(
         { sender, fee, memo: "MinaNFT wallet" },
         async () => {
           const senderUpdate = AccountUpdate.createSigned(sender);
           senderUpdate.balance.subInPlace(1_000_000_000);
-          senderUpdate.send({ to: wallet, amount: 1_000_000_000 });
+          senderUpdate.send({ to: wallet, amount: 2_000_000_000 });
         }
       );
-      await tx.sign([deployer.privateKey]).send();
+      tx.sign([deployer.privateKey]);
+      await sendTx(tx, "wallet");
     }
     await fetchAccount({ publicKey: wallet });
     oldBalance = await accountBalanceMina(wallet);
@@ -599,6 +626,7 @@ describe("Payment", () => {
         );
       }
     );
+    await tx.prove();
     tx.sign([owner.privateKey]);
     const data = JSON.stringify(
       {
@@ -608,8 +636,7 @@ describe("Payment", () => {
       null,
       2
     );
-    await fs.writeFile("./json/payload-issue.json", data);
-    await tx.prove();
+    await fs.writeFile("./json/payload-issue-lightnet.json", data);
     await sendTx(tx, "trusted update");
 
     await fetchAccount({ publicKey: nftPublicKey, tokenId });
