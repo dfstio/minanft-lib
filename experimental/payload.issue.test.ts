@@ -27,6 +27,7 @@ import {
 import { initBlockchain, sleep } from "../src/mina";
 import { blockchain } from "../src/networks";
 import { DEPLOYER, GASTANKS } from "../env.json";
+import fs from "fs/promises";
 
 const chain: blockchain = "devnet" as blockchain;
 
@@ -597,6 +598,15 @@ describe("Payment", () => {
       }
     );
     tx.sign([owner.privateKey]);
+    const data = JSON.stringify(
+      {
+        tx: tx.toJSON(),
+        pretty: tx.toPretty(),
+      },
+      null,
+      2
+    );
+    await fs.writeFile("./json/payload-issue.json", data);
     await tx.prove();
     await sendTx(tx, "trusted update");
 
