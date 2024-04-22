@@ -15,6 +15,7 @@ import {
 import { MinaNFT } from "../src/minanft";
 
 const keys: string[] = [];
+const gastanks_number = 10;
 
 describe("deployers", () => {
   it(
@@ -50,7 +51,10 @@ describe("deployers", () => {
           )
         )
       );
-      const length = DEPLOYERS_API.length > 10 ? 10 : DEPLOYERS_API.length;
+      const length =
+        DEPLOYERS_API.length > gastanks_number
+          ? gastanks_number
+          : DEPLOYERS_API.length;
       for (let i = 0; i < length; i++) {
         const privateKey = PrivateKey.fromBase58(DEPLOYERS_API[i]);
         const publicKey = privateKey.toPublicKey();

@@ -23,15 +23,15 @@ import {
   ZkProgram,
   fetchAccount,
   Transaction,
-  checkZkappTransaction,
 } from "o1js";
 import { initBlockchain, sleep } from "../src/mina";
 import { blockchain } from "../src/networks";
 import { DEPLOYER, GASTANKS } from "../env.json";
 
-const chain: blockchain = "devnet";
-const useLocalBlockchain = false;
-const isZeko = false;
+const chain: blockchain = "devnet" as blockchain;
+
+const useLocalBlockchain = chain === "local";
+const isZeko = chain === "zeko";
 type keypair = { publicKey: PublicKey; privateKey: PrivateKey };
 const MINT_FEE = 10_000n;
 const SELL_FEE = 1_000n;
@@ -570,7 +570,7 @@ describe("Payment", () => {
     console.timeEnd("minted NFT");
   });
 
-  it(`should update NFT using TrustedUpdate`, async () => {
+  it(`should not throw Payload Too Large error`, async () => {
     await fetchAccount({ publicKey: nftPublicKey, tokenId });
     expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
     console.log("Updating using TrustedUpdate...");
@@ -604,228 +604,6 @@ describe("Payment", () => {
     await fetchAccount({ publicKey: wallet });
     await walletBalance();
     expect(nft.metadataParams.get().data[0].toBigInt()).toBe(BigInt(2));
-  });
-
-  it(`should update NFT`, async () => {
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
-    console.log("Updating...");
-    const version = NFTparams.unpack(nft.data.get()).version;
-    const metadataParams = new MetadataParams();
-    metadataParams.data[0] = Field(1);
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    await fetchAccount({ publicKey: owner.publicKey });
-    await fetchAccount({ publicKey: wallet });
-    const tx = await Mina.transaction(
-      { sender: owner.publicKey, fee, memo: "MinaNFT update" },
-      async () => {
-        await zkApp.update({
-          address: nftPublicKey,
-          metadataParams,
-        });
-      }
-    );
-    tx.sign([owner.privateKey]);
-    await tx.prove();
-    await sendTx(tx, "update");
-
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    await walletBalance();
-    expect(nft.metadataParams.get().data[0].toBigInt()).toBe(BigInt(1));
-  });
-
-  it(`should sell NFT`, async () => {
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
-
-    console.log("Selling...");
-    const version = NFTparams.unpack(nft.data.get()).version;
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    await fetchAccount({ publicKey: owner.publicKey });
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const tx = await Mina.transaction(
-      { sender: owner.publicKey, fee, memo: "MinaNFT sell" },
-      async () => {
-        await zkApp.sell({
-          address: nftPublicKey,
-          price,
-        });
-      }
-    );
-    tx.sign([owner.privateKey]);
-    await tx.prove();
-    await sendTx(tx, "sell");
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const data = NFTparams.unpack(nft.data.get());
-    expect(data.price.toBigInt()).toBe(price.toBigInt());
-    expect(data.version.toBigint()).toBe(version.toBigint() + BigInt(1));
-    await walletBalance();
-  });
-
-  it(`should buy NFT`, async () => {
-    console.log("Buying...");
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    await walletBalance();
-    console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
-    console.log("Buyer balance is", await accountBalanceMina(owner2.publicKey));
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    await fetchAccount({ publicKey: owner2.publicKey });
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const tx = await Mina.transaction(
-      { sender: owner2.publicKey, fee, memo: "MinaNFT buy" },
-      async () => {
-        await zkApp.buy({
-          address: nftPublicKey,
-          price,
-        });
-      }
-    );
-    tx.sign([owner2.privateKey]);
-    await tx.prove();
-    await sendTx(tx, "buy");
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const data = NFTparams.unpack(nft.data.get());
-    expect(data.price.toBigInt()).toBe(BigInt(0));
-    expect(nft.owner.get().toBase58()).toBe(owner2.publicKey.toBase58());
-    await walletBalance();
-    console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
-    console.log("Buyer balance is", await accountBalanceMina(owner2.publicKey));
-    owner = owner2;
-  });
-
-  it(`should transfer NFT`, async () => {
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
-    console.log("Transferring...");
-    const version = NFTparams.unpack(nft.data.get()).version;
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    await fetchAccount({ publicKey: owner.publicKey });
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const tx = await Mina.transaction(
-      { sender: owner.publicKey, fee, memo: "MinaNFT transfer" },
-      async () => {
-        await zkApp.transferNFT({
-          address: nftPublicKey,
-          newOwner: owner3.publicKey,
-        });
-      }
-    );
-    tx.sign([owner.privateKey]);
-    await tx.prove();
-    await sendTx(tx, "transfer");
-
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    await walletBalance();
-    owner = owner3;
-    expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
-  });
-
-  it(`should sell NFT with KYC`, async () => {
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    expect(nft.owner.get().toBase58()).toBe(owner.publicKey.toBase58());
-    await walletBalance();
-
-    console.log("Selling with KYC...");
-    const expiry = UInt64.from(Date.now() + 1000 * 60 * 60);
-    const fields = [
-      ...zkAppPublicKey.toFields(),
-      ...nftPublicKey.toFields(),
-      kycPrice.value,
-      ...owner.publicKey.toFields(),
-      expiry.value,
-      getNetworkIdHash(),
-      Field(1),
-    ];
-    const signature = Signature.create(oracle.privateKey, fields);
-    expect(signature.verify(oracle.publicKey, fields).toBoolean()).toBe(true);
-    const version = NFTparams.unpack(nft.data.get()).version;
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    await fetchAccount({ publicKey: owner.publicKey });
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const tx = await Mina.transaction(
-      { sender: owner.publicKey, fee, memo: "MinaNFT sell with KYC" },
-      async () => {
-        await zkApp.sellWithKYC(
-          {
-            address: nftPublicKey,
-            price: kycPrice,
-          },
-          signature,
-          expiry
-        );
-      }
-    );
-    tx.sign([owner.privateKey]);
-    await tx.prove();
-    await sendTx(tx, "kyc sell");
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const data = NFTparams.unpack(nft.data.get());
-    expect(data.price.toBigInt()).toBe(kycPrice.toBigInt());
-    expect(data.version.toBigint()).toBe(version.toBigint() + BigInt(1));
-    await walletBalance();
-  });
-
-  it(`should buy NFT with KYC`, async () => {
-    console.log("Buying with KYC...");
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    await walletBalance();
-    console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
-    console.log("Buyer balance is", await accountBalanceMina(owner4.publicKey));
-    const expiry = UInt64.from(Date.now() + 1000 * 60 * 60);
-    const signature = Signature.create(oracle.privateKey, [
-      ...zkAppPublicKey.toFields(),
-      ...nftPublicKey.toFields(),
-      kycPrice.value,
-      ...owner4.publicKey.toFields(),
-      expiry.value,
-      getNetworkIdHash(),
-      Field(2),
-    ]);
-
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    await fetchAccount({ publicKey: owner4.publicKey });
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const tx = await Mina.transaction(
-      { sender: owner4.publicKey, fee, memo: "MinaNFT buy with KYC" },
-      async () => {
-        await zkApp.buyWithKYC(
-          {
-            address: nftPublicKey,
-            price: kycPrice,
-          },
-          signature,
-          expiry
-        );
-      }
-    );
-    tx.sign([owner4.privateKey]);
-    await tx.prove();
-    await sendTx(tx, "kyc buy");
-    await fetchAccount({ publicKey: nftPublicKey, tokenId });
-    await fetchAccount({ publicKey: wallet });
-    const data = NFTparams.unpack(nft.data.get());
-    expect(data.price.toBigInt()).toBe(BigInt(0));
-    expect(nft.owner.get().toBase58()).toBe(owner4.publicKey.toBase58());
-    await walletBalance();
-    console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
-    console.log("Buyer balance is", await accountBalanceMina(owner4.publicKey));
-    owner = owner4;
-    await walletBalance();
   });
 });
 
