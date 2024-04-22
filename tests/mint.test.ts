@@ -11,7 +11,7 @@ import { MapData } from "../src/storage/map";
 
 const { MINANFT_NAME_SERVICE } = config;
 const pinataJWT = PINATA_JWT;
-const useLocalBlockchain = false;
+const useLocalBlockchain = true;
 const blockchainInstance: blockchain = useLocalBlockchain ? "local" : "devnet";
 const includeFiles = false;
 const includeImage = false;

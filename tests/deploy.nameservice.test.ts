@@ -15,7 +15,7 @@ const { MINANFT_NAME_SERVICE, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = false;
+const useLocalBlockchain: boolean = true;
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;

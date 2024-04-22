@@ -24,7 +24,7 @@
     "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.web.json",
     "compilenode": "rm -rf dist/lib && tsc",
     "test": "jest",
-    "coverage": "jest --coverage",
+    "coverage": "jest --coverage tests/",
     "login": "yarn npm login",
     "publish": "yarn compile && cd dist && yarn npm publish --access public && cd .."
   },
