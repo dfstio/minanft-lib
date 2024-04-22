@@ -73,7 +73,7 @@ const Devnet: MinaNetwork = {
 };
 
 const Zeko: MinaNetwork = {
-  mina: ["http://sequencer-zeko-dev.dcspark.io/graphql"],
+  mina: ["https://devnet.zeko.io/graphql"], //["http://sequencer-zeko-dev.dcspark.io/graphql"], //
   archive: [],
   chainId: "zeko",
 };
