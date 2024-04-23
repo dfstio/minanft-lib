@@ -57,7 +57,7 @@ describe("Broken", () => {
   });
 
   beforeEach(() => {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
     ({ privateKey: deployerKey, publicKey: deployerAccount } =
       Local.testAccounts[0]);

@@ -119,7 +119,8 @@ class MinaNFTBadge {
     );
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: zkAppPublicKey });
-    const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
+    const deployNonce =
+      nonce ?? Number(Mina.getAccount(sender).nonce.toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 
     const zkApp = new MinaNFTVerifierBadge(zkAppPublicKey);
@@ -259,7 +260,8 @@ class MinaNFTBadge {
     await fetchMinaAccount({ publicKey: this.address });
     await fetchMinaAccount({ publicKey: nftAddress, tokenId });
     const hasAccount = Mina.hasAccount(nftAddress, tokenId);
-    const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
+    const deployNonce =
+      nonce ?? Number(Mina.getAccount(sender).nonce.toBigint());
 
     const hasNftAccount = Mina.hasAccount(nftAddress, nftTokenId);
     if (!hasNftAccount) throw new Error("NFT account not found");

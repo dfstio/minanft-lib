@@ -76,7 +76,7 @@ describe("MINA price", () => {
 
     const proofsEnabled = false;
 
-    const Local = Mina.LocalBlockchain({ proofsEnabled: proofsEnabled });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: proofsEnabled });
     Mina.setActiveInstance(Local);
 
     const deployerPK = Local.testAccounts[0].privateKey;

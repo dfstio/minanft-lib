@@ -14,7 +14,7 @@ class Counter extends SmartContract {
 const cacheDir = "./counter-cache";
 
 beforeAll(async () => {
-  const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+  const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
   Mina.setActiveInstance(Local);
 });
 

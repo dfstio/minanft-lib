@@ -23,7 +23,7 @@ describe("deployers", () => {
     async () => {
       console.log("Number of deployers:", DEPLOYERS_API.length);
       let deployer: PrivateKey | undefined = undefined;
-      MinaNFT.minaInit("zeko"); //
+      await MinaNFT.minaInit("zeko"); //
       deployer = PrivateKey.fromBase58(DEPLOYER);
       const contractDeployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 

@@ -18,7 +18,7 @@ let deployer: PrivateKey | undefined = undefined;
 const useFaucet: boolean = false;
 
 beforeAll(async () => {
-  MinaNFT.minaInit(MINAURL);
+  await MinaNFT.minaInit(MINAURL);
   deployer = useFaucet ? PrivateKey.random() : PrivateKey.fromBase58(DEPLOYER);
   if (useFaucet) Mina.faucet(deployer.toPublicKey());
   await MinaNFT.compile();

@@ -7,7 +7,7 @@ jest.setTimeout(1000 * 60 * 60); // 1 hour
 let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+  const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
   Mina.setActiveInstance(Local);
   const { privateKey } = Local.testAccounts[0];
   deployer = privateKey;

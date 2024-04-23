@@ -254,13 +254,13 @@ describe(`MinaNFT contract`, () => {
     const tokenId = nft.tokenId;
     await fetchAccount({ publicKey: nft.address, tokenId });
     const hasAccount = Mina.hasAccount(nft.address, tokenId);
-    const account = Account(nft.address, tokenId);
+    const account = Mina.getAccount(nft.address, tokenId);
     const balance = Mina.getBalance(nft.address, tokenId);
     console.log(
       `Checks result:`,
       hasAccount,
       tokenId.toJSON(),
-      account.balance.get().toString(),
+      account.balance.toString(),
       balance.toString()
     );
   });

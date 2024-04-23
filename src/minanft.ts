@@ -563,8 +563,10 @@ class MinaNFT extends BaseMinaNFT {
    * Initialize Mina o1js library
    * @param chain blockchain to initialize
    */
-  public static minaInit(chain: blockchain): MinaNetworkInstance {
-    return initBlockchain(chain);
+  public static async minaInit(
+    chain: blockchain
+  ): Promise<MinaNetworkInstance> {
+    return await initBlockchain(chain);
   }
 
   /**
@@ -961,8 +963,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: sender });
     const hasAccount = Mina.hasAccount(this.address, tokenId);
     if (!hasAccount) throw new Error("NFT is not deployed, no account");
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
     const version: UInt64 = zkAppNFT.version.get();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     const oldOwner = zkAppNFT.owner.get();
@@ -1229,8 +1231,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: sender });
     const hasAccount = Mina.hasAccount(address, tokenId);
     if (!hasAccount) throw new Error("NFT is not deployed, no account");
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
 
     //console.log("Sending update...");
     const tx = await Mina.transaction(
@@ -1576,8 +1578,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     //await fetchMinaAccount({ publicKey: this.address, tokenId });
     await fetchMinaAccount({ publicKey: sender, force: true });
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
     const hasAccount = Mina.hasAccount(this.address, tokenId);
 
     const transaction = await Mina.transaction(
@@ -1687,8 +1689,8 @@ class MinaNFT extends BaseMinaNFT {
     const tokenId = zkApp.deriveTokenId();
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: address, tokenId });
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
     if (!Mina.hasAccount(address, tokenId))
       throw new Error("NFT is not deployed, no account exists");
     const tx = await Mina.transaction(
@@ -1774,8 +1776,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     await fetchMinaAccount({ publicKey: address, tokenId });
     await fetchMinaAccount({ publicKey: sender });
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () => {

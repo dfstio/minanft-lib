@@ -16,7 +16,7 @@ let senderPrivateKey: PrivateKey | undefined = undefined;
 let senderPublicKey: PublicKey | undefined = undefined;
 
 beforeAll(async () => {
-  const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+  const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
   Mina.setActiveInstance(Local);
   const { privateKey } = Local.testAccounts[0];
   senderPrivateKey = privateKey;

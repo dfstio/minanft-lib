@@ -39,12 +39,12 @@ let counterPrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   if (useLocalBlockchain) {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
   } else {
-    MinaNFT.minaInit("berkeley");
+    await MinaNFT.minaInit("berkeley");
     deployer = PrivateKey.fromBase58(DEPLOYERS[6]);
   }
   await Counter.compile();
@@ -121,7 +121,7 @@ using the deployer with public key ${sender.toBase58()}:
     console.time(`sent ${txNumber} transactions`);
     for (let i = 0; i < txNumber; i++) {
       const transaction = await Mina.transaction(
-        { sender, fee: transactionFee, nonce: nonce++, memo: `zkCloudWorker`},
+        { sender, fee: transactionFee, nonce: nonce++, memo: `zkCloudWorker` },
         () => {
           zkCounter.changeValue(Field(i + 2));
         }

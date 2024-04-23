@@ -20,7 +20,7 @@ let deployers:
   | undefined = undefined;
 
 beforeAll(async () => {
-  const data = initBlockchain(useBlockchain);
+  const data = await initBlockchain(useBlockchain);
   expect(data).toBeDefined();
   if (data === undefined) return;
   deployers = data.keys;

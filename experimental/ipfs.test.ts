@@ -5,7 +5,7 @@ import { IPFS } from "../src/storage/ipfs";
 import { PINATA_JWT } from "../env.json";
 
 beforeAll(() => {
-  MinaNFT.minaInit();
+  await MinaNFT.minaInit();
 });
 
 describe("IPFS", () => {

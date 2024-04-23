@@ -35,12 +35,12 @@ async function initBlockchain(
   let deployer: PrivateKey | undefined = undefined;
   const deployers: PrivateKey[] = [];
   if (instance === "local") {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
-    const { privateKey } = Local.testAccounts[0];
+    const privateKey = Local.testAccounts[0].key;
     deployer = privateKey;
     for (let i = 1; i <= deployersNumber; i++) {
-      const { privateKey } = Local.testAccounts[i];
+      const privateKey = Local.testAccounts[i].key;
       deployers.push(privateKey);
     }
   } else if (instance === "berkeley") {

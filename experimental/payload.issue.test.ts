@@ -392,15 +392,30 @@ describe("Payment", () => {
     console.log("Local blockchain:", useLocalBlockchain);
     console.log("Lightnet:", useLighnet);
     if (useLocalBlockchain) {
-      const local = Mina.LocalBlockchain({
+      const local = await Mina.LocalBlockchain({
         proofsEnabled: true,
       });
       Mina.setActiveInstance(local);
-      deployer = local.testAccounts[0];
-      owner1 = local.testAccounts[1];
-      owner2 = local.testAccounts[2];
-      owner3 = local.testAccounts[3];
-      owner4 = local.testAccounts[4];
+      deployer = {
+        publicKey: local.testAccounts[0],
+        privateKey: local.testAccounts[0].key,
+      };
+      owner1 = {
+        publicKey: local.testAccounts[1],
+        privateKey: local.testAccounts[1].key,
+      };
+      owner2 = {
+        publicKey: local.testAccounts[2],
+        privateKey: local.testAccounts[2].key,
+      };
+      owner3 = {
+        publicKey: local.testAccounts[3],
+        privateKey: local.testAccounts[3].key,
+      };
+      owner4 = {
+        publicKey: local.testAccounts[4],
+        privateKey: local.testAccounts[4].key,
+      };
     } else if (useLighnet) {
       const network = Mina.Network({
         mina: "http://localhost:8080/graphql",
@@ -673,7 +688,7 @@ async function accountBalanceMina(address: PublicKey): Promise<number> {
   return Number((await accountBalance(address)).toBigInt()) / 1e9;
 }
 
-async function sendTx(tx: Transaction, description?: string) {
+async function sendTx(tx: any, description?: string) {
   let txSent: Mina.PendingTransaction | undefined;
   try {
     txSent = await tx.send();

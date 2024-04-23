@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98% </span>
+                <span class="strong">97.87% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>49/50</span>
+                <span class='fraction'>46/47</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.72% </span>
+                <span class="strong">97.56% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>43/44</span>
+                <span class='fraction'>40/41</span>
             </div>
         
             
@@ -222,9 +222,17 @@
 <a name='L157'></a><a href='#L157'>157</a>
 <a name='L158'></a><a href='#L158'>158</a>
 <a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">25x</span>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -345,7 +353,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -361,7 +371,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
@@ -373,7 +385,9 @@
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
@@ -397,6 +411,7 @@ import {
   Struct,
   Account,
   UInt64,
+  AccountUpdate,
 } from "o1js";
 &nbsp;
 import { RedactedMinaNFTMapStateProof } from "./redactedmap";
@@ -503,8 +518,10 @@ class MinaNFTVerifierBadge extends TokenContract {
 &nbsp;
     // Issue verification badge
     const tokenId = this.deriveTokenId();
-    const account = Account(nft, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
+    const tokenBalance = AccountUpdate.create(
+      nft,
+      tokenId
+    ).account.balance.getAndRequireEquals();
     this.internal.mint({
       address: nft,
       amount: badgeEvent.version.sub(tokenBalance),
@@ -519,8 +536,10 @@ class MinaNFTVerifierBadge extends TokenContract {
     signature.verify(oracle, nft.toFields());
 &nbsp;
     const tokenId = this.deriveTokenId();
-    const account = Account(nft, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
+    const tokenBalance = AccountUpdate.create(
+      nft,
+      tokenId
+    ).account.balance.getAndRequireEquals();
 &nbsp;
     // Revoke verification badge
     this.internal.burn({ address: nft, amount: tokenBalance });
@@ -531,8 +550,10 @@ class MinaNFTVerifierBadge extends TokenContract {
 &nbsp;
   @method async verifyBadge(nft: PublicKey, nftTokenId: Field) {
     const tokenId = this.deriveTokenId();
-    const account = Account(nft, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
+    const tokenBalance = AccountUpdate.create(
+      nft,
+      tokenId
+    ).account.balance.getAndRequireEquals();
 &nbsp;
     const minanft = new MinaNFTContract(nft, nftTokenId);
     const version = minanft.version.getAndRequireEquals();
@@ -547,7 +568,7 @@ class MinaNFTVerifierBadge extends TokenContract {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-22T18:38:27.848Z
+                at 2024-04-22T22:53:23.672Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

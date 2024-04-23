@@ -9,7 +9,7 @@ import {
   PublicKey,
   UInt64,
   SmartContract,
-  state, 
+  state,
   State,
   method,
 } from "o1js";
@@ -36,7 +36,7 @@ class Key extends SmartContract {
 
 beforeAll(async () => {
   if (useLocal) {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;

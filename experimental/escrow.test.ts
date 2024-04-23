@@ -93,7 +93,7 @@ let escrowPrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   if (useLocalBlockchain) {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;

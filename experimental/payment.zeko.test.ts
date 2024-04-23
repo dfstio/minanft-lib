@@ -384,7 +384,7 @@ describe("Payment", () => {
 
   it(`should initialize blockchain`, async () => {
     if (useLocalBlockchain) {
-      const local = Mina.LocalBlockchain({
+      const local = await Mina.LocalBlockchain({
         proofsEnabled: true,
       });
       Mina.setActiveInstance(local);

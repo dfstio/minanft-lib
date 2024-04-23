@@ -228,7 +228,7 @@ describe.skip(`MinaNFT contract`, () => {
     expect(MinaNFT.redactedMapVerificationKey).toBeDefined();
     if (MinaNFT.redactedMapVerificationKey === undefined) return;
     const proof: RedactedMinaNFTMapStateProof =
-      RedactedMinaNFTMapStateProof.fromJSON(
+      await RedactedMinaNFTMapStateProof.fromJSON(
         JSON.parse(proofString) as JsonProof
       );
     const verificationResult: boolean = await verify(
@@ -257,7 +257,7 @@ describe.skip(`MinaNFT contract`, () => {
     expect(MinaNFT.redactedMapVerificationKey).toBeDefined();
     if (MinaNFT.redactedMapVerificationKey === undefined) return;
     const proof: RedactedMinaNFTMapStateProof =
-      RedactedMinaNFTMapStateProof.fromJSON(
+      await RedactedMinaNFTMapStateProof.fromJSON(
         JSON.parse(proofString) as JsonProof
       );
 

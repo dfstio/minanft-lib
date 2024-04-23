@@ -90,7 +90,7 @@ let tokenAccountVerificationKey: VerificationKey | undefined = undefined;
 let nonce: number = 0;
 
 beforeAll(async () => {
-  const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+  const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
   Mina.setActiveInstance(Local);
   deployer = Local.testAccounts[0].privateKey;
   const { verificationKey: vk1 } = await TokenAccount.compile();

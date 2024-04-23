@@ -194,10 +194,10 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
     console.time(`merged proofs`);
     let proof: string = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
-      const proof1: TreeStateProof = TreeStateProof.fromJSON(
+      const proof1: TreeStateProof = await TreeStateProof.fromJSON(
         JSON.parse(proof) as JsonProof
       );
-      const proof2: TreeStateProof = TreeStateProof.fromJSON(
+      const proof2: TreeStateProof = await TreeStateProof.fromJSON(
         JSON.parse(proofs[i]) as JsonProof
       );
       const state = RedactedMinaNFTTreeState.merge(
@@ -217,7 +217,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
   });
 
   it(`should verify merged proof`, async () => {
-    const proof: TreeStateProof = TreeStateProof.fromJSON(
+    const proof: TreeStateProof = await TreeStateProof.fromJSON(
       JSON.parse(mergedProof) as JsonProof
     );
     expect(proof).toBeDefined();
@@ -242,7 +242,7 @@ describe(`MinaNFT Redacted Merkle Tree calculations`, () => {
   });
 
   it(`should verify merged proof on chain`, async () => {
-    const proof: TreeStateProof = TreeStateProof.fromJSON(
+    const proof: TreeStateProof = await TreeStateProof.fromJSON(
       JSON.parse(mergedProof) as JsonProof
     );
     expect(proof).toBeDefined();

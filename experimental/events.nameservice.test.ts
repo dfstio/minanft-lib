@@ -15,7 +15,7 @@ const { MINANFT_NAME_SERVICE } = config;
 import { MinaNFTNameServiceContract } from "../src/contract/names";
 
 beforeAll(async () => {
-  MinaNFT.minaInit("berkeley");
+  await MinaNFT.minaInit("berkeley");
   const deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 
   expect(deployer).toBeDefined();
