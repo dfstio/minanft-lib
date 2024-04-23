@@ -105,7 +105,7 @@ class MyTokenContract extends TokenContract {
 describe("Signature", () => {
   it(`should verify signature in the SmartContract`, async () => {
     const cache: Cache = Cache.FileSystem("./cache");
-    const local = Mina.LocalBlockchain({
+    const local = await Mina.LocalBlockchain({
       proofsEnabled: true,
     });
     Mina.setActiveInstance(local);

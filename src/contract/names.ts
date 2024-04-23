@@ -110,10 +110,9 @@ class MinaNFTNameServiceContract extends TokenContract {
   }
 
   isNFT(address: PublicKey) {
-    const tokenId = this.deriveTokenId();
-    const account = Account(address, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
-    tokenBalance.assertEquals(UInt64.from(1_000_000_000));
+    AccountUpdate.create(address, this.deriveTokenId())
+      .account.balance.getAndRequireEquals()
+      .assertEquals(UInt64.from(1_000_000_000));
   }
 
   /**

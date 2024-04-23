@@ -188,13 +188,13 @@ class MinaNFTEscrow {
     await fetchAccount({ publicKey: nameService });
     await fetchAccount({ publicKey: nft, tokenId });
     const hasAccount = Mina.hasAccount(nft, tokenId);
-    const account = Account(nft, tokenId);
+    const account = Mina.getAccount(nft, tokenId);
     const balance = Mina.getBalance(nft, tokenId);
     console.log(
       `transfer checks result:`,
       hasAccount,
       tokenId.toJSON(),
-      account.balance.get().toString(),
+      account.balance.toString(),
       balance.toString()
     );
     /*

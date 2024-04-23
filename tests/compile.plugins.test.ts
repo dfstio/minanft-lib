@@ -5,7 +5,7 @@ import { MinaNFT } from "../src/minanft";
 import { Memory } from "../src/mina";
 
 beforeAll(async () => {
-  const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+  const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
   Mina.setActiveInstance(Local);
 });
 

@@ -49,7 +49,8 @@ class MinaNFTNameService {
     const zkApp = new MinaNFTNameServiceContract(zkAppPublicKey);
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: zkAppPublicKey });
-    const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
+    const deployNonce =
+      nonce ?? Number(Mina.getAccount(sender).nonce.toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 
     const transaction = await Mina.transaction(
@@ -100,7 +101,8 @@ class MinaNFTNameService {
     const zkApp = new MinaNFTNameServiceContract(zkAppPublicKey);
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: zkAppPublicKey });
-    const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
+    const deployNonce =
+      nonce ?? Number(Mina.getAccount(sender).nonce.toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
     if (!hasAccount) throw new Error("Account does not exist");
 

@@ -18,7 +18,7 @@ import {
   Poseidon,
   MerkleMap,
   Bool,
-  Account
+  Account,
 } from "o1js";
 
 import { MinaNFT } from "../src/minanft";
@@ -43,12 +43,10 @@ class NFT extends SmartContract {
 
   reducer = Reducer({ actionType: Update });
 
-  
   events = {
     deploy: Field,
     update: Update,
   };
-  
 
   deploy(args: DeployArgs) {
     super.deploy(args);
@@ -114,12 +112,12 @@ class NFT extends SmartContract {
 
 beforeAll(async () => {
   if (useLocal) {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
     const { privateKey } = Local.testAccounts[0];
     deployer = privateKey;
   } else {
-    MinaNFT.minaInit('testworld2');
+    await MinaNFT.minaInit("testworld2");
     deployer = PrivateKey.fromBase58(DEPLOYER);
   }
   const balanceDeployer =
@@ -196,23 +194,23 @@ describe("Actions and Reducer", () => {
     await fetchAccount({ publicKey: sender });
     let nonce = Number(Account(sender).nonce.get().toBigint());
 
-    for( let i = 0; i < 64; i++) {
+    for (let i = 0; i < 64; i++) {
       console.log("Dispatch 1", i);
-    await fetchAccount({ publicKey: sender });
-    await fetchAccount({ publicKey: zkAppPublicKey });
-    transaction = await Mina.transaction(
-      { sender, fee: transactionFee, nonce: nonce++},
-      () => {
-        zkApp.dispatchState(data, secret);
-      }
-    );
+      await fetchAccount({ publicKey: sender });
+      await fetchAccount({ publicKey: zkAppPublicKey });
+      transaction = await Mina.transaction(
+        { sender, fee: transactionFee, nonce: nonce++ },
+        () => {
+          zkApp.dispatchState(data, secret);
+        }
+      );
 
-    await transaction.prove();
-    transaction.sign([deployer]);
+      await transaction.prove();
+      transaction.sign([deployer]);
 
-    //console.log("Sending the deploy transaction...");
-    tx = await transaction.send();
-    //if (!useLocal) await MinaNFT.transactionInfo(tx);
+      //console.log("Sending the deploy transaction...");
+      tx = await transaction.send();
+      //if (!useLocal) await MinaNFT.transactionInfo(tx);
     }
 
     if (!useLocal) await MinaNFT.transactionInfo(tx);
@@ -222,7 +220,7 @@ describe("Actions and Reducer", () => {
     });
     console.log(
       "Pending actions",
-      pendingActions.length,
+      pendingActions.length
       //JSON.stringify(pendingActions)
     );
 
@@ -281,7 +279,11 @@ describe("Actions and Reducer", () => {
     pendingActions = await zkApp.reducer.fetchActions({
       fromActionState: actionState,
     });
-    console.log("Pending actions", pendingActions.length, JSON.stringify(pendingActions));
+    console.log(
+      "Pending actions",
+      pendingActions.length,
+      JSON.stringify(pendingActions)
+    );
     console.log("Reduce 2");
     await fetchAccount({ publicKey: sender });
     await fetchAccount({ publicKey: zkAppPublicKey });
@@ -306,7 +308,7 @@ describe("Actions and Reducer", () => {
     });
     console.log(
       "Pending actions",
-      pendingActions.length,
+      pendingActions.length
       //JSON.stringify(pendingActions)
     );
     const newRoot3 = zkApp.root.get();

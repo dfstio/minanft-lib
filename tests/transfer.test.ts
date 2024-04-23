@@ -109,8 +109,8 @@ describe(`MinaNFT contract`, () => {
     expect(deployer).toBeDefined();
     if (deployer === undefined) return;
     const sender = deployer.toPublicKey();
-    const account = Account(sender);
-    nonce = Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    nonce = Number(account.nonce.toBigint());
     oraclePrivateKey = PrivateKey.random();
     const names = new MinaNFTNameService({
       oraclePrivateKey,

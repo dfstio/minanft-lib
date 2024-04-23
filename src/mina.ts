@@ -80,21 +80,24 @@ function getDeployer(): PrivateKey {
 }
 */
 
-function initBlockchain(
+async function initBlockchain(
   instance: blockchain,
   deployersNumber: number = 0
-): MinaNetworkInstance {
+): Promise<MinaNetworkInstance> {
   if (instance === "mainnet") {
     throw new Error("Mainnet is not supported yet by zkApps");
   }
 
   if (instance === "local") {
-    const local = Mina.LocalBlockchain({
+    const local = await Mina.LocalBlockchain({
       proofsEnabled: true,
     });
     Mina.setActiveInstance(local);
     currentNetwork = {
-      keys: local.testAccounts,
+      keys: local.testAccounts.map((key) => ({
+        privateKey: key.key,
+        publicKey: key,
+      })),
       network: Local,
       networkIdHash: CircuitString.fromString("local").hash(),
     };

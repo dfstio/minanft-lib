@@ -14,6 +14,7 @@ import {
   Struct,
   Account,
   UInt64,
+  AccountUpdate,
 } from "o1js";
 
 import { RedactedMinaNFTMapStateProof } from "./redactedmap";
@@ -120,8 +121,10 @@ class MinaNFTVerifierBadge extends TokenContract {
 
     // Issue verification badge
     const tokenId = this.deriveTokenId();
-    const account = Account(nft, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
+    const tokenBalance = AccountUpdate.create(
+      nft,
+      tokenId
+    ).account.balance.getAndRequireEquals();
     this.internal.mint({
       address: nft,
       amount: badgeEvent.version.sub(tokenBalance),
@@ -136,8 +139,10 @@ class MinaNFTVerifierBadge extends TokenContract {
     signature.verify(oracle, nft.toFields());
 
     const tokenId = this.deriveTokenId();
-    const account = Account(nft, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
+    const tokenBalance = AccountUpdate.create(
+      nft,
+      tokenId
+    ).account.balance.getAndRequireEquals();
 
     // Revoke verification badge
     this.internal.burn({ address: nft, amount: tokenBalance });
@@ -148,8 +153,10 @@ class MinaNFTVerifierBadge extends TokenContract {
 
   @method async verifyBadge(nft: PublicKey, nftTokenId: Field) {
     const tokenId = this.deriveTokenId();
-    const account = Account(nft, tokenId);
-    const tokenBalance = account.balance.getAndRequireEquals();
+    const tokenBalance = AccountUpdate.create(
+      nft,
+      tokenId
+    ).account.balance.getAndRequireEquals();
 
     const minanft = new MinaNFTContract(nft, nftTokenId);
     const version = minanft.version.getAndRequireEquals();

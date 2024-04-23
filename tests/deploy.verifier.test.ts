@@ -16,7 +16,7 @@ let deployer: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   const data = await initBlockchain(
-    useLocalBlockchain ? "local" : 'berkeley',
+    useLocalBlockchain ? "local" : "berkeley",
     0
   );
   expect(data).toBeDefined();
@@ -27,7 +27,7 @@ beforeAll(async () => {
     ? d
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
 
-  //MinaNFT.minaInit("testworld2");
+  //await MinaNFT.minaInit("testworld2");
   //deployer = PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;

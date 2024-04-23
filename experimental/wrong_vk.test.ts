@@ -50,7 +50,7 @@ let counterPrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
   if (useLocalBlockchain) {
-    const Local = Mina.LocalBlockchain({ proofsEnabled: true });
+    const Local = await Mina.LocalBlockchain({ proofsEnabled: true });
     Mina.setActiveInstance(Local);
     deployer = Local.testAccounts[0].privateKey;
   } else {

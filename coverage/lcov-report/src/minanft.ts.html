@@ -1901,7 +1901,9 @@
 <a name='L1836'></a><a href='#L1836'>1836</a>
 <a name='L1837'></a><a href='#L1837'>1837</a>
 <a name='L1838'></a><a href='#L1838'>1838</a>
-<a name='L1839'></a><a href='#L1839'>1839</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1839'></a><a href='#L1839'>1839</a>
+<a name='L1840'></a><a href='#L1840'>1840</a>
+<a name='L1841'></a><a href='#L1841'>1841</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
@@ -2447,6 +2449,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -4304,8 +4308,10 @@ class MinaNFT extends BaseMinaNFT {
    * Initialize Mina o1js library
    * @param chain blockchain to initialize
    */
-  public <span class="fstat-no" title="function not covered" >static </span>minaInit(chain: blockchain): MinaNetworkInstance {
-<span class="cstat-no" title="statement not covered" >    return initBlockchain(chain);</span>
+  public <span class="fstat-no" title="function not covered" >static </span>async minaInit(
+    chain: blockchain
+  ): Promise&lt;MinaNetworkInstance&gt; {
+<span class="cstat-no" title="statement not covered" >    return await initBlockchain(chain);</span>
   }
 &nbsp;
   /**
@@ -4702,8 +4708,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: sender });
     const hasAccount = Mina.hasAccount(this.address, tokenId);
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!hasAccount) <span class="cstat-no" title="statement not covered" >throw new Error("NFT is not deployed, no account");</span>
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
     const version: UInt64 = zkAppNFT.version.get();
     const newVersion: UInt64 = version.add(UInt64.from(1));
     const oldOwner = zkAppNFT.owner.get();
@@ -4970,8 +4976,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: sender });
     const hasAccount = Mina.hasAccount(address, tokenId);
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!hasAccount) <span class="cstat-no" title="statement not covered" >throw new Error("NFT is not deployed, no account");</span>
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
 &nbsp;
     //console.log("Sending update...");
     const tx = await Mina.transaction(
@@ -5317,8 +5323,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     //await fetchMinaAccount({ publicKey: this.address, tokenId });
     await fetchMinaAccount({ publicKey: sender, force: true });
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? Number(account.nonce.get().toBigint());
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? Number(account.nonce.toBigint());
     const hasAccount = Mina.hasAccount(this.address, tokenId);
 &nbsp;
     const transaction = await Mina.transaction(
@@ -5428,8 +5434,8 @@ class MinaNFT extends BaseMinaNFT {
     const tokenId = zkApp.deriveTokenId();
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: address, tokenId });
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? <span class="branch-1 cbranch-no" title="branch not covered" >Number(account.nonce.get().toBigint());</span>
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? <span class="branch-1 cbranch-no" title="branch not covered" >Number(account.nonce.toBigint());</span>
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!Mina.hasAccount(address, tokenId))
 <span class="cstat-no" title="statement not covered" >      throw new Error("NFT is not deployed, no account exists");</span>
     const tx = await Mina.transaction(
@@ -5515,8 +5521,8 @@ class MinaNFT extends BaseMinaNFT {
     await fetchMinaAccount({ publicKey: nameService.address, force: true });
     await fetchMinaAccount({ publicKey: address, tokenId });
     await fetchMinaAccount({ publicKey: sender });
-    const account = Account(sender);
-    const nonce: number = nonceArg ?? <span class="branch-1 cbranch-no" title="branch not covered" >Number(account.nonce.get().toBigint());</span>
+    const account = Mina.getAccount(sender);
+    const nonce: number = nonceArg ?? <span class="branch-1 cbranch-no" title="branch not covered" >Number(account.nonce.toBigint());</span>
     const tx = await Mina.transaction(
       { sender, fee: await MinaNFT.fee(), memo: "minanft.io", nonce },
       async () =&gt; {
@@ -5584,7 +5590,7 @@ class MinaNFT extends BaseMinaNFT {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-22T18:38:27.848Z
+                at 2024-04-22T22:53:23.672Z
             </div>
         <script src="../prettify.js"></script>
         <script>

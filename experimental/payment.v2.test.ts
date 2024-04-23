@@ -352,7 +352,7 @@ class TrustedUpdate extends SmartContract {
 
 describe("Payment", () => {
   let verificationKey: VerificationKey;
-  const local = Mina.LocalBlockchain({
+  const local = await Mina.LocalBlockchain({
     proofsEnabled: true,
   });
   Mina.setActiveInstance(local);

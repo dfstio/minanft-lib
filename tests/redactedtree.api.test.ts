@@ -293,7 +293,7 @@ describe.skip(`MinaNFT Redacted Merkle Tree calculations`, () => {
     if (proof === "") return;
     expect(verificationKey).toBeDefined();
     if (verificationKey === undefined) return;
-    const calculatedProof: TreeStateProof = TreeStateProof.fromJSON(
+    const calculatedProof: TreeStateProof = await TreeStateProof.fromJSON(
       JSON.parse(proof) as JsonProof
     );
     const ok = await verify(calculatedProof.toJSON(), verificationKey);
@@ -304,7 +304,7 @@ describe.skip(`MinaNFT Redacted Merkle Tree calculations`, () => {
     expect(proof).toBeDefined();
     expect(proof).not.toBe("");
     if (proof === "") return;
-    const calculatedProof: TreeStateProof = TreeStateProof.fromJSON(
+    const calculatedProof: TreeStateProof = await TreeStateProof.fromJSON(
       JSON.parse(proof) as JsonProof
     );
     expect(proof).toBeDefined();

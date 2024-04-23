@@ -169,7 +169,8 @@ class RedactedMinaNFT extends BaseMinaNFT {
     );
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: zkAppPublicKey });
-    const deployNonce = nonce ?? Number(Account(sender).nonce.get().toBigint());
+    const deployNonce =
+      nonce ?? Number(Mina.getAccount(sender).nonce.toBigint());
     const hasAccount = Mina.hasAccount(zkAppPublicKey);
 
     const zkApp = new MinaNFTVerifier(zkAppPublicKey);
