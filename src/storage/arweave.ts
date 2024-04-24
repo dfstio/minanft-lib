@@ -21,6 +21,7 @@ class ARWEAVE {
     });
   }
 
+  // TODO: change to pinJSON with the same parameters as pinJSON in IPFS
   public async pinString(
     data: string,
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types

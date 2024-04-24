@@ -1,5 +1,13 @@
 export { Update, Metadata, MetadataWitness, Storage };
-import { PublicKey, Struct, Field, UInt64, MerkleMapWitness } from "o1js";
+import {
+  PublicKey,
+  Struct,
+  Field,
+  UInt64,
+  MerkleMapWitness,
+  Provable,
+  Encoding,
+} from "o1js";
 /**
  * Metadata is the metadata of the NFT written to the Merkle Map
  * @property data The root of the Merkle Map of the data or data itself if it is a leaf
@@ -47,11 +55,34 @@ class MetadataWitness extends Struct({
  * format of the Arweave hash string: a:...
  * @property hashString The hash string of the storage
  */
+
 class Storage extends Struct({
-  hashString: [Field, Field],
+  hashString: Provable.Array(Field, 2),
 }) {
   constructor(value: { hashString: [Field, Field] }) {
     super(value);
+  }
+
+  static empty(): Storage {
+    return new Storage({ hashString: [Field(0), Field(0)] });
+  }
+
+  static assertEquals(a: Storage, b: Storage) {
+    a.hashString[0].assertEquals(b.hashString[0]);
+    a.hashString[1].assertEquals(b.hashString[1]);
+  }
+
+  static fromIpfsHash(hash: string): Storage {
+    const fields = Encoding.stringToFields("i:" + hash);
+    if (fields.length !== 2) throw new Error("Invalid IPFS hash");
+    return new Storage({ hashString: [fields[0], fields[1]] });
+  }
+
+  toIpfsHash(): string {
+    const hash = Encoding.stringFromFields(this.hashString);
+    if (hash.startsWith("i:")) {
+      return hash.substring(2);
+    } else throw new Error("Invalid IPFS hash");
   }
 }
 
