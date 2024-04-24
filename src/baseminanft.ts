@@ -222,23 +222,29 @@ class BaseMinaNFT {
    */
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   public static setCacheFolder(folder: string = "./cache"): void {
-    MinaNFT.cache = Cache.FileSystem(folder);
+    BaseMinaNFT.cache = Cache.FileSystem(folder);
   }
 
   /**
    * Compiles MinaNFT contract
    * @returns verification key
    */
-  public static async compile(): Promise<VerificationKey> {
-    const options = MinaNFT.cache ? { cache: MinaNFT.cache } : undefined;
+  public static async compile(
+    rollup: boolean = false
+  ): Promise<VerificationKey> {
+    const options = BaseMinaNFT.cache
+      ? { cache: BaseMinaNFT.cache }
+      : undefined;
 
-    if (MinaNFT.updateVerificationKey === undefined) {
+    if (BaseMinaNFT.updateVerificationKey === undefined) {
       console.time("MinaNFTMetadataUpdate compiled");
       await sleep(100); // alow GC to run
       const { verificationKey } = await MinaNFTMetadataUpdate.compile(options);
       console.timeEnd("MinaNFTMetadataUpdate compiled");
-      MinaNFT.updateVerificationKey = verificationKey;
+      BaseMinaNFT.updateVerificationKey = verificationKey;
     }
+
+    if (rollup) return BaseMinaNFT.updateVerificationKey;
 
     if (MinaNFT.transferVerificationKey === undefined) {
       console.time("EscrowTransferVerification compiled");

@@ -216,10 +216,12 @@ class File {
     return this.sha3_512_hash;
   }
 
-  public async pin(
-    pinataJWT: string | undefined,
-    arweaveKey: string | undefined
-  ): Promise<void> {
+  public async pin(params: {
+    pinataJWT?: string;
+    arweaveKey?: string;
+    keyvalues?: object;
+  }): Promise<string> {
+    const { pinataJWT, arweaveKey, keyvalues } = params;
     if (pinataJWT === undefined && arweaveKey === undefined)
       throw new Error(`Pin failed: no pinataJWT or arweaveKey`);
     const metadata = await this.metadata();
@@ -227,12 +229,13 @@ class File {
       const file: fs.FileHandle = await fs.open(this.filename);
       const stream = file.createReadStream();
       const ipfs = new IPFS(pinataJWT);
-      const hash = await ipfs.pinFile(
+      const hash = await ipfs.pinFile({
         stream,
-        path.basename(this.filename),
-        metadata.size,
-        metadata.mimeType
-      );
+        name: path.basename(this.filename),
+        size: metadata.size,
+        mimeType: metadata.mimeType,
+        keyvalues: keyvalues ?? { project: "MinaNFT" },
+      });
       stream.close();
       if (hash === undefined) throw new Error(`IPFS pin failed`);
       this.storage = `i:${hash}`;
@@ -252,6 +255,7 @@ class File {
       this.size = metadata.size;
       this.mimeType = metadata.mimeType;
     }
+    return this.storage;
   }
 
   public async setMetadata(): Promise<void> {

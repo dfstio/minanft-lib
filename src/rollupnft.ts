@@ -1,4 +1,4 @@
-import { Field, verify, Struct } from "o1js";
+import { Field, verify, Struct, VerificationKey } from "o1js";
 import axios from "axios";
 import { MinaNFT } from "./minanft";
 import { BaseMinaNFT } from "./baseminanft";
@@ -89,6 +89,14 @@ export class RollupNFT extends BaseMinaNFT {
     const metadataMap = new MetadataMap();
     this.metadataRoot = root ?? metadataMap.getRoot();
     this.storage = storage;
+  }
+
+  /**
+   * Compiles RollupNFT MetadataUpdate contract
+   * @returns verification key
+   */
+  public static async compile(): Promise<VerificationKey> {
+    return BaseMinaNFT.compile(true);
   }
 
   /**
@@ -243,34 +251,11 @@ export class RollupNFT extends BaseMinaNFT {
   }
 
   /**
-   * Converts a NFT to JSON
-   * @returns JSON object
-   */
-  public toJSON(): object {
-    return this.exportToJSON();
-  }
-
-  /**
-   * Converts a NFT to string
-   * @param params arguments
-   * @param params.includePrivateData include private data
-   * @returns NFT's serialized JSON as string
-   */
-  public exportToString(params: { includePrivateData: boolean }): string {
-    return params.includePrivateData
-      ? JSON.stringify(this.exportToJSON(), null, 2)
-      : JSON.stringify(
-          this.exportToJSON(),
-          (_, value) => (value?.isPrivate === true ? undefined : value),
-          2
-        );
-  }
-
-  /**
    * Converts to JSON
    * @returns JSON object
    */
-  public exportToJSON(): object {
+  public toJSON(params: { includePrivateData?: boolean } = {}): object {
+    const includePrivateData = params.includePrivateData ?? false;
     let description: string | undefined = undefined;
     const descriptionObject = this.getMetadata("description");
     if (
@@ -296,7 +281,7 @@ export class RollupNFT extends BaseMinaNFT {
 
     const { root } = this.getMetadataRootAndMap();
 
-    return {
+    const json = {
       description: description ?? "",
       image,
       external_url: this.storage
@@ -306,6 +291,13 @@ export class RollupNFT extends BaseMinaNFT {
       metadata: { data: root.data.toJSON(), kind: root.kind.toJSON() },
       properties: Object.fromEntries(this.metadata),
     };
+    return includePrivateData
+      ? JSON.parse(JSON.stringify(json))
+      : JSON.parse(
+          JSON.stringify(json, (_, value) =>
+            value?.isPrivate === true ? undefined : value
+          )
+        );
   }
 
   /**
@@ -375,7 +367,11 @@ export class RollupNFT extends BaseMinaNFT {
     const file = new File(data.filename, data.fileType, data.fileMetadata);
     if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
       console.log("Pinning image...");
-      await file.pin(data.pinataJWT, data.arweaveKey);
+      await file.pin({
+        pinataJWT: data.pinataJWT,
+        arweaveKey: data.arweaveKey,
+        keyvalues: { project: "MinaNFT", type: "image", nftType: "RollupNFT" },
+      });
     } else if (data.IPFSHash !== undefined) {
       file.storage = "i:" + data.IPFSHash;
       await file.setMetadata();
@@ -411,7 +407,11 @@ export class RollupNFT extends BaseMinaNFT {
     if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
       if (data.isPrivate !== true) {
         console.log("Pinning file...");
-        await file.pin(data.pinataJWT, data.arweaveKey);
+        await file.pin({
+          pinataJWT: data.pinataJWT,
+          arweaveKey: data.arweaveKey,
+          keyvalues: { project: "MinaNFT", type: "file", nftType: "RollupNFT" },
+        });
       }
     } else if (data.IPFSHash !== undefined) {
       file.storage = "i:" + data.IPFSHash;
@@ -554,12 +554,8 @@ export class RollupNFT extends BaseMinaNFT {
 
     const transactions = transactionsStr.map((t) => {
       const obj = JSON.parse(t);
-      const state = MetadataTransition.fromFields(
-        obj.state.map((f: string) => Field.fromJSON(f))
-      );
-      const update = MetadataUpdate.fromFields(
-        obj.update.map((f: string) => Field.fromJSON(f))
-      );
+      const state = MetadataTransition.fromFields(deserializeFields(obj.state));
+      const update = MetadataUpdate.fromFields(deserializeFields(obj.update));
       return { state, update };
     });
 
@@ -631,19 +627,31 @@ export class RollupNFT extends BaseMinaNFT {
     if (pinataJWT !== undefined) {
       console.log("Pinning to IPFS...");
       const ipfs = new IPFS(pinataJWT);
-      let hash = await ipfs.pinString(
-        this.exportToString({
+      let hash = await ipfs.pinJSON({
+        data: this.toJSON({
           includePrivateData: false,
-        })
-      );
+        }),
+        name: "rollup-nft.json",
+        keyvalues: {
+          project: "MinaNFT",
+          type: "metadata",
+          nftType: "RollupNFT",
+        },
+      });
       if (hash === undefined) {
         console.error("Pinning to IPFS failed. Retrying...");
         await sleep(10000);
-        hash = await ipfs.pinString(
-          this.exportToString({
+        hash = await ipfs.pinJSON({
+          data: this.toJSON({
             includePrivateData: false,
-          })
-        );
+          }),
+          name: "rollup-nft.json",
+          keyvalues: {
+            project: "MinaNFT",
+            type: "metadata",
+            nftType: "RollupNFT",
+          },
+        });
       }
       if (hash === undefined) {
         console.error("Pinning to IPFS failed");
@@ -660,9 +668,13 @@ export class RollupNFT extends BaseMinaNFT {
       console.log("Pinning to Arweave...");
       const arweave = new ARWEAVE(arweaveKey);
       const hash = await arweave.pinString(
-        this.exportToString({
-          includePrivateData: false,
-        })
+        JSON.stringify(
+          this.toJSON({
+            includePrivateData: false,
+          }),
+          null,
+          2
+        )
       );
       if (hash === undefined) return undefined;
       const hashStr = "a:" + hash;

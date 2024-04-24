@@ -162,7 +162,11 @@ class MapData extends BaseMinaNFTObject {
   public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
     const file = new File(data.filename, data.fileType, data.fileMetadata);
     console.log("Pinning file to IPFS...");
-    await file.pin(data.pinataJWT, data.arweaveKey);
+    await file.pin({
+      pinataJWT: data.pinataJWT,
+      arweaveKey: data.arweaveKey,
+      keyvalues: { project: "MinaNFT", type: "file", nftType: "map" },
+    });
     console.log("Calculating file Merkle tree root...");
     console.time("File Merkle tree root calculated");
     await file.treeData(data.calculateRoot ?? true);

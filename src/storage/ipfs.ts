@@ -1,71 +1,102 @@
 export { IPFS };
 import axios from "axios";
 import FormData from "form-data";
+import { makeString } from "../mina";
+import { NAMES_ORACLE } from "..";
 
 class IPFS {
   private auth: string;
+  static ipfsData: { [key: string]: string } = {};
+  static useLocalIpfsData: boolean = false as boolean;
 
   constructor(token: string) {
-    this.auth = "Bearer " + token;
+    this.auth = token;
   }
 
-  public async pinString(data: string): Promise<string | undefined> {
+  public async pinJSON(params: {
+    data: any;
+    name: string;
+    keyvalues?: object;
+  }): Promise<string | undefined> {
+    const { data, name, keyvalues } = params;
+    console.log("saveToIPFS:", { name });
+    if (this.auth === "local") {
+      const hash = makeString(
+        `bafkreibwikqybinoumbe6v2mpzwgluhqw7n4h6d5y7eq2nogils6ibflbi`.length
+      );
+      IPFS.ipfsData[hash] = data;
+      IPFS.useLocalIpfsData = true;
+      return hash;
+    }
+
     try {
-      // replacer will remove all private metadata from the object
-      //const data = JSON.stringify(params, replacer, 2);
+      const pinataData = {
+        pinataOptions: {
+          cidVersion: 1,
+        },
+        pinataMetadata: {
+          name,
+          keyvalues,
+        },
+        pinataContent: data,
+      };
+      const str = JSON.stringify(pinataData);
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: this.auth,
+          Authorization: "Bearer " + this.auth,
         },
       };
 
-      if (this.auth === "Bearer ")
+      if (this.auth === "")
         //for running tests
-        return `QmTosaezLecDB7bAoUoXcrJzeBavHNZyPbPff1QHWw8xus`;
+        return `bafkreibwikqybinoumbe6v2mpzwgluhqw7n4h6d5y7eq2nogils6ibflbi`;
 
       const res = await axios.post(
         "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-        data,
+        str,
         config
       );
 
-      console.log("pinJSON result:", res.data);
+      console.log("saveToIPFS result:", res.data);
       return res.data.IpfsHash;
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      console.error("saveToIPFS error:", error?.message);
       return undefined;
     }
   }
 
-  public async pinFile(
-    stream: NodeJS.ReadableStream,
-    filename: string,
-    size: number,
-    mimeType: string
-  ): Promise<string | undefined> {
+  public async pinFile(params: {
+    stream: NodeJS.ReadableStream;
+    name: string;
+    size: number;
+    mimeType: string;
+    keyvalues?: object;
+  }): Promise<string | undefined> {
+    const { stream, name, size, mimeType, keyvalues } = params;
+    console.log("pinFile:", { name, size, mimeType, keyvalues });
     try {
-      const formData = new FormData();
-
-      // append stream with a file
-      formData.append("file", stream, {
+      const form = new FormData();
+      form.append("file", stream, {
         contentType: mimeType,
         knownLength: size,
-        filename,
+        filename: name,
       });
+      form.append("pinataMetadata", JSON.stringify({ name, keyvalues }));
+      form.append("pinataOptions", JSON.stringify({ cidVersion: 1 }));
 
-      if (this.auth === "Bearer ")
+      if (this.auth === "")
         //for running tests
-        return `QmaRZUgm2GYCCjsDCa5eJk4rjRogTgY6dCyXRQmnhvFmjj`;
+        return `bafkreibwikqybinoumbe6v2mpzwgluhqw7n4h6d5y7eq2nogils6ibflbi`;
       // TODO: add retry logic
       const response = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        formData,
+        form,
         {
           headers: {
-            Authorization: this.auth,
-            ...formData.getHeaders(),
+            Authorization: "Bearer " + this.auth,
+            "Content-Type": "multipart/form-data",
           },
           maxBodyLength: 25 * 1024 * 1024,
         }
@@ -82,78 +113,5 @@ class IPFS {
       console.error("pinFile error 2 - catch", err);
       return undefined;
     }
-    return undefined;
   }
-
-  /*
-  public async pinLink(file: string): Promise<string | undefined> {
-    try {
-      console.log("pinLink", file);
-      const auth: string = this.auth;
-      const client = new S3Client({});
-
-      const params = {
-        Bucket: process.env.BUCKET!,
-        Key: file,
-      };
-
-      let finished = false;
-      await sleep(500);
-      while (!finished) {
-        console.log("Waiting for S3", file);
-        const headcommand = new HeadObjectCommand(params);
-        try {
-          const headresponse = await client.send(headcommand);
-          finished = true;
-          console.log("S3 is ready:", file, headresponse);
-        }
-        catch (e) {
-          console.log("S3 is not ready yet", file);
-          await sleep(500);
-        }
-      }
-
-      // Get file metadata to retrieve size and type
-      const getcommand = new GetObjectCommand(params);
-      const getresponse = await client.send(getcommand);
-
-      // Get read object stream
-      const s3Stream = getresponse.Body
-
-      const formData = new FormData();
-
-      // append stream with a file
-      formData.append("file", s3Stream, {
-        contentType: getresponse.ContentType,
-        knownLength: getresponse.ContentLength,
-        filename: file,
-      });
-
-      const response = await axios.post(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        formData,
-        {
-          headers: {
-            Authorization: auth,
-            ...formData.getHeaders(),
-          },
-          maxBodyLength: 25 * 1024 * 1024,
-        },
-      );
-
-      console.log("addLink result:", response.data);
-      if (response && response.data && response.data.IpfsHash) {
-        return response.data.IpfsHash;
-      } else {
-        console.error("addLink error", response.data.error);
-        return undefined;
-      }
-
-    } catch (err) {
-      console.error("addLink error 2 - catch", err);
-      return undefined;
-    }
-    return undefined;
-  }
-  */
 }
