@@ -1,7 +1,8 @@
 import { Field } from "o1js";
 
+// URL friendly base64 encoding
 const TABLE =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 export function fieldToBase64(field: Field): string {
   const digits = toBase(field.toBigInt(), BigInt(64));
