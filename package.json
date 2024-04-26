@@ -22,6 +22,7 @@
   "type": "module",
   "scripts": {
     "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.web.json",
+    "rollup": "jest tests/rollup",
     "compilenode": "rm -rf dist/lib && tsc",
     "test": "jest",
     "coverage": "jest --coverage tests/",

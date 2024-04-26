@@ -17,8 +17,13 @@ let proofData: RollupNFTCommitData | undefined = undefined;
 let proof: MinaNFTMetadataUpdateProof | undefined = undefined;
 let verificationKey: VerificationKey | undefined = undefined;
 
-describe(`Rollup NFT`, () => {
+describe(`Rollup NFT proofs`, () => {
   it(`should mint Rollup NFT`, async () => {
+    nft.update({ key: "name", value: `@rolluptest` });
+    nft.updateText({
+      key: `address`,
+      text: "B62qrjWrAaXV65CZgpfhLdFynbFdyj851cWZPCPvF92mF3ohGDbNAME",
+    });
     nft.updateText({
       key: `description`,
       text: "This is my long description of the Rollup NFT. Can be of any length, supports markdown.",
@@ -27,7 +32,7 @@ describe(`Rollup NFT`, () => {
     nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
     if (includeImage)
       await nft.updateImage({
-        filename: "./images/navigator.jpg",
+        filename: "./images/image.jpg",
         pinataJWT,
         calculateRoot: false,
       });
@@ -68,7 +73,7 @@ describe(`Rollup NFT`, () => {
     console.log(`private json:`, nft.toJSON({ includePrivateData: true }));
   });
 
-  it(`should prepare proof data`, async () => {
+  it(`should pin to IPFS and prepare proof data`, async () => {
     const commitData: RollupNFTCommit = {
       pinataJWT,
       generateProofData: true,
@@ -78,12 +83,15 @@ describe(`Rollup NFT`, () => {
     //console.log(`proofData:`, proofData);
   });
 
+  it(`should get URL`, async () => {
+    const url = nft.getURL();
+    console.log(`Rollup NFT url:`, url);
+  });
+
   it(`should compile contracts`, async () => {
     RollupNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
-    console.time(`compiled`);
     verificationKey = await RollupNFT.compile();
-    console.timeEnd(`compiled`);
     Memory.info(`compiled`);
   });
 
@@ -93,7 +101,7 @@ describe(`Rollup NFT`, () => {
       console.error(`proofData is undefined`);
       return;
     }
-    proof = await RollupNFT.generateProof(proofData);
+    proof = await RollupNFT.generateProof(proofData, true);
     Memory.info(`proof created`);
     //console.log(`proof:`, proof);
   });
