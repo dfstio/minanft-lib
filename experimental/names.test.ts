@@ -3,16 +3,19 @@ import { Mina, Field, Poseidon, PrivateKey, UInt32 } from "o1js";
 import { MinaNFT } from "../src/minanft";
 
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hour
-const names = ["DFST", "NAME", "NAMES", "MINANFT", "ZERO", "BLOCK"]; //"NFT",
-const lNames = [
-  "minanft",
-  "socialcap",
-  "talha",
-  "staketab",
-  "mario",
-  "worker",
-  "cloud",
-];
+const names = [
+  "DFST",
+  "NAME",
+  "NAMES",
+  "MINANFT",
+  "ZERO",
+  "BLOCK",
+  "mDNS",
+  "MinaDNS",
+  "minaDNS",
+  "MINADNS",
+]; //"NFT",
+const lNames = ["minanft", "socialcap", "staketab", "mario", "worker", "cloud"];
 
 describe("Names", () => {
   it("should generate addresses", async () => {

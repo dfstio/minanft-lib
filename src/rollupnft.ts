@@ -539,6 +539,12 @@ export class RollupNFT extends BaseMinaNFT {
     };
   }
 
+  public getURL(): string | undefined {
+    if (this.storage === undefined) return undefined;
+    const url = this.storage.toIpfsHash();
+    return "https://minanft.io/nft/i" + url;
+  }
+
   /**
    * Commit updates of the MinaNFT to blockchain using prepared data
    * Generates recursive proofs for all updates,
@@ -547,7 +553,8 @@ export class RollupNFT extends BaseMinaNFT {
    * @param generateProof {@link MinaNFTCommit} commit data
    */
   public static async generateProof(
-    preparedCommitData: RollupNFTCommitData
+    preparedCommitData: RollupNFTCommitData,
+    verbose: boolean = false
   ): Promise<MinaNFTMetadataUpdateProof> {
     const { update: updateStr, transactions: transactionsStr } =
       preparedCommitData;
@@ -571,7 +578,10 @@ export class RollupNFT extends BaseMinaNFT {
     const logMsg = `Update proofs created`;
     console.time(logMsg);
     let proofs: MinaNFTMetadataUpdateProof[] = [];
+    let count = 1;
     for (const transaction of transactions) {
+      if (verbose)
+        console.log(`Creating proof ${count++}/${transactions.length}`);
       await sleep(100); // alow GC to run
       const proof: MinaNFTMetadataUpdateProof =
         await MinaNFTMetadataUpdate.update(
@@ -583,7 +593,9 @@ export class RollupNFT extends BaseMinaNFT {
 
     console.log("Merging proofs...");
     let proof: MinaNFTMetadataUpdateProof = proofs[0];
+    count = 1;
     for (let i = 1; i < proofs.length; i++) {
+      if (verbose) console.log(`Merging proof ${count++}/${proofs.length - 1}`);
       await sleep(100); // alow GC to run
       const state: MetadataTransition = MetadataTransition.merge(
         proof.publicInput,

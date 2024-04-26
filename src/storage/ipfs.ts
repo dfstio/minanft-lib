@@ -19,7 +19,7 @@ class IPFS {
     keyvalues?: object;
   }): Promise<string | undefined> {
     const { data, name, keyvalues } = params;
-    console.log("saveToIPFS:", { name });
+    console.log("saveToIPFS:", { name, keyvalues });
     if (this.auth === "local") {
       const hash = makeString(
         `bafkreibwikqybinoumbe6v2mpzwgluhqw7n4h6d5y7eq2nogils6ibflbi`.length

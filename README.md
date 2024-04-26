@@ -6,6 +6,17 @@ This library is designed for easy integration of third-party developers and corp
 
 ## Features
 
+### NEW: Rollup NFTs
+
+Running tests:
+`yarn rollup`
+
+Rollup NFT example:
+https://minanft.io/nft/ibafkreifof56ydwhqhvz744czppjljzcpcvabscuu2ofylemzvzferlvlka
+
+Rollup NFT URI example:
+https://gateway.pinata.cloud/ipfs/bafkreifof56ydwhqhvz744czppjljzcpcvabscuu2ofylemzvzferlvlka
+
 ### Contracts
 
 - [MinaNFTContract](https://docs.minanft.io/api/class/minanftcontract/) for NFT
