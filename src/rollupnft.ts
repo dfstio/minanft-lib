@@ -1,4 +1,4 @@
-import { Field, verify, Struct, VerificationKey } from "o1js";
+import { Field, verify, Struct, VerificationKey, PublicKey } from "o1js";
 import axios from "axios";
 import { MinaNFT } from "./minanft";
 import { BaseMinaNFT } from "./baseminanft";
@@ -69,8 +69,12 @@ export class RollupUpdate extends Struct({
  */
 export class RollupNFT extends BaseMinaNFT {
   storage: Storage | undefined;
-  private updates: MetadataUpdate[] = [];
   metadataRoot: Metadata;
+  isSomeMetadata: boolean = false;
+  private updates: MetadataUpdate[] = [];
+  name?: string;
+  address?: PublicKey;
+  external_url?: string;
 
   /**
    * Create MinaNFT object
@@ -83,12 +87,28 @@ export class RollupNFT extends BaseMinaNFT {
    * @param params.escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
    * @param params.nameService Public key of the NFT Name Service
    */
-  constructor(params: { storage?: Storage; root?: Metadata } = {}) {
-    const { storage, root } = params;
+  constructor(
+    params: {
+      storage?: Storage;
+      root?: Metadata;
+      name?: string;
+      address?: PublicKey | string;
+      external_url?: string;
+    } = {}
+  ) {
+    const { storage, root, name, address, external_url } = params;
     super();
     const metadataMap = new MetadataMap();
-    this.metadataRoot = root ?? metadataMap.getRoot();
+    if (root !== undefined) {
+      this.metadataRoot = root;
+      this.isSomeMetadata = true;
+    } else this.metadataRoot = metadataMap.getRoot();
     this.storage = storage;
+    this.name = name;
+    this.external_url = external_url;
+    if (address !== undefined)
+      this.address =
+        typeof address === "string" ? PublicKey.fromBase58(address) : address;
   }
 
   /**
@@ -108,36 +128,35 @@ export class RollupNFT extends BaseMinaNFT {
     metadataURI: string | undefined = undefined,
     skipCalculatingMetadataRoot: boolean = false
   ): Promise<void> {
-    const storageStr = this.storage
-      ? MinaNFT.stringFromFields(Storage.toFields(this.storage))
+    const uri = metadataURI
+      ? JSON.parse(metadataURI)
+      : this.storage
+      ? (
+          await axios.get(
+            "https://gateway.pinata.cloud/ipfs/" + this.storage.toIpfsHash()
+          )
+        ).data
       : undefined;
-    if (storageStr === undefined && metadataURI === undefined)
-      throw new Error("Storage is undefined");
+    if (uri === undefined) throw new Error("uri: NFT metadata not found");
 
-    let uriURL: string = "";
-    //try {
-    if (storageStr !== undefined) {
-      if (
-        storageStr.length < 2 ||
-        (storageStr[0] !== "i" && storageStr[0] !== "a")
-      ) {
-        throw new Error("Invalid storage string");
-      }
-      const uriURL =
-        storageStr[0] === "i"
-          ? "https://gateway.pinata.cloud/ipfs/" + storageStr.slice(2)
-          : "https://arweave.net/" + storageStr.slice(2);
+    if (this.isSomeMetadata) {
+      if (uri.metadata.data !== this.metadataRoot.data.toJSON())
+        throw new Error("uri: NFT metadata data mismatch");
+      if (uri.metadata.kind !== this.metadataRoot.kind.toJSON())
+        throw new Error("uri: NFT metadata kind mismatch");
+    } else {
+      this.metadataRoot = new Metadata({
+        data: Field.fromJSON(uri.metadata.data),
+        kind: Field.fromJSON(uri.metadata.kind),
+      });
+      this.isSomeMetadata = true;
     }
-
-    const uri =
-      metadataURI === undefined
-        ? (await axios.get(uriURL)).data
-        : JSON.parse(metadataURI);
-
-    if (uri.metadata.data !== this.metadataRoot.data.toJSON())
-      throw new Error("uri: NFT metadata data mismatch");
-    if (uri.metadata.kind !== this.metadataRoot.kind.toJSON())
-      throw new Error("uri: NFT metadata kind mismatch");
+    this.name = uri.name;
+    this.address =
+      uri.address && typeof uri.address === "string"
+        ? PublicKey.fromBase58(uri.address)
+        : undefined;
+    this.external_url = uri.external_url;
 
     Object.entries(uri.properties).forEach(([key, value]) => {
       if (typeof key !== "string")
@@ -225,17 +244,14 @@ export class RollupNFT extends BaseMinaNFT {
           break;
       }
     });
-    /*
-    } catch (error) {
-      throw new Error(`IPFS uri import error: ${error}`);
-    }
-    */
+
     if (skipCalculatingMetadataRoot === false) {
       const { root } = this.getMetadataRootAndMap();
       if (root.data.toJSON() !== this.metadataRoot.data.toJSON())
         throw new Error("Metadata root data mismatch");
       if (root.kind.toJSON() !== this.metadataRoot.kind.toJSON())
         throw new Error("Metadata root kind mismatch");
+      this.isSomeMetadata = true;
     }
   }
 
@@ -282,11 +298,15 @@ export class RollupNFT extends BaseMinaNFT {
     const { root } = this.getMetadataRootAndMap();
 
     const json = {
-      description: description ?? "",
+      name: this.name,
+      address: this.address?.toBase58(),
+      description: description,
       image,
-      external_url: this.storage
-        ? "https://minanft.io/nft/" + serializeFields(this.storage.hashString)
+      external_url: this.external_url ?? this.getURL(),
+      uri: this.storage
+        ? "https://gateway.pinata.cloud/ipfs/" + this.storage.toIpfsHash()
         : undefined,
+      storage: this.storage?.toString(),
       time: Date.now(),
       metadata: { data: root.data.toJSON(), kind: root.kind.toJSON() },
       properties: Object.fromEntries(this.metadata),
@@ -508,7 +528,14 @@ export class RollupNFT extends BaseMinaNFT {
       mergedState = state;
     }
 
-    // TODO : update metadata root
+    if (
+      this.isSomeMetadata &&
+      (this.metadataRoot.data.toJSON() !== mergedState.oldRoot.data.toJSON() ||
+        this.metadataRoot.kind.toJSON() !== mergedState.oldRoot.kind.toJSON())
+    )
+      throw new Error("Metadata old root data mismatch");
+
+    this.metadataRoot = mergedState.newRoot;
     const storage = await this.pinToStorage(pinataJWT, arweaveKey);
     if (storage === undefined) {
       throw new Error("Storage error");
@@ -533,6 +560,8 @@ export class RollupNFT extends BaseMinaNFT {
       update: serializeFields(RollupUpdate.toFields(update)),
     });
 
+    this.isSomeMetadata = true;
+
     return {
       update: updateStr,
       transactions: transactionsStr,
@@ -541,8 +570,7 @@ export class RollupNFT extends BaseMinaNFT {
 
   public getURL(): string | undefined {
     if (this.storage === undefined) return undefined;
-    const url = this.storage.toIpfsHash();
-    return "https://minanft.io/nft/i" + url;
+    return "https://minanft.io/nft/i" + this.storage.toIpfsHash();
   }
 
   /**

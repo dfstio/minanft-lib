@@ -11,6 +11,7 @@ const names = [
   "ZERO",
   "BLOCK",
   "mDNS",
+  "MDNS",
   "MinaDNS",
   "minaDNS",
   "MINADNS",

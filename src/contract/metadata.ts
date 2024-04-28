@@ -7,6 +7,7 @@ import {
   MerkleMapWitness,
   Provable,
   Encoding,
+  Bool,
 } from "o1js";
 /**
  * Metadata is the metadata of the NFT written to the Merkle Map
@@ -67,6 +68,12 @@ class Storage extends Struct({
     return new Storage({ hashString: [Field(0), Field(0)] });
   }
 
+  isEmpty(): Bool {
+    return this.hashString[0]
+      .equals(Field(0))
+      .and(this.hashString[1].equals(Field(0)));
+  }
+
   static assertEquals(a: Storage, b: Storage) {
     a.hashString[0].assertEquals(b.hashString[0]);
     a.hashString[1].assertEquals(b.hashString[1]);
@@ -83,6 +90,22 @@ class Storage extends Struct({
     if (hash.startsWith("i:")) {
       return hash.substring(2);
     } else throw new Error("Invalid IPFS hash");
+  }
+
+  toString(): string {
+    if (this.isEmpty().toBoolean()) return "";
+    else return Encoding.stringFromFields(this.hashString);
+  }
+
+  static fromString(storage: string) {
+    if (
+      storage.startsWith("i:") === false &&
+      storage.startsWith("a:") === false
+    )
+      throw new Error("Invalid storage string");
+    const fields = Encoding.stringToFields(storage);
+    if (fields.length !== 2) throw new Error("Invalid storage string");
+    return new Storage({ hashString: [fields[0], fields[1]] });
   }
 }
 
