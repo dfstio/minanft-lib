@@ -10,7 +10,7 @@ import { MinaNFTMetadataUpdateProof } from "../src/contract/update";
 import { Devnet, Storage } from "../src";
 
 const includeFiles = false;
-const includeImage = false;
+const includeImage = true;
 const pinataJWT = PINATA_JWT;
 
 const address = PrivateKey.random().toPublicKey();
@@ -27,10 +27,6 @@ let uri: string | undefined = undefined;
 describe(`Rollup NFT proofs`, () => {
   it(`should mint Rollup NFT`, async () => {
     nft.update({ key: "name", value: `@rolluptest` });
-    nft.updateText({
-      key: `address`,
-      text: "B62qrjWrAaXV65CZgpfhLdFynbFdyj851cWZPCPvF92mF3ohGDbNAME",
-    });
     nft.updateText({
       key: `description`,
       text: "This is my long description of the Rollup NFT. Can be of any length, supports markdown.",
@@ -87,7 +83,7 @@ describe(`Rollup NFT proofs`, () => {
     const url = nft.getURL();
     console.log(`Rollup NFT url:`, url);
     uri = nft.storage?.toIpfsHash();
-    console.log(`Rollup NFT uri:`, uri);
+    console.log(`Rollup NFT uri:`, "https://gateway.pinata.cloud/ipfs/" + uri);
     expect(uri).toBeDefined();
   });
 

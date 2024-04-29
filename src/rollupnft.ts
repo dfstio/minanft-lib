@@ -409,6 +409,7 @@ export class RollupNFT extends BaseMinaNFT {
     await file.sha3_512();
     console.timeEnd("Calculated SHA-3 512");
     const fileData: FileData = await file.data();
+    //console.log("Image data:", fileData);
     this.updateFileData({
       key: "image",
       type: "image",
