@@ -508,65 +508,85 @@ export class RollupNFT extends BaseMinaNFT {
   ): Promise<RollupNFTCommitData | undefined> {
     const { pinataJWT, arweaveKey, generateProofData } = commitData;
 
-    if (this.updates.length === 0) {
-      console.error("No updates to commit");
-      return undefined;
-    }
+    if (this.updates.length !== 0) {
+      const transactions = [];
+      console.log("Creating transactions...");
+      for (const update of this.updates) {
+        const state: MetadataTransition = MetadataTransition.create(update);
+        transactions.push({ state, update });
+      }
 
-    const transactions = [];
-    for (const update of this.updates) {
-      const state: MetadataTransition = MetadataTransition.create(update);
-      transactions.push({ state, update });
-    }
+      console.log("Merging states...");
+      let mergedState = transactions[0].state;
+      for (let i = 1; i < transactions.length; i++) {
+        const state: MetadataTransition = MetadataTransition.merge(
+          mergedState,
+          transactions[i].state
+        );
+        mergedState = state;
+      }
 
-    //console.log("Merging states...");
-    let mergedState = transactions[0].state;
-    for (let i = 1; i < transactions.length; i++) {
-      const state: MetadataTransition = MetadataTransition.merge(
-        mergedState,
-        transactions[i].state
+      if (
+        this.isSomeMetadata &&
+        (this.metadataRoot.data.toJSON() !==
+          mergedState.oldRoot.data.toJSON() ||
+          this.metadataRoot.kind.toJSON() !== mergedState.oldRoot.kind.toJSON())
+      )
+        throw new Error("Metadata old root data mismatch");
+
+      this.metadataRoot = mergedState.newRoot;
+
+      const storage = await this.pinToStorage(pinataJWT, arweaveKey);
+      if (storage === undefined) {
+        throw new Error("Storage error");
+      }
+      this.storage = storage.hash;
+
+      if (generateProofData !== true) return undefined;
+
+      const update = new RollupUpdate({
+        oldRoot: mergedState.oldRoot,
+        newRoot: mergedState.newRoot,
+        storage: this.storage,
+      });
+
+      const transactionsStr: string[] = transactions.map((t) =>
+        JSON.stringify({
+          state: serializeFields(MetadataTransition.toFields(t.state)),
+          update: serializeFields(MetadataUpdate.toFields(t.update)),
+        })
       );
-      mergedState = state;
+      const updateStr: string = JSON.stringify({
+        update: serializeFields(RollupUpdate.toFields(update)),
+      });
+
+      this.isSomeMetadata = true;
+
+      return {
+        update: updateStr,
+        transactions: transactionsStr,
+      };
+    } else {
+      const storage = await this.pinToStorage(pinataJWT, arweaveKey);
+      if (storage === undefined) {
+        throw new Error("Storage error");
+      }
+      this.storage = storage.hash;
+      if (generateProofData !== true) return undefined;
+
+      const update = new RollupUpdate({
+        oldRoot: this.metadataRoot,
+        newRoot: this.metadataRoot,
+        storage: this.storage,
+      });
+      const updateStr: string = JSON.stringify({
+        update: serializeFields(RollupUpdate.toFields(update)),
+      });
+      return {
+        update: updateStr,
+        transactions: [],
+      };
     }
-
-    if (
-      this.isSomeMetadata &&
-      (this.metadataRoot.data.toJSON() !== mergedState.oldRoot.data.toJSON() ||
-        this.metadataRoot.kind.toJSON() !== mergedState.oldRoot.kind.toJSON())
-    )
-      throw new Error("Metadata old root data mismatch");
-
-    this.metadataRoot = mergedState.newRoot;
-    const storage = await this.pinToStorage(pinataJWT, arweaveKey);
-    if (storage === undefined) {
-      throw new Error("Storage error");
-    }
-    this.storage = storage.hash;
-
-    if (!generateProofData) return undefined;
-
-    const update = new RollupUpdate({
-      oldRoot: mergedState.oldRoot,
-      newRoot: mergedState.newRoot,
-      storage: this.storage,
-    });
-
-    const transactionsStr: string[] = transactions.map((t) =>
-      JSON.stringify({
-        state: serializeFields(MetadataTransition.toFields(t.state)),
-        update: serializeFields(MetadataUpdate.toFields(t.update)),
-      })
-    );
-    const updateStr: string = JSON.stringify({
-      update: serializeFields(RollupUpdate.toFields(update)),
-    });
-
-    this.isSomeMetadata = true;
-
-    return {
-      update: updateStr,
-      transactions: transactionsStr,
-    };
   }
 
   public getURL(): string | undefined {
