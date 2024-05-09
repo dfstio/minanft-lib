@@ -476,10 +476,12 @@ class MinaNFT extends BaseMinaNFT {
    * @param increaseVersion increase version by one
    * @returns JSON object
    */
-  public toJSON(params: {
-    increaseVersion?: boolean;
-    includePrivateData?: boolean;
-  }): object {
+  public toJSON(
+    params: {
+      increaseVersion?: boolean;
+      includePrivateData?: boolean;
+    } = {}
+  ): object {
     const increaseVersion: boolean = params.increaseVersion ?? false;
     const includePrivateData: boolean = params.includePrivateData ?? false;
     let description: string | undefined = undefined;

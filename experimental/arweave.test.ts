@@ -38,7 +38,7 @@ describe("Arewave", () => {
     console.log("Balance:", balance);
     const ar = arweave.ar.winstonToAr(balance);
     console.log("Ar balance:", ar);
-    console.log("Ar balance change: USD", 1 - parseFloat(ar));
+    console.log("Ar balance change: USD", 0.498 - parseFloat(ar));
     const transactionId = await arweave.wallets.getLastTransactionID(address);
     console.log("transactionId", transactionId);
     const transaction = await arweave.createTransaction(

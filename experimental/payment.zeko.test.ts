@@ -29,7 +29,7 @@ import { initBlockchain, sleep } from "../src/mina";
 import { blockchain } from "../src/networks";
 import { DEPLOYER, GASTANKS } from "../env.json";
 
-const chain: blockchain = "devnet";
+const chain: blockchain = "zeko";
 const useLocalBlockchain = false;
 const isZeko = false;
 type keypair = { publicKey: PublicKey; privateKey: PrivateKey };
@@ -388,20 +388,23 @@ describe("Payment", () => {
         proofsEnabled: true,
       });
       Mina.setActiveInstance(local);
-      deployer = local.testAccounts[0];
+      /*
+      deployer = local.testAccounts[0].key;
       owner1 = local.testAccounts[1];
       owner2 = local.testAccounts[2];
       owner3 = local.testAccounts[3];
       owner4 = local.testAccounts[4];
+      */
     } else {
       await initBlockchain(chain);
-      deployer = key(DEPLOYER);
+      deployer = key(GASTANKS[4]);
       owner1 = key(GASTANKS[0]);
       owner2 = key(GASTANKS[1]);
       owner3 = key(GASTANKS[2]);
       owner4 = key(GASTANKS[3]);
     }
-
+    console.log("chain", chain);
+    console.log("Deployer", deployer.publicKey.toBase58());
     owner = owner1;
     sender = deployer.publicKey;
     console.log("Sender balance is", await accountBalanceMina(sender));
@@ -856,7 +859,7 @@ async function accountBalanceMina(address: PublicKey): Promise<number> {
   return Number((await accountBalance(address)).toBigInt()) / 1e9;
 }
 
-async function sendTx(tx: Transaction, description?: string) {
+async function sendTx(tx: any, description?: string) {
   let txSent: Mina.PendingTransaction | undefined;
   try {
     txSent = await tx.send();

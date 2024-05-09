@@ -29,7 +29,7 @@ beforeAll(async () => {
   if (deployer === undefined) return;
 });
 
-describe.skip(`MinaNFT contract`, () => {
+describe(`MinaNFT mint with arweave`, () => {
   it(`should compile contracts`, async () => {
     MinaNFT.setCacheFolder("./cache");
     console.log(`Compiling...`);
