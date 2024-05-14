@@ -226,7 +226,6 @@ class MinaNFTNameServiceContract extends TokenContract {
     escrow2: PublicKey,
     escrow3: PublicKey
   ) {
-    // TODO: Return back after bug resolution https://github.com/o1-labs/o1js/issues/1245
     this.isNFT(address);
     const tokenId = this.deriveTokenId();
     const nft = new MinaNFTContract(address, tokenId);

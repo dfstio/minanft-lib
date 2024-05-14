@@ -692,8 +692,10 @@ export class RollupNFT extends BaseMinaNFT {
         data: this.toJSON({
           includePrivateData: false,
         }),
-        name: "rollup-nft.json",
+        name: (this.name ? this.name + "-" : "") + "rollup-nft.json",
         keyvalues: {
+          name: this.name,
+          address: this.address?.toBase58(),
           project: "MinaNFT",
           type: "metadata",
           nftType: "RollupNFT",

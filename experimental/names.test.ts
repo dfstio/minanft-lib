@@ -15,6 +15,7 @@ const names = [
   "MinaDNS",
   "minaDNS",
   "MINADNS",
+  "ADD",
 ]; //"NFT",
 const lNames = ["minanft", "socialcap", "staketab", "mario", "worker", "cloud"];
 

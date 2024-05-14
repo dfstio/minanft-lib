@@ -15,9 +15,9 @@ import { Memory, sleep } from "./mina";
 import { fetchMinaAccount } from "./fetch";
 
 class RedactedMinaNFT extends BaseMinaNFT {
-  nft: MinaNFT;
+  nft: BaseMinaNFT;
 
-  constructor(nft: MinaNFT) {
+  constructor(nft: BaseMinaNFT) {
     super();
     this.nft = nft;
   }

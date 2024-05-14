@@ -59,7 +59,9 @@ async function initBlockchain(
     }
   } else if (instance === "zeko") {
     initBlockchainMina("zeko");
-    deployer = PrivateKey.fromBase58(DEPLOYER);
+    deployer = PrivateKey.fromBase58(
+      "EKE6vwZjfG9wHhaaPDvq4GuZABVsyzqA8fHVGK2QdYsoNHb78mYF"
+    );
     for (let i = 0; i < deployersNumber; i++) {
       const privateKey = PrivateKey.fromBase58(DEPLOYERS[i]);
       deployers.push(privateKey);

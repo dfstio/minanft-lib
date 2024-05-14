@@ -82,16 +82,14 @@ class MetadataTransition extends Struct({
   newRoot: Metadata,
 }) {
   static create(update: MetadataUpdate) {
-    // TODO: remove comments from key validation after https://github.com/o1-labs/o1js/issues/1552
-
     const [dataWitnessRootBefore, dataWitnessKey] =
       update.witness.data.computeRootAndKey(update.oldValue.data);
     update.oldRoot.data.assertEquals(dataWitnessRootBefore);
-    //dataWitnessKey.assertEquals(update.key);
+    dataWitnessKey.assertEquals(update.key);
     const [kindWitnessRootBefore, kindWitnessKey] =
       update.witness.kind.computeRootAndKey(update.oldValue.kind);
     update.oldRoot.kind.assertEquals(kindWitnessRootBefore);
-    //kindWitnessKey.assertEquals(update.key);
+    kindWitnessKey.assertEquals(update.key);
 
     const [dataWitnessRootAfter, _] = update.witness.data.computeRootAndKey(
       update.newValue.data
