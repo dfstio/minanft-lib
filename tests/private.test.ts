@@ -121,7 +121,11 @@ describe(`MinaNFT contract`, () => {
     expect(await MinaNFT.wait(tx)).toBe(true);
     expect(await nft.checkState()).toBe(true);
     nftPublicKey = nft.address;
-    metadataURI = JSON.stringify(nft.toJSON(), null, 2);
+    metadataURI = JSON.stringify(
+      nft.toJSON({ includePrivateData: true }),
+      null,
+      2
+    );
     console.log(`metadataURI:`, metadataURI);
   });
 

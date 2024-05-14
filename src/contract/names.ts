@@ -243,9 +243,7 @@ class MinaNFTNameServiceContract extends TokenContract {
   /**
    * Approve setting of the new escrow
    * @param address address of the NFT
-   * @param data {@link EscrowApproval} - data for the approval
-   * @param signature signature of the owner
-   * @param owner owner's public key
+   * @param proof {@link EscrowTransferProof} - escrow proof
    */
   @method async approveEscrow(address: PublicKey, proof: EscrowTransferProof) {
     this.isNFT(address);

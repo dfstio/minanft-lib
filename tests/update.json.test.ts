@@ -131,7 +131,7 @@ describe(`MinaNFT contract - load private metadata from json`, () => {
       owners.push(owner);
       nfts.push(nft);
       nftAddresses.push(nft.address);
-      metadata.push(JSON.stringify(nft.toJSON()));
+      metadata.push(JSON.stringify(nft.toJSON({ includePrivateData: true })));
     }
     Memory.info(`minted`);
   });
@@ -200,7 +200,9 @@ describe(`MinaNFT contract - load private metadata from json`, () => {
           if (tx === undefined) return;
           txs[i] = tx;
           nfts[i] = nft;
-          metadata[i] = JSON.stringify(nft.toJSON());
+          metadata[i] = JSON.stringify(
+            nft.toJSON({ includePrivateData: true })
+          );
         } catch (e) {
           console.log(`Commit failed`, e);
           Memory.info(`Commit failed`);

@@ -103,10 +103,14 @@ describe(`MinaNFT contract`, () => {
 
     */
 
-    metadataURI = nft.exportToString({
-      increaseVersion: true,
-      includePrivateData: true,
-    });
+    metadataURI = JSON.stringify(
+      nft.toJSON({
+        increaseVersion: true,
+        includePrivateData: true,
+      }),
+      null,
+      2
+    );
 
     console.log(`metadataURI:`, metadataURI);
     const tx = await nft.mint({

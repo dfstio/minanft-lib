@@ -86,10 +86,14 @@ describe.skip(`MinaNFT mint using api`, () => {
         pinataJWT,
       });
 
-    uri = nft.exportToString({
-      increaseVersion: true,
-      includePrivateData: false,
-    });
+    uri = JSON.stringify(
+      nft.toJSON({
+        increaseVersion: true,
+        includePrivateData: false,
+      }),
+      null,
+      2
+    );
     Memory.info(`created`);
   });
 
@@ -145,10 +149,14 @@ describe.skip(`MinaNFT mint using api`, () => {
     expect(nftPrivateKey).toBeDefined();
     if (nftPrivateKey === undefined) return;
     const minanft = new api(JWT);
-    const uri = nft.exportToString({
-      increaseVersion: true,
-      includePrivateData: false,
-    });
+    const uri = JSON.stringify(
+      nft.toJSON({
+        increaseVersion: true,
+        includePrivateData: false,
+      }),
+      null,
+      2
+    );
     //console.log("uri", uri);
 
     const reserved = await minanft.reserveName({

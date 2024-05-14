@@ -122,9 +122,7 @@ class MinaNFTContract extends SmartContract {
 
   /**
    * Approve setting of the new escrow
-   * @param data {@link EscrowApproval} - data for the approval
-   * @param signature signature of the owner
-   * @param owner owner's public key
+   * @param proof {@link EscrowTransferProof} - escrow proof
    */
   @method async approveEscrow(proof: EscrowTransferProof) {
     proof.verify();
