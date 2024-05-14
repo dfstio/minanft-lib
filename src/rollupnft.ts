@@ -55,17 +55,12 @@ export class RollupUpdate extends Struct({
  * RollupNFT are the NFT used in the Rollup
  * TODO: change parameters
  * @property name Name of the NFT
- * @property creator Creator of the NFT
  * @property storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
- * @property owner Owner of the NFT - Poseidon hash of owner's public key
- * @property escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
- * @property version Version of the NFT, increases by one with the changing of the metadata or owner
- * @property isMinted True if the NFT is minted
- * @property address Public key of the deployed NFT zkApp
- * @property tokenId Token ID of the NFT Name Service
- * @property nameService Public key of the NFT Name Service
+ * @property address Public key of the NFT
  * @property updates Array of the metadata updates
  * @property metadataRoot Root of the Merkle Map of the metadata
+ * @property isSomeMetadata Boolean if there is some metadata
+ * @property external_url External URL of the NFT
  */
 export class RollupNFT extends BaseMinaNFT {
   storage: Storage | undefined;
@@ -80,12 +75,10 @@ export class RollupNFT extends BaseMinaNFT {
    * Create MinaNFT object
    * @param params arguments
    * @param params.name Name of NFT
-   * @param params.address Public key of the deployed NFT zkApp
-   * @param params.creator Creator of the NFT
+   * @param params.address Public key of the NFT
+   * @param params.root Root of the Merkle Map of the metadata
    * @param params.storage Storage of the NFT - IPFS (i:...) or Arweave (a:...) hash string
-   * @param params.owner Owner of the NFT - Poseidon hash of owner's public key
-   * @param params.escrow Escrow of the NFT - Poseidon hash of three escrow's public keys
-   * @param params.nameService Public key of the NFT Name Service
+   * @param params.external_url External URL of the NFT
    */
   constructor(
     params: {
@@ -598,8 +591,9 @@ export class RollupNFT extends BaseMinaNFT {
    * Commit updates of the MinaNFT to blockchain using prepared data
    * Generates recursive proofs for all updates,
    * than verify the proof locally and send the transaction to the blockchain
-   *
-   * @param generateProof {@link MinaNFTCommit} commit data
+   * @param preparedCommitData {@link RollupNFTCommitData} commit data
+   * @param verbose verbose mode
+   * @returns proof {@link MinaNFTMetadataUpdateProof}
    */
   public static async generateProof(
     preparedCommitData: RollupNFTCommitData,

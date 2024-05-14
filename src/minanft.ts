@@ -473,7 +473,9 @@ class MinaNFT extends BaseMinaNFT {
 
   /**
    * Converts to JSON
-   * @param increaseVersion increase version by one
+   * @param params parameters
+   * @param params.increaseVersion increase version by one
+   * @param params.includePrivateData include private data
    * @returns JSON object
    */
   public toJSON(

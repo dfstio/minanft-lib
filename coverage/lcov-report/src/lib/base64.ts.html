@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/fetch.ts</title>
+    <title>Code coverage report for src/lib/base64.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> fetch.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/lib</a> base64.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">35.13% </span>
+                <span class="strong">84.37% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/37</span>
+                <span class='fraction'>54/64</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/3</span>
+                <span class='fraction'>6/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.14% </span>
+                <span class="strong">88.46% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/35</span>
+                <span class='fraction'>46/52</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -156,194 +156,191 @@
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
 <a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">27x</span>
+<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">113490x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">27x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">27x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">209x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">113490x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">27x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15649x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">27x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
-  PublicKey,
-  Field,
-  Mina,
-  fetchAccount,
-  checkZkappTransaction,
-} from "o1js";
-import { sleep } from "./mina";
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-yes">163961x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-yes">163961x</span>
+<span class="cline-any cline-yes">163961x</span>
+<span class="cline-any cline-yes">163961x</span>
+<span class="cline-any cline-yes">163961x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15649x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-yes">55664x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5193x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Field } from "o1js";
 &nbsp;
-export async function fetchMinaAccount(params: {
-  publicKey: string | PublicKey;
-  tokenId?: string | Field | undefined;
-  force?: boolean;
-}) {
-  const { publicKey, tokenId, force } = params;
-  const timeout = 1000 * 60 * 10; // 10 minutes
-  const startTime = Date.now();
-  let result = { account: undefined };
-  while (Date.now() - startTime &lt; timeout) {
-    try {
-      const result = await fetchAccount({
-        publicKey,
-        tokenId,
-      });
-      return result;
-      /*
-      if (result.account !== undefined) return result;
-      if (force !== true) return result;
-      console.log(
-        "Cannot fetch account",
-        typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
-        result
-      );
-      */
-    } catch (error: any) {
-<span class="cstat-no" title="statement not covered" >      if (force === true) <span class="cstat-no" title="statement not covered" >console.log("Error in fetchAccount:", error);</span></span>
-      else {
-<span class="cstat-no" title="statement not covered" >        console.log(</span>
-          "fetchMinaAccount error",
-          typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
-          tokenId?.toString(),
-          force,
-          error
-        );
-<span class="cstat-no" title="statement not covered" >        return result;</span>
-      }
-    }
-<span class="cstat-no" title="statement not covered" >    await sleep(1000 * 10);</span>
-  }
-<span class="cstat-no" title="statement not covered" >  console.log(</span>
-    "fetchMinaAccount timeout",
-    typeof publicKey === "string" ? publicKey : publicKey.toBase58(),
-    tokenId?.toString(),
-    force
-  );
-<span class="cstat-no" title="statement not covered" >  return result;</span>
+// URL friendly base64 encoding
+const TABLE =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+&nbsp;
+export function fieldToBase64(field: Field): string {
+  const digits = toBase(field.toBigInt(), BigInt(64));
+  //console.log("digits:", digits);
+  const str = digits.map((x) =&gt; TABLE[Number(x)]).join("");
+  //console.log("str:", str);
+  return str;
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >fetchMinaActions(</span>
-  publicKey: PublicKey,
-  fromActionState: Field,
-  endActionState?: Field
-) {
-  const timeout = <span class="cstat-no" title="statement not covered" >1000 * 60 * 600;</span> // 10 hours
-  const startTime = <span class="cstat-no" title="statement not covered" >Date.now();</span>
-<span class="cstat-no" title="statement not covered" >  while (Date.now() - startTime &lt; timeout) {</span>
-<span class="cstat-no" title="statement not covered" >    try {</span>
-      let actions = <span class="cstat-no" title="statement not covered" >await Mina.fetchActions(publicKey, {</span>
-        fromActionState,
-        endActionState,
-      });
-<span class="cstat-no" title="statement not covered" >      if (Array.isArray(actions)) <span class="cstat-no" title="statement not covered" >return actions;</span></span>
-      else <span class="cstat-no" title="statement not covered" >console.log("Cannot fetch actions - wrong format");</span>
-    } catch (error: any) {
-<span class="cstat-no" title="statement not covered" >      console.log(</span>
-        "Error in fetchMinaActions",
-        error.toString().substring(0, 300)
-      );
-    }
-<span class="cstat-no" title="statement not covered" >    await sleep(1000 * 60 * 2);</span>
-  }
-<span class="cstat-no" title="statement not covered" >  console.log("Timeout in fetchMinaActions");</span>
-<span class="cstat-no" title="statement not covered" >  return undefined;</span>
+export function <span class="fstat-no" title="function not covered" >bigintToBase64(</span>value: bigint): string {
+  const digits = <span class="cstat-no" title="statement not covered" >toBase(value, BigInt(64));</span>
+  //console.log("digits:", digits);
+  const str = <span class="cstat-no" title="statement not covered" >digits.map(<span class="fstat-no" title="function not covered" >(x</span>) =&gt; <span class="cstat-no" title="statement not covered" >TABLE[Number(x)])</span>.join("");</span>
+  //console.log("str:", str);
+<span class="cstat-no" title="statement not covered" >  return str;</span>
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >checkMinaZkappTransaction(</span>hash: string) {
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const result = <span class="cstat-no" title="statement not covered" >await checkZkappTransaction(hash);</span>
-<span class="cstat-no" title="statement not covered" >    return result;</span>
-  } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error("Error in checkZkappTransaction:", error);</span>
-<span class="cstat-no" title="statement not covered" >    return { success: false };</span>
+export function fieldFromBase64(str: string): Field {
+  const base64Digits = str.split("").map((x) =&gt; BigInt(TABLE.indexOf(x)));
+  const x = fromBase(base64Digits, BigInt(64));
+  return Field(x);
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >bigintFromBase64(</span>str: string): bigint {
+  const base64Digits = <span class="cstat-no" title="statement not covered" >str.split("").map(<span class="fstat-no" title="function not covered" >(x</span>) =&gt; <span class="cstat-no" title="statement not covered" >BigInt(TABLE.indexOf(x)))</span>;</span>
+  const x = <span class="cstat-no" title="statement not covered" >fromBase(base64Digits, BigInt(64));</span>
+<span class="cstat-no" title="statement not covered" >  return x;</span>
+}
+&nbsp;
+function fromBase(digits: bigint[], base: bigint) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (base &lt;= BigInt(0)) <span class="cstat-no" title="statement not covered" >throw Error("fromBase: base must be positive");</span>
+  // compute powers base, base^2, base^4, ..., base^(2^k)
+  // with largest k s.t. n = 2^k &lt; digits.length
+  let basePowers = [];
+  for (
+    let power = base, n = 1;
+    n &lt; digits.length;
+    power **= BigInt(2), n *= 2
+  ) {
+    basePowers.push(power);
   }
+  let k = basePowers.length;
+  // pad digits array with zeros s.t. digits.length === 2^k
+  digits = digits.concat(Array(2 ** k - digits.length).fill(0n));
+  // accumulate [x0, x1, x2, x3, ...] -&gt; [x0 + base*x1, x2 + base*x3, ...] -&gt; [x0 + base*x1 + base^2*(x2 + base*x3), ...] -&gt; ...
+  // until we end up with a single element
+  for (let i = 0; i &lt; k; i++) {
+    let newDigits = Array(digits.length &gt;&gt; 1);
+    let basePower = basePowers[i];
+    for (let j = 0; j &lt; newDigits.length; j++) {
+      newDigits[j] = digits[2 * j] + basePower * digits[2 * j + 1];
+    }
+    digits = newDigits;
+  }
+  console.assert(digits.length === 1);
+  let [digit] = digits;
+  return digit;
+}
+&nbsp;
+function toBase(x: bigint, base: bigint) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (base &lt;= 0n) <span class="cstat-no" title="statement not covered" >throw Error("toBase: base must be positive");</span>
+  // compute powers base, base^2, base^4, ..., base^(2^k)
+  // with largest k s.t. base^(2^k) &lt; x
+  let basePowers = [];
+  for (let power = base; power &lt;= x; power **= 2n) {
+    basePowers.push(power);
+  }
+  let digits = [x]; // single digit w.r.t base^(2^(k+1))
+  // successively split digits w.r.t. base^(2^j) into digits w.r.t. base^(2^(j-1))
+  // until we arrive at digits w.r.t. base
+  let k = basePowers.length;
+  for (let i = 0; i &lt; k; i++) {
+    let newDigits = Array(2 * digits.length);
+    let basePower = basePowers[k - 1 - i];
+    for (let j = 0; j &lt; digits.length; j++) {
+      let x = digits[j];
+      let high = x / basePower;
+      newDigits[2 * j + 1] = high;
+      newDigits[2 * j] = x - high * basePower;
+    }
+    digits = newDigits;
+  }
+  // pop "leading" zero digits
+  while (digits[digits.length - 1] === 0n) {
+    digits.pop();
+  }
+  return digits;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -354,14 +351,14 @@ export async function <span class="fstat-no" title="function not covered" >check
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2024-05-14T16:36:52.401Z
             </div>
-        <script src="../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../sorter.js"></script>
-        <script src="../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
