@@ -76,6 +76,9 @@ const Zeko: MinaNetwork = {
   mina: ["https://devnet.zeko.io/graphql"], //["http://sequencer-zeko-dev.dcspark.io/graphql"], //
   archive: [],
   chainId: "zeko",
+  name: "Zeko",
+  explorerAccountUrl: "https://zekoscan.io/devnet/account/",
+  explorerTransactionUrl: "https://zekoscan.io/devnet/tx/",
 };
 
 const TestWorld2: MinaNetwork = {

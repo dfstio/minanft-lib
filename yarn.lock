@@ -1283,12 +1283,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.8":
-  version: 20.12.8
-  resolution: "@types/node@npm:20.12.8"
+"@types/node@npm:^20.12.11":
+  version: 20.12.11
+  resolution: "@types/node@npm:20.12.11"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/840002d20654e38a9af8cdffa215598fdb28ac4f96c5701ed672ec365ed6ccc66da299edddaa409baf13cd71bbf1128901f633b5e44e070fc236e26415805b78
+  checksum: 10c0/efaa7b08c50ba6e6982ac7d531ba08d5935539ba76e954807df1ff9382a319ead7e003ccaca5ad7cf33ecf53f212507f7c1f2794bd2ff52df6365fef21f6e1fb
   languageName: node
   linkType: hard
 
@@ -1443,15 +1443,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"arweave@npm:^1.15.0":
-  version: 1.15.0
-  resolution: "arweave@npm:1.15.0"
+"arweave@npm:^1.15.1":
+  version: 1.15.1
+  resolution: "arweave@npm:1.15.1"
   dependencies:
     arconnect: "npm:^0.4.2"
     asn1.js: "npm:^5.4.1"
     base64-js: "npm:^1.5.1"
     bignumber.js: "npm:^9.0.2"
-  checksum: 10c0/a269f5f1dc81de4eb5e27f7c2606499aa6e807f2292ee17d1c1a8935d5d2e1aef350184017f188c85744ab06a3aa4cdf489d3079919fb3b4ebac314d342bc6f6
+  checksum: 10c0/2af04ee2071d3aa95f4ebf11463542ea18bc5eab810025a7b2ce60a6175ff7859f1447a925234e8bee31631f2fd2d67af80826909f65bc793d72dcb080cab26f
   languageName: node
   linkType: hard
 
@@ -3348,8 +3348,8 @@ __metadata:
     "@jest/globals": "npm:^29.7.0"
     "@types/jest": "npm:^29.5.12"
     "@types/mime": "npm:^3.0.4"
-    "@types/node": "npm:^20.12.8"
-    arweave: "npm:^1.15.0"
+    "@types/node": "npm:^20.12.11"
+    arweave: "npm:^1.15.1"
     axios: "npm:^1.6.8"
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"

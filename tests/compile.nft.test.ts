@@ -25,7 +25,7 @@ describe("Compile contracts", () => {
     expect(MinaNFT.verificationKey).toBeDefined();
     // also in index.ts
     expect(MinaNFT.verificationKey?.hash.toJSON()).toBe(
-      "18205871586586083856035352295587958829477352642617256016301402297372039950101"
+      "10063414310819081074150032663721926544337121483850004965294429026545856295819"
     );
   });
 
