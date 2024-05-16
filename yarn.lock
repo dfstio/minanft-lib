@@ -3355,7 +3355,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jimp: "npm:^0.22.12"
     mime: "npm:^3.0.0"
-    o1js: "npm:^1.1.0"
+    o1js: "npm:^1.2.0"
     ts-jest: "npm:^29.1.2"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -3575,9 +3575,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "o1js@npm:1.1.0"
+"o1js@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "o1js@npm:1.2.0"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -3587,7 +3587,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 10c0/cac9302989290686e03231dec7e2879715dc593722296726f5c802a18180b8fce75b5fa23c3c651d89b6c1f3fa43275a3e9043f84d6871665942a3e54877c064
+  checksum: 10c0/facde84ceb1cde5871676503672ffb99fb1ea4f5c3ae678a5de2b618955291fe41d0a9197f3887670de523297cba6d86a1e8de39707f843e0c4cb426b647acba
   languageName: node
   linkType: hard
 
