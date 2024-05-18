@@ -3,35 +3,40 @@ import { sleep } from "../mina";
 
 import config from "../config";
 import { MinaNFTCommitData } from "../update";
+import { blockchain } from "../networks";
+import { PublicKey } from "o1js";
 const { MINNFTAPIAUTH, MINNFTAPI } = config;
 
 /**
-* API class for interacting with the serverless api
-* @property jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
-* @property endpoint The endpoint of the serverless api
-*/
+ * API class for interacting with the serverless api
+ * @property jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
+ * @property endpoint The endpoint of the serverless api
+ */
 export class api {
   jwt: string;
   endpoint: string;
 
   /**
-    * Constructor for the API class
-    * @param jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
-    */
+   * Constructor for the API class
+   * @param jwt The jwt token for authentication, get it at https://t.me/minanft_bot?start=auth
+   */
   constructor(jwt: string) {
     this.jwt = jwt;
     this.endpoint = MINNFTAPI;
   }
 
   /**
-    * Gets the address (publicKey) of the NFT using serverless api call
-    * @param name The name of the NFT
-    */
+   * Gets the address (publicKey) of the NFT using serverless api call
+   * @param name The name of the NFT
+   */
   public async lookupName(name: string): Promise<{
     success: boolean;
     error?: string;
     address?: string;
     reason?: string;
+    found?: boolean;
+    chain?: string;
+    contract?: string;
   }> {
     const result = await this.apiHub("lookupName", {
       transactions: [],
@@ -40,21 +45,46 @@ export class api {
       task: "lookupName",
       args: [name],
     });
-    return {
-      success: result.success,
-      error: result.error,
-      address: result.data === "error" ? undefined : result.data,
-      reason: result.data === "error" ? "not found" : undefined,
-    };
+    try {
+      const data = JSON.parse(result.data);
+      const { found, name, publicKey, chain, contract } = data;
+      if (found === true)
+        return {
+          success: result.success,
+          error: result.error,
+          address: publicKey,
+          found: found,
+          chain: chain,
+          contract: contract,
+        };
+      else
+        return {
+          success: result.success,
+          error: result.error,
+          reason: "not found",
+          found: found,
+        };
+    } catch (error) {
+      return {
+        success: result.success,
+        error: error?.toString() ?? result.error,
+        reason: result.error,
+      };
+    }
   }
 
   /**
-    * Reserves the name of the NFT using serverless api call
-    * @param data The data for the reserveName call
-    * @param data.name The name of the NFT
-    * @param data.publicKey The public key of the NFT
-    */
-  public async reserveName(data: { name: string; publicKey: string }): Promise<{
+   * Reserves the name of the NFT using serverless api call
+   * @param data The data for the reserveName call
+   * @param data.name The name of the NFT
+   * @param data.publicKey The public key of the NFT
+   */
+  public async reserveName(data: {
+    name: string;
+    publicKey: string;
+    chain: blockchain;
+    contract: string;
+  }): Promise<{
     success: boolean;
     error?: string;
     price: object;
@@ -67,7 +97,7 @@ export class api {
       developer: "@dfst",
       name: "reserveName",
       task: "reserveName",
-      args: [data.name, data.publicKey],
+      args: [data.name, data.publicKey, data.chain, data.contract],
     });
     const reserved =
       result.data === undefined ? { success: false } : result.data;
@@ -83,12 +113,12 @@ export class api {
   }
 
   /**
-    * Index the NFT using serverless api call
-    * The NFT mint transaction should be included in the block before calling this function
-    * otherwise it will fail and return isIndexed : false
-    * @param data The data for the indexName call
-    * @param data.name The name of the NFT
-    */
+   * Index the NFT using serverless api call
+   * The NFT mint transaction should be included in the block before calling this function
+   * otherwise it will fail and return isIndexed : false
+   * @param data The data for the indexName call
+   * @param data.name The name of the NFT
+   */
   public async indexName(data: { name: string }): Promise<{
     success: boolean;
     isIndexed: boolean;
@@ -182,19 +212,19 @@ export class api {
     return { success: result.success, jobId: result.data, error: result.error };
   }
 
-  /** 
-    * Starts a new job for the proof calculation using serverless api call
-    * The developer and name should correspond to the BackupPlugin of the API
-    * All other parameters should correspond to the parameters of the BackupPlugin
-    * @param data the data for the proof call
-    * @param data.transactions the transactions
-    * @param data.developer the developer
-    * @param data.name the name of the job
-    * @param data.task the task of the job
-    * @param data.args the arguments of the job
-    * @returns { success: boolean, error?: string, jobId?: string }
-    * where jonId is the jobId of the job
-    */
+  /**
+   * Starts a new job for the proof calculation using serverless api call
+   * The developer and name should correspond to the BackupPlugin of the API
+   * All other parameters should correspond to the parameters of the BackupPlugin
+   * @param data the data for the proof call
+   * @param data.transactions the transactions
+   * @param data.developer the developer
+   * @param data.name the name of the job
+   * @param data.task the task of the job
+   * @param data.args the arguments of the job
+   * @returns { success: boolean, error?: string, jobId?: string }
+   * where jonId is the jobId of the job
+   */
   public async proof(data: {
     transactions: string[];
     developer: string;
@@ -220,17 +250,17 @@ export class api {
       };
   }
 
-  /** 
-    * Gets the result of the job using serverless api call
-    * @param data the data for the jobResult call
-    * @param data.jobId the jobId of the job
-    * @returns { success: boolean, error?: string, result?: any }
-    * where result is the result of the job
-    * if the job is not finished yet, the result will be undefined
-    * if the job failed, the result will be undefined and error will be set
-    * if the job is finished, the result will be set and error will be undefined
-    * if the job is not found, the result will be undefined and error will be set
-    */
+  /**
+   * Gets the result of the job using serverless api call
+   * @param data the data for the jobResult call
+   * @param data.jobId the jobId of the job
+   * @returns { success: boolean, error?: string, result?: any }
+   * where result is the result of the job
+   * if the job is not finished yet, the result will be undefined
+   * if the job failed, the result will be undefined and error will be set
+   * if the job is finished, the result will be set and error will be undefined
+   * if the job is not found, the result will be undefined and error will be set
+   */
   public async jobResult(data: { jobId: string }): Promise<{
     success: boolean;
     error?: string;
@@ -253,10 +283,10 @@ export class api {
   }
 
   /**
-    * Gets the billing report for the jobs sent using JWT
-    * @returns { success: boolean, error?: string, result?: any }
-    * where result is the billing report
-    */
+   * Gets the billing report for the jobs sent using JWT
+   * @returns { success: boolean, error?: string, result?: any }
+   * where result is the billing report
+   */
   public async queryBilling(): Promise<{
     success: boolean;
     error?: string;
@@ -279,15 +309,15 @@ export class api {
   }
 
   /**
-    * Waits for the job to finish
-    * @param data the data for the waitForJobResult call
-    * @param data.jobId the jobId of the job
-    * @param data.maxAttempts the maximum number of attempts, default is 360 (2 hours)
-    * @param data.interval the interval between attempts, default is 20000 (20 seconds)
-    * @param data.maxErrors the maximum number of network errors, default is 10
-    * @returns { success: boolean, error?: string, result?: any }
-    * where result is the result of the job
-    */
+   * Waits for the job to finish
+   * @param data the data for the waitForJobResult call
+   * @param data.jobId the jobId of the job
+   * @param data.maxAttempts the maximum number of attempts, default is 360 (2 hours)
+   * @param data.interval the interval between attempts, default is 20000 (20 seconds)
+   * @param data.maxErrors the maximum number of network errors, default is 10
+   * @returns { success: boolean, error?: string, result?: any }
+   * where result is the result of the job
+   */
   public async waitForJobResult(data: {
     jobId: string;
     maxAttempts?: number;
@@ -342,11 +372,11 @@ export class api {
     };
   }
 
-  /** 
-    * Calls the serverless API
-    * @param command the command of the API
-    * @param data the data of the API
-    * */
+  /**
+   * Calls the serverless API
+   * @param command the command of the API
+   * @param data the data of the API
+   * */
   private async apiHub(
     command: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -378,4 +408,3 @@ export class api {
     return false;
   }
 }
-
