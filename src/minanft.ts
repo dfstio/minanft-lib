@@ -36,7 +36,7 @@ import {
 import { RedactedMinaNFTMapStateProof } from "./plugins/redactedmap";
 import { MinaNFTVerifier } from "./plugins/verifier";
 import { TextData } from "./storage/text";
-import { File, FileData } from "./storage/file";
+import { FileData } from "./storage/file";
 import { MinaNFTMapUpdate } from "./storage/map";
 import { IPFS } from "./storage/ipfs";
 import { ARWEAVE } from "./storage/arweave";
@@ -615,108 +615,6 @@ class MinaNFT extends BaseMinaNFT {
         linkedObject: data.map,
       })
     );
-  }
-
-  /**
-   * updates PrivateMetadata
-   * @param data {@link MinaNFTImageUpdate} update data
-   */
-  public async updateImage(data: MinaNFTImageUpdate): Promise<void> {
-    const file = new File(data.filename, data.fileType, data.fileMetadata);
-    if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
-      console.log("Pinning image...");
-      await file.pin({
-        pinataJWT: data.pinataJWT,
-        arweaveKey: data.arweaveKey,
-        keyvalues: { project: "MinaNFT", type: "image", nft: this.name },
-      });
-    } else if (data.IPFSHash !== undefined) {
-      file.storage = "i:" + data.IPFSHash;
-      await file.setMetadata();
-    } else if (data.ArweaveHash !== undefined) {
-      file.storage = "a:" + data.ArweaveHash;
-      await file.setMetadata();
-    }
-    if (data.calculateRoot !== false) {
-      console.log("Calculating image Merkle tree root...");
-      console.time("Image Merkle tree root calculated");
-      await file.treeData(data.calculateRoot ?? true);
-      console.timeEnd("Image Merkle tree root calculated");
-    } else await file.treeData(false);
-    console.time("Calculated SHA-3 512");
-    await file.sha3_512();
-    console.timeEnd("Calculated SHA-3 512");
-    const fileData: FileData = await file.data();
-    this.updateFileData({
-      key: "image",
-      type: "image",
-      data: fileData,
-      isPrivate: false,
-    });
-    /*
-    this.updateMetadata(
-      "image",
-      new PrivateMetadata({
-        data: fileData.root,
-        kind: MinaNFT.stringToField("image"),
-        isPrivate: false,
-        linkedObject: fileData,
-      })
-    );
-*/
-  }
-
-  /**
-   * updates PrivateMetadata
-   * @param data {@link MinaNFTFileUpdate} update data
-   */
-  public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
-    const file = new File(data.filename, data.fileType, data.fileMetadata);
-
-    if (data.IPFSHash === undefined && data.ArweaveHash === undefined) {
-      if (data.isPrivate !== true) {
-        console.log("Pinning file...");
-        await file.pin({
-          pinataJWT: data.pinataJWT,
-          arweaveKey: data.arweaveKey,
-          keyvalues: { project: "MinaNFT", type: "file", nft: this.name },
-        });
-      }
-    } else if (data.IPFSHash !== undefined) {
-      file.storage = "i:" + data.IPFSHash;
-      await file.setMetadata();
-    } else if (data.ArweaveHash !== undefined) {
-      file.storage = "a:" + data.ArweaveHash;
-      await file.setMetadata();
-    }
-    if (data.calculateRoot !== false) {
-      console.log("Calculating file Merkle tree root...");
-      console.time("File Merkle tree root calculated");
-      await file.treeData(data.calculateRoot ?? true);
-      console.timeEnd("File Merkle tree root calculated");
-    } else await file.treeData(false);
-
-    console.time("Calculated SHA-3 512");
-    await file.sha3_512();
-    console.timeEnd("Calculated SHA-3 512");
-    const fileData: FileData = await file.data();
-    this.updateFileData({
-      key: data.key,
-      type: "file",
-      data: fileData,
-      isPrivate: data.isPrivate ?? false,
-    });
-    /*
-    this.updateMetadata(
-      data.key,
-      new PrivateMetadata({
-        data: fileData.root,
-        kind: MinaNFT.stringToField("file"),
-        isPrivate: data.isPrivate ?? false,
-        linkedObject: fileData,
-      })
-    );
-*/
   }
 
   /**

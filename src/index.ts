@@ -35,6 +35,7 @@ export * from "./api/api";
 export * from "./lib/base64";
 export * from "./lib/fields";
 export * from "./rollupnft";
+export * from "./contract-v2/sign-test";
 const NAMES_ORACLE = "B62qids6rU9iqjvBV4DHxW8z67mgHFws1rPmFoqpcyRq2arYxUw6sZu";
 const MINANFT_NAME_SERVICE =
   "B62qrryunX2LzaZ1sGtqfJqzSdNdN7pVSZw8YtnxQNxrrF9Vt56bNFT";
