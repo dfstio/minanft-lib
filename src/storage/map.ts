@@ -16,7 +16,7 @@ import {
 } from "../update";
 import { MinaNFT } from "../minanft";
 import { TextData } from "./text";
-import { File, FileData } from "./file";
+import { FileData } from "./file";
 
 /**
  * MinaNFTMapUpdate is the data for the update of the metadata to be written to the NFT state
@@ -151,38 +151,6 @@ class MapData extends BaseMinaNFTObject {
         kind: MinaNFT.stringToField("map"),
         isPrivate: data.isPrivate ?? false,
         linkedObject: data.map,
-      })
-    );
-  }
-
-  /**
-   * updates PrivateMetadata
-   * @param data {@link MinaNFTFileUpdate} update data
-   */
-  public async updateFile(data: MinaNFTFileUpdate): Promise<void> {
-    const file = new File(data.filename, data.fileType, data.fileMetadata);
-    console.log("Pinning file to IPFS...");
-    await file.pin({
-      pinataJWT: data.pinataJWT,
-      arweaveKey: data.arweaveKey,
-      keyvalues: { project: "MinaNFT", type: "file", nftType: "map" },
-    });
-    console.log("Calculating file Merkle tree root...");
-    console.time("File Merkle tree root calculated");
-    await file.treeData(data.calculateRoot ?? true);
-    console.timeEnd("File Merkle tree root calculated");
-    console.time("Calculated SHA-3 512");
-    await file.sha3_512();
-    console.timeEnd("Calculated SHA-3 512");
-    const fileData: FileData = await file.data();
-
-    this.updateMetadata(
-      data.key,
-      new PrivateMetadata({
-        data: fileData.root,
-        kind: MinaNFT.stringToField("file"),
-        isPrivate: data.isPrivate ?? false,
-        linkedObject: fileData,
       })
     );
   }
