@@ -19,19 +19,14 @@ import {
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
+import { getNetworkIdHash } from "../mina";
 
-const MINT_FEE = 10_000_000_000n;
-const SELL_FEE = 1_000_000_000n;
-const SELL_WITH_KYC_FEE = 50_000_000_000n;
-const TRANSFER_FEE = 1_000_000_000n;
-const UPDATE_FEE = 1_000_000_000n;
-const wallet = PublicKey.fromBase58(
+export const SELL_FEE = 1_000_000_000n;
+export const TRANSFER_FEE = 1_000_000_000n;
+export const UPDATE_FEE = 1_000_000_000n;
+export const wallet = PublicKey.fromBase58(
   "B62qq7ecvBQZQK68dwstL27888NEKZJwNXNFjTyu3xpQcfX5UBivCU6"
 );
-
-function getNetworkIdHash(): Field {
-  return Field(123); // TODO: implement
-}
 
 export class MetadataParams extends Struct({
   metadata: Metadata,
@@ -56,13 +51,25 @@ export class TransferParams extends Struct({
 export class MintParams extends Struct({
   name: Field,
   address: PublicKey,
+  fee: UInt64,
+  feeMaster: PublicKey,
   metadataParams: MetadataParams,
   verificationKey: VerificationKey,
+  contractAddress: PublicKey,
+  network: Field,
+  signature: Signature,
+}) {}
+
+export class MintEvent extends Struct({
+  name: Field,
+  address: PublicKey,
+  metadataParams: MetadataParams,
 }) {}
 
 export class UpdateParams extends Struct({
   address: PublicKey,
   metadataParams: MetadataParams,
+  // TODO: Update proof with sideloaded verification key??
 }) {}
 
 export class NFTparams extends Struct({
@@ -84,7 +91,7 @@ export class NFTparams extends Struct({
   }
 }
 
-export class NFTContract extends SmartContract {
+export class NFTContractV2 extends SmartContract {
   @state(Field) name = State<Field>();
   @state(MetadataParams) metadataParams = State<MetadataParams>();
   @state(PublicKey) owner = State<PublicKey>();
@@ -156,9 +163,10 @@ export class NFTContract extends SmartContract {
   }
 }
 
-export class NameContract extends TokenContract {
+export class NameContractV2 extends TokenContract {
   @state(UInt64) priceLimit = State<UInt64>();
   @state(PublicKey) oracle = State<PublicKey>();
+  @state(Field) verificationKeyHash = State<Field>(); // TODO: create test with wrong verification key
 
   async deploy(args: DeployArgs) {
     super.deploy(args);
@@ -168,23 +176,75 @@ export class NameContract extends TokenContract {
     });
   }
 
+  events = {
+    mint: MintEvent,
+    update: UpdateParams,
+    sell: SellParams,
+    buy: BuyParams,
+    transfer: TransferParams,
+    oracle: PublicKey,
+    limit: UInt64,
+    verificationKey: Field,
+  };
+
   async approveBase(forest: AccountUpdateForest) {
     throw Error(
       "transfers of tokens are not allowed, change the owner instead"
     );
   }
 
-  @method async mint(params: MintParams) {
-    const { name, metadataParams, address, verificationKey } = params;
-    const owner = this.sender.getAndRequireSignature();
-    const ownerUpdate = AccountUpdate.createSigned(owner);
-    ownerUpdate.send({ to: wallet, amount: MINT_FEE });
+  @method async setOracle(oracle: PublicKey) {
+    this.oracle.set(oracle);
+    this.emitEvent("oracle", oracle);
+  }
 
-    this.internal.mint({ address, amount: 1_000_000_000 });
+  @method async setPriceLimit(limit: UInt64) {
+    this.priceLimit.set(limit);
+    this.emitEvent("limit", limit);
+  }
+
+  @method async setVerificationKeyHash(verificationKeyHash: Field) {
+    this.verificationKeyHash.set(verificationKeyHash);
+    this.emitEvent("verificationKey", verificationKeyHash);
+  }
+
+  @method async mint(params: MintParams) {
+    const {
+      name,
+      address,
+      fee,
+      feeMaster,
+      metadataParams,
+      verificationKey,
+      contractAddress,
+      network,
+      signature,
+    } = params;
+    const oracle = this.oracle.getAndRequireEquals();
+    signature
+      .verify(oracle, [
+        ...address.toFields(),
+        name,
+        fee.value,
+        ...feeMaster.toFields(),
+        ...contractAddress.toFields(),
+        network,
+      ])
+      .assertEquals(true);
+    contractAddress.assertEquals(this.address);
+    network.assertEquals(getNetworkIdHash());
+    const owner = this.sender.getAndRequireSignature();
+    this.verificationKeyHash
+      .getAndRequireEquals()
+      .assertEquals(verificationKey.hash);
+    const ownerUpdate = AccountUpdate.createSigned(owner);
+    ownerUpdate.send({ to: feeMaster, amount: fee });
+
     const tokenId = this.deriveTokenId();
     const update = AccountUpdate.createSigned(address, tokenId);
+    update.account.isNew.getAndRequireEquals().assertTrue();
+    this.internal.mint({ address, amount: 1_000_000_000 });
 
-    //TODO: make verification key a constant
     update.body.update.verificationKey = {
       isSome: Bool(true),
       value: verificationKey,
@@ -208,6 +268,11 @@ export class NameContract extends TokenContract {
       isSome: Bool(true),
       value: field,
     }));
+    this.emitEvent("mint", {
+      name,
+      address,
+      metadataParams,
+    });
   }
 
   @method async update(params: UpdateParams) {
@@ -216,13 +281,14 @@ export class NameContract extends TokenContract {
     const ownerUpdate = AccountUpdate.createSigned(sender);
     ownerUpdate.send({ to: wallet, amount: UPDATE_FEE });
     const tokenId = this.deriveTokenId();
-    const nft = new NFTContract(address, tokenId);
+    const nft = new NFTContractV2(address, tokenId);
     await nft.update(params);
+    this.emitEvent("update", params);
   }
 
   @method async sell(params: SellParams) {
     params.price.assertLessThanOrEqual(this.priceLimit.getAndRequireEquals());
-    await this.internalSell(params, UInt64.from(SELL_FEE));
+    await this.internalSell(params);
   }
 
   @method async sellWithKYC(
@@ -243,7 +309,8 @@ export class NameContract extends TokenContract {
         Field(1),
       ])
       .assertTrue();
-    await this.internalSell(params, UInt64.from(SELL_WITH_KYC_FEE));
+    // TODO: check expiry date
+    await this.internalSell(params);
   }
 
   @method async buy(params: BuyParams) {
@@ -272,28 +339,45 @@ export class NameContract extends TokenContract {
     await this.internalBuy(params);
   }
 
-  async internalSell(params: SellParams, fee: UInt64) {
+  private async internalSell(params: SellParams) {
     const { address, price } = params;
     const sender = this.sender.getAndRequireSignature();
     const ownerUpdate = AccountUpdate.createSigned(sender);
-    ownerUpdate.send({ to: wallet, amount: fee });
+    ownerUpdate.send({ to: wallet, amount: SELL_FEE });
     const tokenId = this.deriveTokenId();
-    const nft = new NFTContract(address, tokenId);
+    const nft = new NFTContractV2(address, tokenId);
     await nft.sell(price);
+    this.emitEvent("sell", params);
   }
 
-  async internalBuy(params: BuyParams) {
+  private async internalBuy(params: BuyParams) {
     const { address, price } = params;
     const buyer = this.sender.getAndRequireSignature();
     const tokenId = this.deriveTokenId();
-    const nft = new NFTContract(address, tokenId);
+    const nft = new NFTContractV2(address, tokenId);
     const seller = await nft.buy(price);
     const commission = price.div(UInt64.from(10));
     const payment = price.sub(commission);
     const buyerUpdate = AccountUpdate.createSigned(buyer);
     buyerUpdate.send({ to: seller, amount: payment });
     buyerUpdate.send({ to: wallet, amount: commission });
+    this.emitEvent("buy", params);
   }
+
+  /*
+  private mintPrice(name: Field): UInt64 {
+    const price: UInt64 = Provable.if(
+      name.greaterThan(Field(BigInt(2 ** 43))),
+      UInt64.from(10_000_000_000n),
+      Provable.if(
+        name.lessThan(Field(BigInt(2 ** 27))),
+        UInt64.from(99_000_000_000n),
+        UInt64.from(19_000_000_000n)
+      )
+    );
+    return price;
+  }
+  */
 
   @method async transferNFT(params: TransferParams) {
     const { address, newOwner } = params;
@@ -301,7 +385,8 @@ export class NameContract extends TokenContract {
     const ownerUpdate = AccountUpdate.createSigned(sender);
     ownerUpdate.send({ to: wallet, amount: TRANSFER_FEE });
     const tokenId = this.deriveTokenId();
-    const nft = new NFTContract(address, tokenId);
+    const nft = new NFTContractV2(address, tokenId);
     await nft.transferNFT(newOwner);
+    this.emitEvent("transfer", params);
   }
 }
