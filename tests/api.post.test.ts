@@ -14,7 +14,7 @@ import { MapData } from "../src/storage/map";
 const { MINANFT_NAME_SERVICE } = config;
 
 const pinataJWT = PINATA_JWT;
-const blockchainInstance: blockchain = "berkeley";
+const blockchainInstance: blockchain = "devnet";
 const includeFiles = true;
 
 let deployer: PrivateKey | undefined = undefined;
@@ -81,7 +81,7 @@ describe.skip(`MinaNFT mint using api`, () => {
     nft.update({ key: `twitter`, value: `@builder` });
     nft.update({ key: `secret`, value: `mysecretvalue`, isPrivate: true });
     if (includeFiles)
-      await nft.updateImage({
+      await updateImage(nft, {
         filename: "./images/image.jpg",
         pinataJWT,
       });
@@ -162,6 +162,8 @@ describe.skip(`MinaNFT mint using api`, () => {
     const reserved = await minanft.reserveName({
       name: nft.name,
       publicKey: nft.address.toBase58(),
+      chain: blockchainInstance,
+      contract: MINANFT_NAME_SERVICE,
     });
     console.log("Reserved:", reserved);
     if (

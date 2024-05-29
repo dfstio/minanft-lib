@@ -72,7 +72,7 @@ export class RollupNFT extends BaseMinaNFT {
   external_url?: string;
 
   /**
-   * Create MinaNFT object
+   * Create RollupNFT object
    * @param params arguments
    * @param params.name Name of NFT
    * @param params.address Public key of the NFT
