@@ -1283,12 +1283,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.11":
-  version: 20.12.11
-  resolution: "@types/node@npm:20.12.11"
+"@types/node@npm:^20.12.12":
+  version: 20.12.12
+  resolution: "@types/node@npm:20.12.12"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/efaa7b08c50ba6e6982ac7d531ba08d5935539ba76e954807df1ff9382a319ead7e003ccaca5ad7cf33ecf53f212507f7c1f2794bd2ff52df6365fef21f6e1fb
+  checksum: 10c0/f374b763c744e8f16e4f38cf6e2c0eef31781ec9228c9e43a6f267880fea420fab0a238b59f10a7cb3444e49547c5e3785787e371fc242307310995b21988812
   languageName: node
   linkType: hard
 
@@ -1474,7 +1474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.5, axios@npm:^1.6.8":
+"axios@npm:^1.6.5":
   version: 1.6.8
   resolution: "axios@npm:1.6.8"
   dependencies:
@@ -1482,6 +1482,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10c0/0f22da6f490335479a89878bc7d5a1419484fbb437b564a80c34888fc36759ae4f56ea28d55a191695e5ed327f0bad56e7ff60fb6770c14d1be6501505d47ab9
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.2":
+  version: 1.7.2
+  resolution: "axios@npm:1.7.2"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10c0/cbd47ce380fe045313364e740bb03b936420b8b5558c7ea36a4563db1258c658f05e40feb5ddd41f6633fdd96d37ac2a76f884dad599c5b0224b4c451b3fa7ae
   languageName: node
   linkType: hard
 
@@ -3348,15 +3359,15 @@ __metadata:
     "@jest/globals": "npm:^29.7.0"
     "@types/jest": "npm:^29.5.12"
     "@types/mime": "npm:^3.0.4"
-    "@types/node": "npm:^20.12.11"
+    "@types/node": "npm:^20.12.12"
     arweave: "npm:^1.15.1"
-    axios: "npm:^1.6.8"
+    axios: "npm:^1.7.2"
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"
     jimp: "npm:^0.22.12"
     mime: "npm:^3.0.0"
-    o1js: "npm:^1.2.0"
-    ts-jest: "npm:^29.1.2"
+    o1js: "npm:^1.3.0"
+    ts-jest: "npm:^29.1.3"
     typescript: "npm:5.4.5"
   languageName: unknown
   linkType: soft
@@ -3575,9 +3586,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "o1js@npm:1.2.0"
+"o1js@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "o1js@npm:1.3.0"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -3587,7 +3598,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 10c0/facde84ceb1cde5871676503672ffb99fb1ea4f5c3ae678a5de2b618955291fe41d0a9197f3887670de523297cba6d86a1e8de39707f843e0c4cb426b647acba
+  checksum: 10c0/e3a8f347fda9914dd02d124f1cfcd024662455a6482a0dda4fef3e4381448cfe7a84dff6d63b1363adf17497935dfa136cafc866b572b5c98dd21bdb3082cf12
   languageName: node
   linkType: hard
 
@@ -4344,9 +4355,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^29.1.2":
-  version: 29.1.2
-  resolution: "ts-jest@npm:29.1.2"
+"ts-jest@npm:^29.1.3":
+  version: 29.1.3
+  resolution: "ts-jest@npm:29.1.3"
   dependencies:
     bs-logger: "npm:0.x"
     fast-json-stable-stringify: "npm:2.x"
@@ -4358,12 +4369,15 @@ __metadata:
     yargs-parser: "npm:^21.0.1"
   peerDependencies:
     "@babel/core": ">=7.0.0-beta.0 <8"
+    "@jest/transform": ^29.0.0
     "@jest/types": ^29.0.0
     babel-jest: ^29.0.0
     jest: ^29.0.0
     typescript: ">=4.3 <6"
   peerDependenciesMeta:
     "@babel/core":
+      optional: true
+    "@jest/transform":
       optional: true
     "@jest/types":
       optional: true
@@ -4373,7 +4387,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 10c0/c2f51f0241f89d127d41392decbcb83b5dfd5e57ab9d50220aa7b7e2f9b3f3b07ccdbba33311284df1c41941879e4ddfad44b15a9d0da4b74bd1b98702b729df
+  checksum: 10c0/7810882f53c7d722dfcd9fbe65c1c80258ec4bd216a21448f27759f2f06d57a2f3f2472e1efe4a5e29fd4064dce07a93c8dbf3b13e77dac0e32419a30756f8f5
   languageName: node
   linkType: hard
 
