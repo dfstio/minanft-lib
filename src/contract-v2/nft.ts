@@ -16,6 +16,7 @@ import {
   UInt32,
   UInt64,
   Signature,
+  Provable,
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
@@ -378,6 +379,19 @@ export class NameContractV2 extends TokenContract {
     return price;
   }
   */
+
+  private mintPrice(name: Field): UInt64 {
+    const price: UInt64 = Provable.if(
+      name.greaterThan(Field(BigInt(2 ** 43))),
+      UInt64.from(10_000_000_000n),
+      Provable.if(
+        name.lessThan(Field(BigInt(2 ** 27))),
+        UInt64.from(99_000_000_000n),
+        UInt64.from(19_000_000_000n)
+      )
+    );
+    return price;
+  }
 
   @method async transferNFT(params: TransferParams) {
     const { address, newOwner } = params;
