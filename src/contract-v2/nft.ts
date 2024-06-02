@@ -99,14 +99,6 @@ export class NFTContractV2 extends SmartContract {
   @state(PublicKey) owner = State<PublicKey>();
   @state(Field) data = State<Field>();
 
-  async deploy(args: DeployArgs) {
-    super.deploy(args);
-    this.account.permissions.set({
-      ...Permissions.default(),
-      editState: Permissions.proof(),
-    });
-  }
-
   @method async update(params: UpdateParams) {
     const { metadataParams } = params;
     const sender = this.sender.getAndRequireSignature();
