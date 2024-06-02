@@ -2,7 +2,11 @@ import { describe, expect, it } from "@jest/globals";
 import { PrivateKey, PublicKey, fetchAccount, UInt64 } from "o1js";
 
 import { MinaNFT } from "../../src/minanft";
-import { NFTContractV2, NameContractV2 } from "../../src/contract-v2/nft";
+import {
+  NFTContractV2,
+  NameContractV2,
+  networkIdHash,
+} from "../../src/contract-v2/nft";
 import { initBlockchain, accountBalance } from "../../src/mina";
 import { Memory } from "../../src/mina";
 import {
@@ -13,7 +17,6 @@ import {
 import config from "../../src/config";
 const { MINANFT_NAME_SERVICE_V2, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceV2 as MinaNFTNameService } from "../../src/minanftnames2";
-import fs from "fs/promises";
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
 const useLocalBlockchain: boolean = false;
@@ -33,6 +36,11 @@ beforeAll(async () => {
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
   nameServicePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_V2_SK);
+  if (
+    nameServicePrivateKey.toPublicKey().toBase58() !== MINANFT_NAME_SERVICE_V2
+  ) {
+    throw new Error(`Invalid name service private key`);
+  }
 
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;

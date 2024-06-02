@@ -8,7 +8,7 @@ const config = {
   MINANFT_NAME_SERVICE:
     "B62qrryunX2LzaZ1sGtqfJqzSdNdN7pVSZw8YtnxQNxrrF9Vt56bNFT",
   MINANFT_NAME_SERVICE_V2:
-    "B62qoknCPWJ5KuzKnS5rvsFjCkKdpfr3aJdvYAJ9k138jmXhHMWjNFT",
+    "B62qm5wKfuQxJaFtaA5PYrYebri9kniwhefpiMdmn4dm4R6DjquxNFT",
   MINANFT_NAME_SERVICE_OLD:
     "B62qpiD9ZWPi1JCx7hd4XcRujM1qc5jCADhhJVzTm3zZBWBpyRr3NFT",
   MINANFT_NFT_ADDRESS:

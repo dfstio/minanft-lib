@@ -11,9 +11,12 @@ import {
   UInt64,
 } from "o1js";
 import { MinaNFT } from "./minanft";
-import { NFTContractV2, NameContractV2 } from "./contract-v2/nft";
+import {
+  NFTContractV2,
+  NameContractV2,
+  networkIdHash,
+} from "./contract-v2/nft";
 import { fetchMinaAccount } from "./fetch";
-import { getNetworkIdHash } from "./mina";
 
 class MinaNFTNameServiceV2 {
   address?: PublicKey;
@@ -57,8 +60,9 @@ class MinaNFTNameServiceV2 {
 
     console.time(`compiled`);
     const verificationKey = (await NFTContractV2.compile()).verificationKey;
-    await NameContractV2.compile();
+    const vk = (await NameContractV2.compile()).verificationKey;
     console.timeEnd(`compiled`);
+    console.log(`vk hash: ${vk.hash.toJSON()}`);
     const zkApp = new NameContractV2(zkAppPublicKey);
     await fetchMinaAccount({ publicKey: sender });
     const deployNonce =
@@ -159,7 +163,7 @@ class MinaNFTNameServiceV2 {
       fee.value,
       ...feeMaster.toFields(),
       ...this.address.toFields(),
-      getNetworkIdHash(),
+      networkIdHash(),
     ]);
   }
 }

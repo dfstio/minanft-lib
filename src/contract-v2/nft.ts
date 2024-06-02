@@ -16,11 +16,15 @@ import {
   UInt32,
   UInt64,
   Signature,
-  Provable,
+  Encoding,
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
-import { getNetworkIdHash } from "../mina";
+//import { getNetworkIdHash } from "../mina";
+
+export function networkIdHash(): Field {
+  return Encoding.stringToFields("testnet")[0];
+}
 
 export const SELL_FEE = 1_000_000_000n;
 export const TRANSFER_FEE = 1_000_000_000n;
@@ -52,6 +56,7 @@ export class TransferParams extends Struct({
 export class MintParams extends Struct({
   name: Field,
   address: PublicKey,
+  price: UInt64,
   fee: UInt64,
   feeMaster: PublicKey,
   metadataParams: MetadataParams,
@@ -62,6 +67,7 @@ export class MintParams extends Struct({
 export class MintEvent extends Struct({
   name: Field,
   address: PublicKey,
+  price: UInt64,
   metadataParams: MetadataParams,
 }) {}
 
@@ -206,6 +212,7 @@ export class NameContractV2 extends TokenContract {
     const {
       name,
       address,
+      price,
       fee,
       feeMaster,
       metadataParams,
@@ -221,7 +228,7 @@ export class NameContractV2 extends TokenContract {
         fee.value,
         ...feeMaster.toFields(),
         ...this.address.toFields(),
-        getNetworkIdHash(),
+        networkIdHash(),
       ])
       .assertEquals(true);
     this.verificationKeyHash
@@ -250,7 +257,7 @@ export class NameContractV2 extends TokenContract {
       ...MetadataParams.toFields(metadataParams),
       ...owner.toFields(),
       new NFTparams({
-        price: UInt64.from(0),
+        price,
         version: UInt32.from(1),
       }).pack(),
     ];
@@ -261,6 +268,7 @@ export class NameContractV2 extends TokenContract {
     this.emitEvent("mint", {
       name,
       address,
+      price,
       metadataParams,
     });
   }
@@ -295,7 +303,7 @@ export class NameContractV2 extends TokenContract {
         params.price.value,
         ...this.sender.getAndRequireSignature().toFields(),
         expiry.value,
-        getNetworkIdHash(),
+        networkIdHash(),
         Field(1),
       ])
       .assertTrue();
@@ -322,7 +330,7 @@ export class NameContractV2 extends TokenContract {
         params.price.value,
         ...this.sender.getAndRequireSignature().toFields(),
         expiry.value,
-        getNetworkIdHash(),
+        networkIdHash(),
         Field(2),
       ])
       .assertTrue();
