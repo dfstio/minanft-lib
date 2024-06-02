@@ -23,7 +23,6 @@ import {
   ZkProgram,
 } from "o1js";
 import { accountBalanceMina } from "../src/mina";
-import { skip } from "node:test";
 const MINT_FEE = 10_000_000_000n;
 const SELL_FEE = 1_000_000_000n;
 const SELL_WITH_KYC_FEE = 50_000_000_000n;

@@ -56,8 +56,6 @@ export class MintParams extends Struct({
   feeMaster: PublicKey,
   metadataParams: MetadataParams,
   verificationKey: VerificationKey,
-  contractAddress: PublicKey,
-  network: Field,
   signature: Signature,
 }) {}
 
@@ -76,6 +74,9 @@ export class UpdateParams extends Struct({
 export class NFTparams extends Struct({
   price: UInt64,
   version: UInt32,
+  // TODO: add more fields
+  // isUpdated: Bool,
+  // isAddedOnly: Bool,
 }) {
   pack(): Field {
     const price = this.price.value.toBits(64);
@@ -97,14 +98,6 @@ export class NFTContractV2 extends SmartContract {
   @state(MetadataParams) metadataParams = State<MetadataParams>();
   @state(PublicKey) owner = State<PublicKey>();
   @state(Field) data = State<Field>();
-
-  async deploy(args: DeployArgs) {
-    super.deploy(args);
-    this.account.permissions.set({
-      ...Permissions.default(),
-      editState: Permissions.proof(),
-    });
-  }
 
   @method async update(params: UpdateParams) {
     const { metadataParams } = params;
@@ -217,24 +210,20 @@ export class NameContractV2 extends TokenContract {
       feeMaster,
       metadataParams,
       verificationKey,
-      contractAddress,
-      network,
       signature,
     } = params;
     const oracle = this.oracle.getAndRequireEquals();
+    const owner = this.sender.getAndRequireSignature();
     signature
       .verify(oracle, [
-        ...address.toFields(),
+        ...owner.toFields(),
         name,
         fee.value,
         ...feeMaster.toFields(),
-        ...contractAddress.toFields(),
-        network,
+        ...this.address.toFields(),
+        getNetworkIdHash(),
       ])
       .assertEquals(true);
-    contractAddress.assertEquals(this.address);
-    network.assertEquals(getNetworkIdHash());
-    const owner = this.sender.getAndRequireSignature();
     this.verificationKeyHash
       .getAndRequireEquals()
       .assertEquals(verificationKey.hash);
@@ -379,19 +368,6 @@ export class NameContractV2 extends TokenContract {
     return price;
   }
   */
-
-  private mintPrice(name: Field): UInt64 {
-    const price: UInt64 = Provable.if(
-      name.greaterThan(Field(BigInt(2 ** 43))),
-      UInt64.from(10_000_000_000n),
-      Provable.if(
-        name.lessThan(Field(BigInt(2 ** 27))),
-        UInt64.from(99_000_000_000n),
-        UInt64.from(19_000_000_000n)
-      )
-    );
-    return price;
-  }
 
   @method async transferNFT(params: TransferParams) {
     const { address, newOwner } = params;

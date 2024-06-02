@@ -1,10 +1,8 @@
 import { describe, expect, it } from "@jest/globals";
 import {
-  Account,
   PrivateKey,
   PublicKey,
   Mina,
-  Poseidon,
   VerificationKey,
   UInt64,
   UInt32,
@@ -62,9 +60,6 @@ describe("Contract V2", () => {
   const price = UInt64.from(100_000_000_000);
   const kycPrice = UInt64.from(200_000_000_000);
   const oracle = PrivateKey.randomKeypair();
-  price.toBigInt();
-  const p32 = UInt32.from(1);
-  p32.toBigint();
 
   it(`should initialize blockchain`, async () => {
     const { keys } = await initBlockchain("local", 5);
@@ -162,13 +157,27 @@ describe("Contract V2", () => {
   it(`should min NFT`, async () => {
     console.log("Minting NFT...");
     console.time("minted NFT");
+    const fee = UInt64.from(10_000_000_000);
+    const name = Encoding.stringToFields("digital")[0];
+    const feeMaster = wallet;
+    const signature = getMintSignature({
+      oracle: oracle.privateKey,
+      zkAppPublicKey,
+      fee,
+      feeMaster,
+      name,
+      owner: owner.publicKey,
+    });
     const tx = await Mina.transaction({ sender: owner.publicKey }, async () => {
       AccountUpdate.fundNewAccount(owner.publicKey);
       await zkApp.mint({
-        name: Encoding.stringToFields("digital")[0],
+        name,
         address: nftPublicKey,
         metadataParams: MetadataParams.empty(),
         verificationKey,
+        fee,
+        feeMaster,
+        signature,
       });
     });
     tx.sign([nftPrivateKey, owner.privateKey]);
@@ -354,3 +363,22 @@ describe("Contract V2", () => {
     owner = owner4;
   });
 });
+
+function getMintSignature(params: {
+  oracle: PrivateKey;
+  zkAppPublicKey: PublicKey;
+  fee: UInt64;
+  feeMaster: PublicKey;
+  name: Field;
+  owner: PublicKey;
+}) {
+  const { oracle, zkAppPublicKey, fee, feeMaster, owner, name } = params;
+  return Signature.create(oracle, [
+    ...owner.toFields(),
+    name,
+    fee.value,
+    ...feeMaster.toFields(),
+    ...zkAppPublicKey.toFields(),
+    getNetworkIdHash(),
+  ]);
+}
