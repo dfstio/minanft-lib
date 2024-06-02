@@ -273,6 +273,16 @@ export class RollupNFT extends BaseMinaNFT {
       descriptionObject.linkedObject instanceof TextData
     )
       description = descriptionObject.linkedObject.text;
+
+    let collection: string | undefined = undefined;
+    const collectionObject = this.getMetadata("collection");
+    if (
+      collectionObject !== undefined &&
+      collectionObject.kind.toBigInt() ===
+        MinaNFT.stringToField("string").toBigInt()
+    )
+      collection = MinaNFT.stringFromField(collectionObject.data);
+
     let image: string | undefined = undefined;
     const imageObject = this.getMetadata("image");
     if (
@@ -292,6 +302,7 @@ export class RollupNFT extends BaseMinaNFT {
 
     const json = {
       name: this.name,
+      collection: collection,
       address: this.address?.toBase58(),
       description: description,
       image,

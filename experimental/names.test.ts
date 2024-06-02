@@ -5,6 +5,7 @@ import { MinaNFT } from "../src/minanft";
 jest.setTimeout(1000 * 60 * 60 * 24); // 24 hour
 const names = [
   "DFST",
+  "NFT",
   "NAME",
   "NAMES",
   "MINANFT",
@@ -15,7 +16,6 @@ const names = [
   "MinaDNS",
   "minaDNS",
   "MINADNS",
-  "ADD",
 ]; //"NFT",
 const lNames = ["minanft", "socialcap", "staketab", "mario", "worker", "cloud"];
 

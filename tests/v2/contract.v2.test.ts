@@ -101,7 +101,6 @@ describe("Contract V2", () => {
     console.time("compiled NameContract");
     const cache: Cache = Cache.FileSystem("./cache");
     verificationKey = (await NFTContractV2.compile({ cache })).verificationKey;
-    return;
     await NameContractV2.compile({ cache });
     console.timeEnd("compiled NameContract");
 
@@ -130,7 +129,6 @@ describe("Contract V2", () => {
       }
     }
   });
-  return;
 
   it(`should deploy contracts`, async () => {
     console.log("Deploying contracts...");
