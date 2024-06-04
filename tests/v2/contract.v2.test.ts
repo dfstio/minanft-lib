@@ -178,6 +178,7 @@ describe("Contract V2", () => {
         fee,
         feeMaster,
         signature,
+        price,
       });
     });
     tx.sign([nftPrivateKey, owner.privateKey]);

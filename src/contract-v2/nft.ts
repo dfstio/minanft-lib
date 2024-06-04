@@ -20,10 +20,11 @@ import {
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
-//import { getNetworkIdHash } from "../mina";
+import { getNetworkIdHash } from "../mina";
 
 export function networkIdHash(): Field {
-  return Encoding.stringToFields("testnet")[0];
+  //return Encoding.stringToFields("testnet")[0];
+  return getNetworkIdHash();
 }
 
 export const SELL_FEE = 1_000_000_000n;
@@ -219,6 +220,7 @@ export class NameContractV2 extends TokenContract {
       verificationKey,
       signature,
     } = params;
+    // TODO: add time limit to the signature
     const oracle = this.oracle.getAndRequireEquals();
     const owner = this.sender.getAndRequireSignature();
     signature
@@ -294,8 +296,9 @@ export class NameContractV2 extends TokenContract {
     signature: Signature,
     expiry: UInt64
   ) {
-    const timestamp = this.network.timestamp.getAndRequireEquals();
-    timestamp.assertLessThan(expiry);
+    // TODO: check expiry date
+    //const timestamp = this.network.timestamp.getAndRequireEquals();
+    //timestamp.assertLessThan(expiry);
     signature
       .verify(this.oracle.getAndRequireEquals(), [
         ...this.address.toFields(),
@@ -307,7 +310,7 @@ export class NameContractV2 extends TokenContract {
         Field(1),
       ])
       .assertTrue();
-    // TODO: check expiry date
+
     await this.internalSell(params);
   }
 
@@ -321,8 +324,9 @@ export class NameContractV2 extends TokenContract {
     signature: Signature,
     expiry: UInt64
   ) {
-    const timestamp = this.network.timestamp.getAndRequireEquals();
-    timestamp.assertLessThan(expiry);
+    // TODO: check expiry date
+    //const timestamp = this.network.timestamp.getAndRequireEquals();
+    //timestamp.assertLessThan(expiry);
     signature
       .verify(this.oracle.getAndRequireEquals(), [
         ...this.address.toFields(),

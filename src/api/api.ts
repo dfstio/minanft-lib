@@ -78,12 +78,20 @@ export class api {
    * @param data The data for the reserveName call
    * @param data.name The name of the NFT
    * @param data.publicKey The public key of the NFT
+   * @param data.chain The blockchain
+   * @param data.contract The contract
+   * @param data.version The version of signature ("v1" or "v2")
+   * @param data.developer The developer of the NFT
+   * @param data.repo The repo of the NFT
    */
   public async reserveName(data: {
     name: string;
     publicKey: string;
     chain: blockchain;
     contract: string;
+    version?: string;
+    developer?: string;
+    repo?: string;
   }): Promise<{
     success: boolean;
     error?: string;
@@ -97,7 +105,7 @@ export class api {
       developer: "@dfst",
       name: "reserveName",
       task: "reserveName",
-      args: [data.name, data.publicKey, data.chain, data.contract],
+      args: [JSON.stringify(data, null, 2)],
     });
     const reserved =
       result.data === undefined ? { success: false } : result.data;

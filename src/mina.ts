@@ -84,9 +84,11 @@ async function initBlockchain(
   instance: blockchain,
   deployersNumber: number = 0
 ): Promise<MinaNetworkInstance> {
+  /*
   if (instance === "mainnet") {
     throw new Error("Mainnet is not supported yet by zkApps");
   }
+  */
 
   if (instance === "local") {
     const local = await Mina.LocalBlockchain({
