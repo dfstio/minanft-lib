@@ -11,12 +11,10 @@ import {
   UInt64,
 } from "o1js";
 import { MinaNFT } from "./minanft";
-import {
-  NFTContractV2,
-  NameContractV2,
-  networkIdHash,
-} from "./contract-v2/nft";
+import { NFTContractV2, NameContractV2 } from "./contract-v2/nft";
 import { fetchMinaAccount } from "./fetch";
+import { blockchain } from "./networks";
+import { calculateNetworkIdHash } from "./mina";
 
 class MinaNFTNameServiceV2 {
   address?: PublicKey;
@@ -150,8 +148,9 @@ class MinaNFTNameServiceV2 {
     feeMaster: PublicKey;
     name: Field;
     owner: PublicKey;
+    chain: blockchain;
   }): Promise<Signature> {
-    const { fee, feeMaster, owner, name } = params;
+    const { fee, feeMaster, owner, name, chain } = params;
     if (this.address === undefined)
       throw new Error("Names service address is not set");
     if (this.oraclePrivateKey === undefined)
@@ -163,7 +162,7 @@ class MinaNFTNameServiceV2 {
       fee.value,
       ...feeMaster.toFields(),
       ...this.address.toFields(),
-      networkIdHash(),
+      calculateNetworkIdHash(chain),
     ]);
   }
 }

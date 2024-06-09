@@ -16,7 +16,6 @@ import {
   UInt32,
   UInt64,
   Signature,
-  Encoding,
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
