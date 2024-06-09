@@ -4,7 +4,7 @@ import { initBlockchain } from "../../src/mina";
 import { blockchain } from "../../src";
 import fs from "fs/promises";
 
-const chain: blockchain = "devnet" as blockchain;
+const chain: blockchain = "mainnet" as blockchain;
 
 describe(`Deploy MinaNFT Name Service contract`, () => {
   it(`should get verification key`, async () => {
