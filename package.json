@@ -13,7 +13,7 @@
     "web3",
     "zero knowledge"
   ],
-  "version": "1.15.0",
+  "version": "1.16.0",
   "homepage": "https://docs.minanft.io",
   "repository": "git@dfstio.github.com:dfstio/minanft-lib.git",
   "main": "src/index.ts",

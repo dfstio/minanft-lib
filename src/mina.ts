@@ -41,6 +41,10 @@ function getNetworkIdHash(): Field {
   return currentNetwork.networkIdHash;
 }
 
+export function calculateNetworkIdHash(chain: blockchain): Field {
+  return CircuitString.fromString(chain).hash();
+}
+
 function getDeployer(): PrivateKey {
   if (currentNetwork === undefined) {
     throw new Error("Network is not initialized");
@@ -84,9 +88,12 @@ async function initBlockchain(
   instance: blockchain,
   deployersNumber: number = 0
 ): Promise<MinaNetworkInstance> {
+  /*
   if (instance === "mainnet") {
     throw new Error("Mainnet is not supported yet by zkApps");
   }
+  */
+  const networkIdHash = calculateNetworkIdHash(instance);
 
   if (instance === "local") {
     const local = await Mina.LocalBlockchain({
@@ -99,7 +106,7 @@ async function initBlockchain(
         publicKey: key,
       })),
       network: Local,
-      networkIdHash: CircuitString.fromString("local").hash(),
+      networkIdHash,
     };
     return currentNetwork;
   }
@@ -113,6 +120,7 @@ async function initBlockchain(
     mina: network.mina,
     archive: network.archive,
     lightnetAccountManager: network.accountManager,
+    networkId: instance === "mainnet" ? "mainnet" : "testnet",
   });
   Mina.setActiveInstance(networkInstance);
 
@@ -145,7 +153,7 @@ async function initBlockchain(
   currentNetwork = {
     keys,
     network,
-    networkIdHash: CircuitString.fromString(instance).hash(),
+    networkIdHash,
   };
   return currentNetwork;
 }

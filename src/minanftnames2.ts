@@ -13,7 +13,8 @@ import {
 import { MinaNFT } from "./minanft";
 import { NFTContractV2, NameContractV2 } from "./contract-v2/nft";
 import { fetchMinaAccount } from "./fetch";
-import { getNetworkIdHash } from "./mina";
+import { blockchain } from "./networks";
+import { calculateNetworkIdHash } from "./mina";
 
 class MinaNFTNameServiceV2 {
   address?: PublicKey;
@@ -57,8 +58,9 @@ class MinaNFTNameServiceV2 {
 
     console.time(`compiled`);
     const verificationKey = (await NFTContractV2.compile()).verificationKey;
-    await NameContractV2.compile();
+    const vk = (await NameContractV2.compile()).verificationKey;
     console.timeEnd(`compiled`);
+    console.log(`vk hash: ${vk.hash.toJSON()}`);
     const zkApp = new NameContractV2(zkAppPublicKey);
     await fetchMinaAccount({ publicKey: sender });
     const deployNonce =
@@ -146,8 +148,9 @@ class MinaNFTNameServiceV2 {
     feeMaster: PublicKey;
     name: Field;
     owner: PublicKey;
+    chain: blockchain;
   }): Promise<Signature> {
-    const { fee, feeMaster, owner, name } = params;
+    const { fee, feeMaster, owner, name, chain } = params;
     if (this.address === undefined)
       throw new Error("Names service address is not set");
     if (this.oraclePrivateKey === undefined)
@@ -159,7 +162,7 @@ class MinaNFTNameServiceV2 {
       fee.value,
       ...feeMaster.toFields(),
       ...this.address.toFields(),
-      getNetworkIdHash(),
+      calculateNetworkIdHash(chain),
     ]);
   }
 }

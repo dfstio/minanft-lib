@@ -1,9 +1,13 @@
 import { describe, expect, it } from "@jest/globals";
-import { PrivateKey, PublicKey, fetchAccount, UInt64 } from "o1js";
+import { PrivateKey, PublicKey, fetchAccount, UInt64, Mina } from "o1js";
 
 import { MinaNFT } from "../../src/minanft";
-import { NFTContractV2, NameContractV2 } from "../../src/contract-v2/nft";
-import { initBlockchain, accountBalance } from "../../src/mina";
+import { NameContractV2 } from "../../src/contract-v2/nft";
+import {
+  initBlockchain,
+  accountBalance,
+  accountBalanceMina,
+} from "../../src/mina";
 import { Memory } from "../../src/mina";
 import {
   CONTRACT_DEPLOYER_SK,
@@ -13,10 +17,10 @@ import {
 import config from "../../src/config";
 const { MINANFT_NAME_SERVICE_V2, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceV2 as MinaNFTNameService } from "../../src/minanftnames2";
-import fs from "fs/promises";
+import { blockchain } from "../../src";
 
-// eslint-disable-next-line @typescript-eslint/no-inferrable-types
-const useLocalBlockchain: boolean = false;
+const chain: blockchain = "mainnet" as blockchain;
+const useLocalBlockchain: boolean = chain === "local";
 
 let deployer: PrivateKey | undefined = undefined;
 let nameService: MinaNFTNameService | undefined = undefined;
@@ -24,7 +28,7 @@ let nameServicePrivateKey: PrivateKey | undefined = undefined;
 let oraclePrivateKey: PrivateKey | undefined = undefined;
 
 beforeAll(async () => {
-  const data = await initBlockchain(useLocalBlockchain ? "local" : "devnet");
+  const data = await initBlockchain(chain);
   expect(data).toBeDefined();
   if (data === undefined) return;
 
@@ -33,13 +37,19 @@ beforeAll(async () => {
     : PrivateKey.fromBase58(CONTRACT_DEPLOYER_SK);
   oraclePrivateKey = PrivateKey.fromBase58(NAMES_ORACLE_SK);
   nameServicePrivateKey = PrivateKey.fromBase58(MINANFT_NAME_SERVICE_V2_SK);
+  if (
+    nameServicePrivateKey.toPublicKey().toBase58() !== MINANFT_NAME_SERVICE_V2
+  ) {
+    throw new Error(`Invalid name service private key`);
+  }
 
   expect(deployer).toBeDefined();
   if (deployer === undefined) return;
   const balanceDeployer =
     Number((await accountBalance(deployer.toPublicKey())).toBigInt()) / 1e9;
-  expect(balanceDeployer).toBeGreaterThan(15);
-  if (balanceDeployer <= 15) return;
+  expect(balanceDeployer).toBeGreaterThan(5);
+  if (balanceDeployer <= 5) return;
+  console.log("id", Mina.getNetworkId());
 });
 
 describe(`Deploy MinaNFT Name Service contract`, () => {
@@ -54,6 +64,10 @@ describe(`Deploy MinaNFT Name Service contract`, () => {
       oraclePrivateKey,
       priceLimit: UInt64.from(500_000_000_000),
     });
+    const sender = deployer.toPublicKey();
+    const deployerBalance = await accountBalanceMina(sender);
+    console.log(`sender`, sender.toBase58());
+    console.log(`deployer balance: ${deployerBalance}`);
     const tx = await names.deploy(deployer, nameServicePrivateKey);
     expect(tx).toBeDefined();
     if (tx === undefined) return;

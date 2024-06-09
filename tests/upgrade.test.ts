@@ -9,7 +9,7 @@ import { MINANFT_NAME_SERVICE_SK } from "../env.json";
 import config from "../src/config";
 const { MINANFT_NAME_SERVICE } = config;
 
-const chain: blockchain = "local" as blockchain;
+const chain: blockchain = "devnet" as blockchain;
 
 let deployer: PrivateKey | undefined = undefined;
 

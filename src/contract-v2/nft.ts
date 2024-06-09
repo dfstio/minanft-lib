@@ -16,11 +16,15 @@ import {
   UInt32,
   UInt64,
   Signature,
-  Provable,
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
 import { getNetworkIdHash } from "../mina";
+
+export function networkIdHash(): Field {
+  //return Encoding.stringToFields("testnet")[0];
+  return getNetworkIdHash();
+}
 
 export const SELL_FEE = 1_000_000_000n;
 export const TRANSFER_FEE = 1_000_000_000n;
@@ -52,6 +56,7 @@ export class TransferParams extends Struct({
 export class MintParams extends Struct({
   name: Field,
   address: PublicKey,
+  price: UInt64,
   fee: UInt64,
   feeMaster: PublicKey,
   metadataParams: MetadataParams,
@@ -62,6 +67,7 @@ export class MintParams extends Struct({
 export class MintEvent extends Struct({
   name: Field,
   address: PublicKey,
+  price: UInt64,
   metadataParams: MetadataParams,
 }) {}
 
@@ -206,12 +212,14 @@ export class NameContractV2 extends TokenContract {
     const {
       name,
       address,
+      price,
       fee,
       feeMaster,
       metadataParams,
       verificationKey,
       signature,
     } = params;
+    // TODO: add time limit to the signature
     const oracle = this.oracle.getAndRequireEquals();
     const owner = this.sender.getAndRequireSignature();
     signature
@@ -221,7 +229,7 @@ export class NameContractV2 extends TokenContract {
         fee.value,
         ...feeMaster.toFields(),
         ...this.address.toFields(),
-        getNetworkIdHash(),
+        networkIdHash(),
       ])
       .assertEquals(true);
     this.verificationKeyHash
@@ -250,7 +258,7 @@ export class NameContractV2 extends TokenContract {
       ...MetadataParams.toFields(metadataParams),
       ...owner.toFields(),
       new NFTparams({
-        price: UInt64.from(0),
+        price,
         version: UInt32.from(1),
       }).pack(),
     ];
@@ -261,6 +269,7 @@ export class NameContractV2 extends TokenContract {
     this.emitEvent("mint", {
       name,
       address,
+      price,
       metadataParams,
     });
   }
@@ -286,8 +295,9 @@ export class NameContractV2 extends TokenContract {
     signature: Signature,
     expiry: UInt64
   ) {
-    const timestamp = this.network.timestamp.getAndRequireEquals();
-    timestamp.assertLessThan(expiry);
+    // TODO: check expiry date
+    //const timestamp = this.network.timestamp.getAndRequireEquals();
+    //timestamp.assertLessThan(expiry);
     signature
       .verify(this.oracle.getAndRequireEquals(), [
         ...this.address.toFields(),
@@ -295,11 +305,11 @@ export class NameContractV2 extends TokenContract {
         params.price.value,
         ...this.sender.getAndRequireSignature().toFields(),
         expiry.value,
-        getNetworkIdHash(),
+        networkIdHash(),
         Field(1),
       ])
       .assertTrue();
-    // TODO: check expiry date
+
     await this.internalSell(params);
   }
 
@@ -313,8 +323,9 @@ export class NameContractV2 extends TokenContract {
     signature: Signature,
     expiry: UInt64
   ) {
-    const timestamp = this.network.timestamp.getAndRequireEquals();
-    timestamp.assertLessThan(expiry);
+    // TODO: check expiry date
+    //const timestamp = this.network.timestamp.getAndRequireEquals();
+    //timestamp.assertLessThan(expiry);
     signature
       .verify(this.oracle.getAndRequireEquals(), [
         ...this.address.toFields(),
@@ -322,7 +333,7 @@ export class NameContractV2 extends TokenContract {
         params.price.value,
         ...this.sender.getAndRequireSignature().toFields(),
         expiry.value,
-        getNetworkIdHash(),
+        networkIdHash(),
         Field(2),
       ])
       .assertTrue();
