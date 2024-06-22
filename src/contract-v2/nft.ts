@@ -16,14 +16,18 @@ import {
   UInt32,
   UInt64,
   Signature,
+  Mina,
+  Encoding,
+  Poseidon,
+  Provable,
 } from "o1js";
 import { Metadata } from "../contract/metadata";
 import { Storage } from "../contract/metadata";
-import { getNetworkIdHash } from "../mina";
+//import { getNetworkIdHash } from "../mina";
 
 export function networkIdHash(): Field {
-  //return Encoding.stringToFields("testnet")[0];
-  return getNetworkIdHash();
+  return Encoding.stringToFields(Mina.getNetworkId().toString())[0];
+  //return getNetworkIdHash();
 }
 
 export const SELL_FEE = 1_000_000_000n;
@@ -53,20 +57,44 @@ export class TransferParams extends Struct({
   newOwner: PublicKey,
 }) {}
 
+export class KYCSignatureData extends Struct({
+  contract: PublicKey,
+  address: PublicKey,
+  price: UInt64,
+  kycHolder: PublicKey,
+  networkIdHash: Field,
+  expiry: UInt32,
+  sell: Bool, // true - sell, false - buy
+}) {}
+
 export class MintParams extends Struct({
   name: Field,
   address: PublicKey,
+  owner: PublicKey,
   price: UInt64,
   fee: UInt64,
   feeMaster: PublicKey,
   metadataParams: MetadataParams,
   verificationKey: VerificationKey,
   signature: Signature,
+  expiry: UInt32,
+}) {}
+
+export class MintSignatureData extends Struct({
+  contract: PublicKey,
+  name: Field,
+  owner: PublicKey,
+  fee: UInt64,
+  feeMaster: PublicKey,
+  address: PublicKey,
+  networkIdHash: Field,
+  expiry: UInt32,
 }) {}
 
 export class MintEvent extends Struct({
   name: Field,
   address: PublicKey,
+  owner: PublicKey,
   price: UInt64,
   metadataParams: MetadataParams,
 }) {}
@@ -212,31 +240,41 @@ export class NameContractV2 extends TokenContract {
     const {
       name,
       address,
+      owner,
       price,
       fee,
       feeMaster,
       metadataParams,
       verificationKey,
       signature,
+      expiry,
     } = params;
     // TODO: add time limit to the signature
     const oracle = this.oracle.getAndRequireEquals();
-    const owner = this.sender.getAndRequireSignature();
+    const sender = this.sender.getAndRequireSignature();
+    this.network.globalSlotSinceGenesis.requireBetween(UInt32.from(0), expiry);
     signature
-      .verify(oracle, [
-        ...owner.toFields(),
-        name,
-        fee.value,
-        ...feeMaster.toFields(),
-        ...this.address.toFields(),
-        networkIdHash(),
-      ])
+      .verify(
+        oracle,
+        MintSignatureData.toFields(
+          new MintSignatureData({
+            contract: this.address,
+            owner,
+            name,
+            fee,
+            feeMaster,
+            address,
+            networkIdHash: networkIdHash(),
+            expiry,
+          })
+        )
+      )
       .assertEquals(true);
     this.verificationKeyHash
       .getAndRequireEquals()
       .assertEquals(verificationKey.hash);
-    const ownerUpdate = AccountUpdate.createSigned(owner);
-    ownerUpdate.send({ to: feeMaster, amount: fee });
+    const senderUpdate = AccountUpdate.createSigned(sender);
+    senderUpdate.send({ to: feeMaster, amount: fee });
 
     const tokenId = this.deriveTokenId();
     const update = AccountUpdate.createSigned(address, tokenId);
@@ -269,9 +307,10 @@ export class NameContractV2 extends TokenContract {
     this.emitEvent("mint", {
       name,
       address,
+      owner,
       price,
       metadataParams,
-    });
+    } as MintEvent);
   }
 
   @method async update(params: UpdateParams) {
@@ -293,22 +332,28 @@ export class NameContractV2 extends TokenContract {
   @method async sellWithKYC(
     params: SellParams,
     signature: Signature,
-    expiry: UInt64
+    expiry: UInt32
   ) {
-    // TODO: check expiry date
-    //const timestamp = this.network.timestamp.getAndRequireEquals();
-    //timestamp.assertLessThan(expiry);
+    const oracle = this.oracle.getAndRequireEquals();
+    const sender = this.sender.getAndRequireSignature();
+    this.network.globalSlotSinceGenesis.requireBetween(UInt32.from(0), expiry);
+
     signature
-      .verify(this.oracle.getAndRequireEquals(), [
-        ...this.address.toFields(),
-        ...params.address.toFields(),
-        params.price.value,
-        ...this.sender.getAndRequireSignature().toFields(),
-        expiry.value,
-        networkIdHash(),
-        Field(1),
-      ])
-      .assertTrue();
+      .verify(
+        oracle,
+        KYCSignatureData.toFields(
+          new KYCSignatureData({
+            contract: this.address,
+            address: params.address,
+            price: params.price,
+            kycHolder: sender,
+            networkIdHash: networkIdHash(),
+            expiry,
+            sell: Bool(true),
+          })
+        )
+      )
+      .assertEquals(true);
 
     await this.internalSell(params);
   }
@@ -321,22 +366,25 @@ export class NameContractV2 extends TokenContract {
   @method async buyWithKYC(
     params: BuyParams,
     signature: Signature,
-    expiry: UInt64
+    expiry: UInt32
   ) {
-    // TODO: check expiry date
-    //const timestamp = this.network.timestamp.getAndRequireEquals();
-    //timestamp.assertLessThan(expiry);
+    this.network.globalSlotSinceGenesis.requireBetween(UInt32.from(0), expiry);
     signature
-      .verify(this.oracle.getAndRequireEquals(), [
-        ...this.address.toFields(),
-        ...params.address.toFields(),
-        params.price.value,
-        ...this.sender.getAndRequireSignature().toFields(),
-        expiry.value,
-        networkIdHash(),
-        Field(2),
-      ])
-      .assertTrue();
+      .verify(
+        this.oracle.getAndRequireEquals(),
+        KYCSignatureData.toFields(
+          new KYCSignatureData({
+            contract: this.address,
+            address: params.address,
+            price: params.price,
+            kycHolder: this.sender.getAndRequireSignature(),
+            networkIdHash: networkIdHash(),
+            expiry,
+            sell: Bool(false),
+          })
+        )
+      )
+      .assertEquals(true);
     await this.internalBuy(params);
   }
 

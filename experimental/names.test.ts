@@ -6,6 +6,7 @@ jest.setTimeout(1000 * 60 * 60 * 24); // 24 hour
 const names = [
   "DFST",
   "NFT",
+  "mNFT",
   "NAME",
   "NAMES",
   "MINANFT",
