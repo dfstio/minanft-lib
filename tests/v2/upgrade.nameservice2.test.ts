@@ -62,21 +62,18 @@ describe(`Deploy MinaNFT Name Service contract`, () => {
     if (oraclePrivateKey === undefined) return;
     const names = new MinaNFTNameService({
       oraclePrivateKey,
-      priceLimit: UInt64.from(500_000_000_000),
+      address: PublicKey.fromBase58(MINANFT_NAME_SERVICE_V2),
     });
     const sender = deployer.toPublicKey();
     const deployerBalance = await accountBalanceMina(sender);
     console.log(`sender`, sender.toBase58());
     console.log(`deployer balance: ${deployerBalance}`);
-    const tx = await names.deploy({
+    const result = await names.upgrade({
       deployer,
       privateKey: nameServicePrivateKey,
     });
-    console.log(`tx`, { tx, hash: tx?.hash });
-    expect(tx).toBeDefined();
-    if (tx === undefined) return;
-    Memory.info(`names service deployed`);
-    expect(await MinaNFT.wait(tx)).toBe(true);
+    console.log(`result`, result);
+    Memory.info(`names service upgraded`);
     nameService = names;
     expect(nameService).toBeDefined();
     if (nameService === undefined) return;

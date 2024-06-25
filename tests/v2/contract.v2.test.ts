@@ -174,7 +174,6 @@ describe("Contract V2", () => {
     const signature = getMintSignature({
       oracle: oracle.privateKey,
       contract: zkAppPublicKey,
-      address: nftPublicKey,
       fee,
       feeMaster,
       name,
@@ -194,12 +193,13 @@ describe("Contract V2", () => {
       expiry,
     });
     const tx = await Mina.transaction({ sender: owner.publicKey }, async () => {
-      AccountUpdate.fundNewAccount(owner.publicKey);
+      //AccountUpdate.fundNewAccount(owner.publicKey);
       await zkApp.mint(mintParams);
     });
     tx.sign([nftPrivateKey, owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU  mint: ", tx.transaction.accountUpdates.length);
     console.timeEnd("minted NFT");
   });
 
@@ -238,6 +238,7 @@ describe("Contract V2", () => {
     tx.sign([owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU sell: ", tx.transaction.accountUpdates.length);
     const data = NFTparams.unpack(nft.data.get());
     expect(data.price.toBigInt()).toBe(price.toBigInt());
     expect(data.version.toBigint()).toBe(version.toBigint() + BigInt(1));
@@ -261,6 +262,7 @@ describe("Contract V2", () => {
     tx.sign([owner2.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU buy:", tx.transaction.accountUpdates.length);
     const data = NFTparams.unpack(nft.data.get());
     expect(data.price.toBigInt()).toBe(BigInt(0));
     expect(nft.owner.get().toBase58()).toBe(owner2.publicKey.toBase58());
@@ -395,20 +397,17 @@ describe("Contract V2", () => {
 function getMintSignature(params: {
   oracle: PrivateKey;
   contract: PublicKey;
-  address: PublicKey;
   fee: UInt64;
   feeMaster: PublicKey;
   name: Field;
   owner: PublicKey;
   expiry: UInt32;
 }) {
-  const { oracle, contract, address, fee, feeMaster, owner, name, expiry } =
-    params;
+  const { oracle, contract, fee, feeMaster, owner, name, expiry } = params;
   return Signature.create(
     oracle,
     MintSignatureData.toFields(
       new MintSignatureData({
-        address,
         fee,
         feeMaster,
         name,
