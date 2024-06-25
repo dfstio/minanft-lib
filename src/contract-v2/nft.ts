@@ -248,7 +248,7 @@ export class NameContractV2 extends TokenContract {
     } = params;
     // TODO: add time limit to the signature
     const oracle = this.oracle.getAndRequireEquals();
-    const sender = this.sender.getUnconstrained(); //getAndRequireSignature();
+    const sender = this.sender.getUnconstrained();
     this.network.globalSlotSinceGenesis.requireBetween(UInt32.from(0), expiry);
     signature
       .verify(
@@ -274,8 +274,11 @@ export class NameContractV2 extends TokenContract {
     const update = AccountUpdate.createSigned(address, tokenId);
     update.account.isNew.getAndRequireEquals().assertTrue();
     const senderUpdate = AccountUpdate.createSigned(sender);
+    // AccountUpdate.fundNewAccount(sender);
+    senderUpdate.label = "AccountUpdate.fundNewAccount()";
+    senderUpdate.balance.subInPlace(1_000_000_000);
     senderUpdate.send({ to: feeMaster, amount: fee });
-    AccountUpdate.fundNewAccount(sender);
+
     this.internal.mint({ address: update, amount: 1_000_000_000 });
 
     update.body.update.verificationKey = {
@@ -312,7 +315,7 @@ export class NameContractV2 extends TokenContract {
 
   @method async update(params: UpdateParams) {
     const { address } = params;
-    const sender = this.sender.getAndRequireSignature();
+    const sender = this.sender.getUnconstrained();
     const ownerUpdate = AccountUpdate.createSigned(sender);
     ownerUpdate.send({ to: wallet, amount: UPDATE_FEE });
     const tokenId = this.deriveTokenId();
@@ -323,7 +326,7 @@ export class NameContractV2 extends TokenContract {
 
   @method async sell(params: SellParams) {
     params.price.assertLessThanOrEqual(this.priceLimit.getAndRequireEquals());
-    const sender = this.sender.getAndRequireSignature();
+    const sender = this.sender.getUnconstrained();
     await this.internalSell(params, sender);
   }
 
@@ -333,7 +336,7 @@ export class NameContractV2 extends TokenContract {
     expiry: UInt32
   ) {
     const oracle = this.oracle.getAndRequireEquals();
-    const sender = this.sender.getAndRequireSignature();
+    const sender = this.sender.getUnconstrained();
     this.network.globalSlotSinceGenesis.requireBetween(UInt32.from(0), expiry);
 
     signature
@@ -398,13 +401,14 @@ export class NameContractV2 extends TokenContract {
 
   private async internalBuy(params: BuyParams) {
     const { address, price } = params;
-    const buyer = this.sender.getAndRequireSignature();
+    const buyer = this.sender.getUnconstrained();
+    const buyerUpdate = AccountUpdate.createSigned(buyer);
     const tokenId = this.deriveTokenId();
     const nft = new NFTContractV2(address, tokenId);
     const seller = await nft.buy(price, buyer);
     const commission = price.div(UInt64.from(10));
     const payment = price.sub(commission);
-    const buyerUpdate = AccountUpdate.createSigned(buyer);
+
     buyerUpdate.send({ to: seller, amount: payment });
     buyerUpdate.send({ to: wallet, amount: commission });
     this.emitEvent("buy", params);
@@ -427,7 +431,7 @@ export class NameContractV2 extends TokenContract {
 
   @method async transferNFT(params: TransferParams) {
     const { address, newOwner } = params;
-    const sender = this.sender.getAndRequireSignature();
+    const sender = this.sender.getUnconstrained();
     const ownerUpdate = AccountUpdate.createSigned(sender);
     ownerUpdate.send({ to: wallet, amount: TRANSFER_FEE });
     const tokenId = this.deriveTokenId();

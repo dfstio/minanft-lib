@@ -218,6 +218,7 @@ describe("Contract V2", () => {
     tx.sign([owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU update:", tx.transaction.accountUpdates.length);
 
     console.log("Wallet balance is", await accountBalanceMina(wallet));
     expect(nft.metadataParams.get().metadata.data.toBigInt()).toBe(BigInt(1));
