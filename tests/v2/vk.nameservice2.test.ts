@@ -4,7 +4,7 @@ import { initBlockchain } from "../../src/mina";
 import { blockchain } from "../../src";
 import fs from "fs/promises";
 
-const chain: blockchain = "mainnet" as blockchain;
+const chain: blockchain = "devnet" as blockchain;
 
 describe(`Deploy MinaNFT Name Service contract`, () => {
   it(`should get verification key`, async () => {
@@ -17,6 +17,7 @@ describe(`Deploy MinaNFT Name Service contract`, () => {
       data: verificationKey.data,
       nameHash: vkName.hash.toJSON(),
     };
+    console.log(json);
     await fs.writeFile(
       `./json/vk.${chain}.json`,
       JSON.stringify(json, null, 2)

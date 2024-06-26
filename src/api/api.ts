@@ -98,6 +98,7 @@ export class api {
     price: object;
     isReserved: boolean;
     signature?: string;
+    expiry?: string;
     reason?: string;
   }> {
     const result = await this.apiHub("reserveName", {
@@ -116,6 +117,7 @@ export class api {
       price: price,
       isReserved: reserved.success ?? false,
       signature: reserved.signature,
+      expiry: reserved.expiry,
       reason: reserved.reason ?? reserved.toString(),
     };
   }

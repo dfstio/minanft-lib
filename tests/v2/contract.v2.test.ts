@@ -11,6 +11,9 @@ import {
   Field,
   Encoding,
   Signature,
+  fetchLastBlock,
+  Bool,
+  Poseidon,
 } from "o1js";
 import {
   NameContractV2,
@@ -18,12 +21,14 @@ import {
   NFTparams,
   wallet,
   MetadataParams,
+  KYCSignatureData,
+  MintSignatureData,
+  networkIdHash,
+  MintParams,
+  BuyParams,
+  SellParams,
 } from "../../src/contract-v2/nft";
-import {
-  accountBalanceMina,
-  getNetworkIdHash,
-  initBlockchain,
-} from "../../src/mina";
+import { accountBalanceMina, initBlockchain } from "../../src/mina";
 
 describe("Contract V2", () => {
   let verificationKey: VerificationKey;
@@ -154,36 +159,47 @@ describe("Contract V2", () => {
     console.log("Wallet balance is", await accountBalanceMina(wallet));
   });
 
-  it(`should min NFT`, async () => {
+  it(`should mint NFT`, async () => {
     console.log("Minting NFT...");
     console.time("minted NFT");
     const fee = UInt64.from(10_000_000_000);
     const name = Encoding.stringToFields("digital")[0];
     const feeMaster = wallet;
+    //console.log("Fetching last block...");
+    //const lastBlock = await fetchLastBlock();
+    //console.log("Last block:", lastBlock);
+    const slot = Mina.getNetworkState().globalSlotSinceGenesis;
+    console.log("Slot:", slot.toBigint());
+    const expiry = slot.add(UInt32.from(100));
     const signature = getMintSignature({
       oracle: oracle.privateKey,
-      zkAppPublicKey,
+      contract: zkAppPublicKey,
       fee,
       feeMaster,
       name,
       owner: owner.publicKey,
+      expiry,
+    });
+    const mintParams: MintParams = new MintParams({
+      name,
+      address: nftPublicKey,
+      owner: owner.publicKey,
+      metadataParams: MetadataParams.empty(),
+      verificationKey,
+      fee,
+      feeMaster,
+      signature,
+      price,
+      expiry,
     });
     const tx = await Mina.transaction({ sender: owner.publicKey }, async () => {
-      AccountUpdate.fundNewAccount(owner.publicKey);
-      await zkApp.mint({
-        name,
-        address: nftPublicKey,
-        metadataParams: MetadataParams.empty(),
-        verificationKey,
-        fee,
-        feeMaster,
-        signature,
-        price,
-      });
+      //AccountUpdate.fundNewAccount(owner.publicKey);
+      await zkApp.mint(mintParams);
     });
     tx.sign([nftPrivateKey, owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU  mint: ", tx.transaction.accountUpdates.length);
     console.timeEnd("minted NFT");
   });
 
@@ -202,6 +218,7 @@ describe("Contract V2", () => {
     tx.sign([owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU update:", tx.transaction.accountUpdates.length);
 
     console.log("Wallet balance is", await accountBalanceMina(wallet));
     expect(nft.metadataParams.get().metadata.data.toBigInt()).toBe(BigInt(1));
@@ -222,6 +239,7 @@ describe("Contract V2", () => {
     tx.sign([owner.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU sell: ", tx.transaction.accountUpdates.length);
     const data = NFTparams.unpack(nft.data.get());
     expect(data.price.toBigInt()).toBe(price.toBigInt());
     expect(data.version.toBigint()).toBe(version.toBigint() + BigInt(1));
@@ -245,6 +263,7 @@ describe("Contract V2", () => {
     tx.sign([owner2.privateKey]);
     await tx.prove();
     await tx.send();
+    console.log("AU buy:", tx.transaction.accountUpdates.length);
     const data = NFTparams.unpack(nft.data.get());
     expect(data.price.toBigInt()).toBe(BigInt(0));
     expect(nft.owner.get().toBase58()).toBe(owner2.publicKey.toBase58());
@@ -278,38 +297,37 @@ describe("Contract V2", () => {
     console.log("Wallet balance is", await accountBalanceMina(wallet));
 
     console.log("Selling with KYC...");
-    const expiry = UInt64.from(Date.now() + 1000 * 60 * 60);
-    /*
-    signature
-      .verify(this.oracle.getAndRequireEquals(), [
-        ...this.address.toFields(),
-        ...params.address.toFields(),
-        params.price.value,
-        ...this.sender.getAndRequireSignature().toFields(),
-        expiry.value,
-        getNetworkIdHash(),
-        Field(1),
-      ])
-      .assertTrue();
-    */
-    const fields = [
-      ...zkAppPublicKey.toFields(),
-      ...nftPublicKey.toFields(),
-      kycPrice.value,
-      ...owner.publicKey.toFields(),
-      expiry.value,
-      getNetworkIdHash(),
-      Field(1),
-    ];
-    const signature = Signature.create(oracle.privateKey, fields);
-    expect(signature.verify(oracle.publicKey, fields).toBoolean()).toBe(true);
+    //await fetchLastBlock();
+    const slot = Mina.getNetworkState().globalSlotSinceGenesis;
+    console.log("Sell KYC Slot:", slot.toBigint());
+    const expiry = slot.add(UInt32.from(100));
+    const signatureData: KYCSignatureData = new KYCSignatureData({
+      contract: zkAppPublicKey,
+      address: nftPublicKey,
+      price: kycPrice,
+      kycHolder: owner.publicKey,
+      expiry,
+      networkIdHash: networkIdHash(),
+      sell: Bool(true),
+    });
+    const hash = Poseidon.hash(KYCSignatureData.toFields(signatureData));
+    console.log("test hash", hash.toJSON());
+    const signature = Signature.create(
+      oracle.privateKey,
+      KYCSignatureData.toFields(signatureData)
+    );
+    const ok = signature
+      .verify(oracle.publicKey, KYCSignatureData.toFields(signatureData))
+      .toBoolean();
+    expect(ok).toBe(true);
+    console.log("Signature is ok:", ok);
     const version = NFTparams.unpack(nft.data.get()).version;
     const tx = await Mina.transaction({ sender: owner.publicKey }, async () => {
       await zkApp.sellWithKYC(
         {
           address: nftPublicKey,
           price: kycPrice,
-        },
+        } as SellParams,
         signature,
         expiry
       );
@@ -328,16 +346,28 @@ describe("Contract V2", () => {
     console.log("Wallet balance is", await accountBalanceMina(wallet));
     console.log("Seller balance is", await accountBalanceMina(owner.publicKey));
     console.log("Buyer balance is", await accountBalanceMina(owner4.publicKey));
-    const expiry = UInt64.from(Date.now() + 1000 * 60 * 60);
-    const signature = Signature.create(oracle.privateKey, [
-      ...zkAppPublicKey.toFields(),
-      ...nftPublicKey.toFields(),
-      kycPrice.value,
-      ...owner4.publicKey.toFields(),
-      expiry.value,
-      getNetworkIdHash(),
-      Field(2),
-    ]);
+    //await fetchLastBlock();
+    const slot = Mina.getNetworkState().globalSlotSinceGenesis;
+    console.log("Buy KYC Slot:", slot.toBigint());
+    const expiry = slot.add(UInt32.from(100));
+    const signatureData: KYCSignatureData = new KYCSignatureData({
+      contract: zkAppPublicKey,
+      address: nftPublicKey,
+      price: kycPrice,
+      kycHolder: owner4.publicKey,
+      expiry,
+      networkIdHash: networkIdHash(),
+      sell: Bool(false),
+    });
+    const signature = Signature.create(
+      oracle.privateKey,
+      KYCSignatureData.toFields(signatureData)
+    );
+    expect(
+      signature
+        .verify(oracle.publicKey, KYCSignatureData.toFields(signatureData))
+        .toBoolean()
+    ).toBe(true);
 
     const tx = await Mina.transaction(
       { sender: owner4.publicKey },
@@ -346,7 +376,7 @@ describe("Contract V2", () => {
           {
             address: nftPublicKey,
             price: kycPrice,
-          },
+          } as BuyParams,
           signature,
           expiry
         );
@@ -367,19 +397,26 @@ describe("Contract V2", () => {
 
 function getMintSignature(params: {
   oracle: PrivateKey;
-  zkAppPublicKey: PublicKey;
+  contract: PublicKey;
   fee: UInt64;
   feeMaster: PublicKey;
   name: Field;
   owner: PublicKey;
+  expiry: UInt32;
 }) {
-  const { oracle, zkAppPublicKey, fee, feeMaster, owner, name } = params;
-  return Signature.create(oracle, [
-    ...owner.toFields(),
-    name,
-    fee.value,
-    ...feeMaster.toFields(),
-    ...zkAppPublicKey.toFields(),
-    getNetworkIdHash(),
-  ]);
+  const { oracle, contract, fee, feeMaster, owner, name, expiry } = params;
+  return Signature.create(
+    oracle,
+    MintSignatureData.toFields(
+      new MintSignatureData({
+        fee,
+        feeMaster,
+        name,
+        owner,
+        contract,
+        networkIdHash: networkIdHash(),
+        expiry,
+      })
+    )
+  );
 }
