@@ -47,12 +47,12 @@ class RedactedMinaNFTMapState extends Struct({
   static create(element: MapElement, witness: MerkleMapWitness) {
     /*
     const [originalWitnessRoot, originalWitnessKey] =
-      element.originalWitness.computeRootAndKey(element.value);
+      element.originalWitness.computeRootAndKeyV2(element.value);
     element.originalRoot.assertEquals(originalWitnessRoot);
     originalWitnessKey.assertEquals(element.key);
 
     const [redactedWitnessRoot, redactedWitnessKey] =
-      element.redactedWitness.computeRootAndKey(element.value);
+      element.redactedWitness.computeRootAndKeyV2(element.value);
     element.redactedRoot.assertEquals(redactedWitnessRoot);
     redactedWitnessKey.assertEquals(element.key);
     */

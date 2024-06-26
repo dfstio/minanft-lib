@@ -27,22 +27,22 @@ class RedactedMinaNFTMapState extends Struct({
   ) {
     // TODO: remove comments from key validation after https://github.com/o1-labs/o1js/issues/1552
     const [originalDataWitnessRoot, originalDataWitnessKey] =
-      originalWitness.data.computeRootAndKey(element.value.data);
+      originalWitness.data.computeRootAndKeyV2(element.value.data);
     element.originalRoot.data.assertEquals(originalDataWitnessRoot);
     //originalDataWitnessKey.assertEquals(element.key);
 
     const [originalKindWitnessRoot, originalKindWitnessKey] =
-      originalWitness.kind.computeRootAndKey(element.value.kind);
+      originalWitness.kind.computeRootAndKeyV2(element.value.kind);
     element.originalRoot.kind.assertEquals(originalKindWitnessRoot);
     //originalKindWitnessKey.assertEquals(element.key);
 
     const [redactedDataWitnessRoot, redactedDataWitnessKey] =
-      redactedWitness.data.computeRootAndKey(element.value.data);
+      redactedWitness.data.computeRootAndKeyV2(element.value.data);
     element.redactedRoot.data.assertEquals(redactedDataWitnessRoot);
     //redactedDataWitnessKey.assertEquals(element.key);
 
     const [redactedKindWitnessRoot, redactedKindWitnessKey] =
-      redactedWitness.kind.computeRootAndKey(element.value.kind);
+      redactedWitness.kind.computeRootAndKeyV2(element.value.kind);
     element.redactedRoot.kind.assertEquals(redactedKindWitnessRoot);
     //redactedKindWitnessKey.assertEquals(element.key);
 

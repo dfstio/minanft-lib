@@ -86,13 +86,13 @@ class PassportHolders extends SmartContract {
 
         // check that we have the right merkle path
         const emptyValue = Field(0);
-        let [impliedRoot, impliedKey] = path.computeRootAndKey(emptyValue);
+        let [impliedRoot, impliedKey] = path.computeRootAndKeyV2(emptyValue);
         impliedKey.assertEquals(key);
         let isEmpty = oldRoot.equals(impliedRoot);
 
         // update root with merkle path + new value
         // still works if (key, value) = (0, 0) bc new root is the same as old
-        let [newRoot, _] = path.computeRootAndKey(value);
+        let [newRoot, _] = path.computeRootAndKeyV2(value);
 
         return Provable.if(isEmpty, newRoot, oldRoot);
       },
@@ -120,7 +120,7 @@ class PassportHolders extends SmartContract {
 
     // check merkle map inclusion
     let root = this.passportHoldersRoot.getAndRequireEquals();
-    let [impliedRoot, impliedKey] = witness.computeRootAndKey(value);
+    let [impliedRoot, impliedKey] = witness.computeRootAndKeyV2(value);
     impliedKey.assertEquals(key);
     impliedRoot.assertEquals(root);
 

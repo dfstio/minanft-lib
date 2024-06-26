@@ -25,8 +25,8 @@ describe("Merkle Map", () => {
     const witness2 = map2.getWitness(Field(3));
     const root1 = map1.getRoot();
     const root2 = map2.getRoot();
-    const [root1calc, key1calc] = witness1.computeRootAndKey(Field(5));
-    const [root2calc, key2calc] = witness2.computeRootAndKey(Field(9));
+    const [root1calc, key1calc] = witness1.computeRootAndKeyV2(Field(5));
+    const [root2calc, key2calc] = witness2.computeRootAndKeyV2(Field(9));
     expect(root1calc.toJSON()).toEqual(root1.toJSON());
     expect(root2calc.toJSON()).toEqual(root2.toJSON());
     expect(key1calc.toJSON()).toEqual(Field(3).toJSON());
