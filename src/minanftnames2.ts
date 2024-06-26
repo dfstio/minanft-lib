@@ -158,7 +158,7 @@ class MinaNFTNameServiceV2 {
       this.address = zkAppPublicKey;
       this.tokenId = zkApp.deriveTokenId();
     } else return undefined;
-    const tx1included = await tx1.wait();
+    const tx1included = await tx1.wait({ maxAttempts: 1000 });
     await sleep(10000);
     await fetchMinaAccount({ publicKey: sender });
     await fetchMinaAccount({ publicKey: zkAppPublicKey });
@@ -168,7 +168,7 @@ class MinaNFTNameServiceV2 {
         sender,
         fee: await MinaNFT.fee(),
         memo: "upgrade minanft.io 2/2",
-        nonce: deployNonce + 1,
+        nonce: deployNonce,
       },
       async () => {
         await zkApp.setVerificationKeyHash(verificationKey.hash);
@@ -178,7 +178,7 @@ class MinaNFTNameServiceV2 {
     await transaction2.prove();
     const tx2 = await transaction2.send();
     await MinaNFT.transactionInfo(tx2, "name service upgrade 2/2", false);
-    const tx2included = await tx2.wait();
+    const tx2included = await tx2.wait({ maxAttempts: 1000 });
     return { tx1included, tx2included };
   }
 
