@@ -24,14 +24,14 @@ class BadgeData extends Struct({
 
   static create(badgeDataWitness: BadgeDataWitness) {
     const [dataWitnessRootBefore, dataWitnessKey] =
-      badgeDataWitness.witness.data.computeRootAndKey(
+      badgeDataWitness.witness.data.computeRootAndKeyV2(
         badgeDataWitness.value.data
       );
     badgeDataWitness.root.data.assertEquals(dataWitnessRootBefore);
     //dataWitnessKey.assertEquals(badgeDataWitness.key);
 
     const [kindWitnessRootBefore, kindWitnessKey] =
-      badgeDataWitness.witness.kind.computeRootAndKey(
+      badgeDataWitness.witness.kind.computeRootAndKeyV2(
         badgeDataWitness.value.kind
       );
     badgeDataWitness.root.kind.assertEquals(kindWitnessRootBefore);

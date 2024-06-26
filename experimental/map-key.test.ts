@@ -8,7 +8,7 @@ describe("Map key", () => {
     const value = map.get(key);
     console.log("value", value.toJSON());
     const witness = map.getWitness(key);
-    const [, calculatedKey] = witness.computeRootAndKey(Field(0));
+    const [, calculatedKey] = witness.computeRootAndKeyV2(Field(0));
     console.log("calculatedKey", calculatedKey.toJSON());
     expect(calculatedKey.toJSON()).toEqual(key.toJSON());
   });

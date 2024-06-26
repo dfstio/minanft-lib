@@ -108,7 +108,7 @@ const MapInclusion = ZkProgram({
 
       async method(data: LeafInclusion[], witness: MerkleMapWitness[]) {
         for (let i = 0; i < PROOF_SIZE; i++) {
-          const [root, key] = witness[i].computeRootAndKey(data[i].value);
+          const [root, key] = witness[i].computeRootAndKeyV2(data[i].value);
           data[i].root.assertEquals(root);
           data[i].key.assertEquals(key);
         }

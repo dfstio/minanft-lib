@@ -1283,12 +1283,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.14.8":
-  version: 20.14.8
-  resolution: "@types/node@npm:20.14.8"
+"@types/node@npm:^20.14.9":
+  version: 20.14.9
+  resolution: "@types/node@npm:20.14.9"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/06d4643fa3b179b41fe19f9c75c240278ca1f7a313b3b837bc36ea119499c7ad77f06bbe72694ac04aa91ec77fe747baa09b889f4c435450c1724a26bd55f160
+  checksum: 10c0/911ffa444dc032897f4a23ed580c67903bd38ea1c5ec99b1d00fa10b83537a3adddef8e1f29710cbdd8e556a61407ed008e06537d834e48caf449ce59f87d387
   languageName: node
   linkType: hard
 
@@ -3328,14 +3328,14 @@ __metadata:
     "@jest/globals": "npm:^29.7.0"
     "@types/jest": "npm:^29.5.12"
     "@types/mime": "npm:^3.0.4"
-    "@types/node": "npm:^20.14.8"
+    "@types/node": "npm:^20.14.9"
     arweave: "npm:^1.15.1"
     axios: "npm:^1.7.2"
     form-data: "npm:^4.0.0"
     jest: "npm:^29.7.0"
     jimp: "npm:^0.22.12"
     mime: "npm:^3.0.0"
-    o1js: "npm:^1.3.1"
+    o1js: "npm:^1.4.0"
     ts-jest: "npm:^29.1.5"
     typescript: "npm:5.5.2"
   languageName: unknown
@@ -3555,9 +3555,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"o1js@npm:^1.3.1":
-  version: 1.3.1
-  resolution: "o1js@npm:1.3.1"
+"o1js@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "o1js@npm:1.4.0"
   dependencies:
     blakejs: "npm:1.2.1"
     cachedir: "npm:^2.4.0"
@@ -3567,7 +3567,7 @@ __metadata:
     tslib: "npm:^2.3.0"
   bin:
     snarky-run: src/build/run.js
-  checksum: 10c0/1f6fea04ada32c7574c1097535631f525726305f23b1a9ad7c0eefcb7a6d64ad03732439c3a202a5f10ca60ba18323ffbf5d0148c791d1982c234dfc0455637a
+  checksum: 10c0/5c193005bb73fdb14c9af5ebf8512a850c42bf1c4123932d75a88f31a8962b4fdf01215f191690dd09a13921c8e8332b4684486bc1782e1761cbc38408cf7ee8
   languageName: node
   linkType: hard
 

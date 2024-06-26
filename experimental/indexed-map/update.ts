@@ -75,19 +75,19 @@ class MetadataTransition extends Struct({
 }) {
   static create(update: MetadataUpdate) {
     const [dataWitnessRootBefore, dataWitnessKey] =
-      update.witness.data.computeRootAndKey(update.oldValue.data);
+      update.witness.data.computeRootAndKeyV2(update.oldValue.data);
     update.oldRoot.data.assertEquals(dataWitnessRootBefore);
     dataWitnessKey.assertEquals(update.key);
     const [kindWitnessRootBefore, kindWitnessKey] =
-      update.witness.kind.computeRootAndKey(update.oldValue.kind);
+      update.witness.kind.computeRootAndKeyV2(update.oldValue.kind);
     update.oldRoot.kind.assertEquals(kindWitnessRootBefore);
     kindWitnessKey.assertEquals(update.key);
 
-    const [dataWitnessRootAfter, _] = update.witness.data.computeRootAndKey(
+    const [dataWitnessRootAfter, _] = update.witness.data.computeRootAndKeyV2(
       update.newValue.data
     );
     update.newRoot.data.assertEquals(dataWitnessRootAfter);
-    const [kindWitnessRootAfter, __] = update.witness.kind.computeRootAndKey(
+    const [kindWitnessRootAfter, __] = update.witness.kind.computeRootAndKeyV2(
       update.newValue.kind
     );
     update.newRoot.kind.assertEquals(kindWitnessRootAfter);

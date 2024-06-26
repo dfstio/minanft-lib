@@ -91,7 +91,7 @@ const MapInclusion = ZkProgram({
       privateInputs: [MerkleMapWitness],
 
       async method(data: LeafInclusion, witness: MerkleMapWitness) {
-        const [root, key] = witness.computeRootAndKey(data.value);
+        const [root, key] = witness.computeRootAndKeyV2(data.value);
         data.root.assertEquals(root);
         data.key.assertEquals(key);
       },

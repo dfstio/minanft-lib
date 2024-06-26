@@ -19,7 +19,7 @@ const { MINANFT_NAME_SERVICE_V2, NAMES_ORACLE } = config;
 import { MinaNFTNameServiceV2 as MinaNFTNameService } from "../../src/minanftnames2";
 import { blockchain } from "../../src";
 
-const chain: blockchain = "devnet" as blockchain;
+const chain: blockchain = "mainnet" as blockchain;
 const useLocalBlockchain: boolean = chain === "local";
 
 let deployer: PrivateKey | undefined = undefined;
