@@ -552,8 +552,8 @@ class MinaNFT extends BaseMinaNFT {
    * @returns current Mina network fee
    */
   public static async fee(): Promise<UInt64> {
-    //TODO: update after mainnet launch
-    return UInt64.fromJSON(MINAFEE);
+    if (Mina.getNetworkId() === "mainnet") return UInt64.from(MINAFEE);
+    else return UInt64.from(MINAFEE * 2);
   }
 
   /**
