@@ -5,7 +5,7 @@ import config from "../config";
 import { MinaNFTCommitData } from "../update";
 import { blockchain } from "../networks";
 import { PublicKey } from "o1js";
-const { MINNFTAPIAUTH, MINNFTAPI } = config;
+const { MINANFT_API_AUTH, MINANFT_API } = config;
 
 /**
  * API class for interacting with the serverless api
@@ -22,7 +22,7 @@ export class api {
    */
   constructor(jwt: string) {
     this.jwt = jwt;
-    this.endpoint = MINNFTAPI;
+    this.endpoint = MINANFT_API;
   }
 
   /**
@@ -394,7 +394,7 @@ export class api {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<{ success: boolean; data?: any; error?: any }> {
     const apiData = {
-      auth: MINNFTAPIAUTH,
+      auth: MINANFT_API_AUTH,
       command: command,
       jwtToken: this.jwt,
       data: data,

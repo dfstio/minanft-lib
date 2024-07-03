@@ -1,8 +1,8 @@
 const config = {
-  MINAFEE: "100000000",
-  MINNFTAPIAUTH:
+  MINAFEE: 100_000_000,
+  MINANFT_API_AUTH:
     "AkRjS8yioA7i1CwvB3nOvcyLYh6sNMi4em7C0ybmYy67lhDC2KxEQtm1z45llEAR",
-  MINNFTAPI: "https://n1zjzclr99.execute-api.eu-west-1.amazonaws.com/dev/api",
+  MINANFT_API: "https://n1zjzclr99.execute-api.eu-west-1.amazonaws.com/dev/api",
   CONTRACT_DEPLOYER: "B62qiTrtDyWmDFMQvUDRUdWVsVwNFhUV4rkPVgeANi4adKhrUwfdNFT",
   NAMES_ORACLE: "B62qids6rU9iqjvBV4DHxW8z67mgHFws1rPmFoqpcyRq2arYxUw6sZu",
   MINANFT_NAME_SERVICE:
