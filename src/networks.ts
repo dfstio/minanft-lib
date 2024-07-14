@@ -68,12 +68,12 @@ const Berkeley: MinaNetwork = {
 
 const Devnet: MinaNetwork = {
   mina: [
-    "https://proxy.devnet.minaexplorer.com/graphql",
-    //"https://api.minascan.io/node/devnet/v1/graphql",
+    //"https://proxy.devnet.minaexplorer.com/graphql",
+    "https://api.minascan.io/node/devnet/v1/graphql",
   ],
   archive: [
-    //"https://api.minascan.io/archive/devnet/v1/graphql",
-    "https://archive.devnet.minaexplorer.com",
+    "https://api.minascan.io/archive/devnet/v1/graphql",
+    //"https://archive.devnet.minaexplorer.com",
   ],
   explorerAccountUrl: "https://minascan.io/devnet/account/",
   explorerTransactionUrl: "https://minascan.io/devnet/tx/",
